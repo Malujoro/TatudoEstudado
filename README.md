@@ -7,6 +7,91 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+# TáTudoEstudado
+
+## Como rodar a aplicação (desenvolvimento)
+
+### Requisitos
+
+- PHP **8.2+** e Composer
+- Node.js **18+** e npm
+- Docker + Docker Compose (recomendado para o Postgres/pgAdmin)
+
+### 1) Subir o banco (Postgres + pgAdmin)
+
+Na raiz do projeto:
+
+```bash
+docker compose up -d
+```
+
+Isso sobe:
+
+- Postgres em `localhost:5432`
+- pgAdmin em `http://localhost:5050`
+	- e-mail: `tatudoestudado@gmail.com`
+	- senha: `admin`
+
+No pgAdmin, ao criar a conexão com o servidor Postgres:
+
+- **Host name/address**: `postgres`
+- **Port**: `5432`
+- **Username**: `tatudoestudado_user`
+- **Password**: `tatudoestudado_password`
+
+### 2) Configurar o `.env` e gerar a chave
+
+Crie o arquivo `.env` a partir do exemplo:
+
+```bash
+cp .env.example .env
+```
+
+Edite o `.env` para usar Postgres (valores compatíveis com o `docker-compose.yml`):
+
+```dotenv
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=tatudoestudado_db
+DB_USERNAME=tatudoestudado_user
+DB_PASSWORD=tatudoestudado_password
+```
+
+Gere o `APP_KEY`:
+
+```bash
+php artisan key:generate
+```
+
+### 3) Instalar dependências e rodar migrations
+
+```bash
+composer install
+npm install
+php artisan migrate
+```
+
+
+### 4) Rodar o projeto
+
+Opção A (recomendada): tudo junto (server + queue + vite):
+
+```bash
+composer run dev
+```
+
+A aplicação fica disponível em `http://localhost:8000` (quando usando `php artisan serve`).
+
+## Comandos úteis
+
+- Setup automatizado (assumindo `.env` pronto e banco acessível): `composer run setup`
+- Resetar o banco (apaga todas as tabelas e recria): `php artisan migrate:fresh`
+- Resetar o banco e popular dados (seed): `php artisan migrate:fresh --seed`
+- Reaplicar migrations (rollback + migrate): `php artisan migrate:refresh`
+- Rodar testes: `composer test`
+- Build do front (produção): `npm run build`
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
