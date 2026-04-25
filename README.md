@@ -1,12 +1,10 @@
 <img width="4000" height="800" alt="Image" src="https://github.com/user-attachments/assets/5c23eff5-a6d5-400d-8a69-05a91d13c86f" />
 
-# TaTudoEstudado
-
-## Descrição do Projeto
+# Descrição do Projeto
 
 O TatuDoEstudado é um sistema de organização de estudos desenvolvido com o objetivo de ajudar estudantes a planejarem, acompanharem e otimizarem sua rotina de aprendizado. A plataforma oferece um cronograma automatizado baseado na disponibilidade do usuário, promovendo maior eficiência e constância nos estudos.
 
-## Problemática
+# Problemática
 
 A falta de planejamento estruturado impacta diretamente no rendimento acadêmico e muitos estudantes enfrentam dificuldades para:
 
@@ -16,7 +14,7 @@ A falta de planejamento estruturado impacta diretamente no rendimento acadêmico
 - Evitar procrastinação e distrações
 - Acompanhar seu próprio desempenho
 
-## Solução Proposta
+# Solução Proposta
 
 O sistema propõe:
 
@@ -26,7 +24,7 @@ O sistema propõe:
 - Reorganização dinâmica da rotina
 - Registro e acompanhamento de erros (caderno de erros)
 
-## Tecnologias Utilizadas
+# Tecnologias Utilizadas
 
 O sistema segue o padrão MVC (Model-View-Controller) utilizando:
 
@@ -37,15 +35,15 @@ O sistema segue o padrão MVC (Model-View-Controller) utilizando:
 - Containerização: Docker
 - Prototipação: Figma
 
-## Como rodar o projeto (desenvolvimento)
+# Como rodar o projeto (desenvolvimento)
 
-### Requisitos
+## Requisitos
 
 - PHP **8.2+** e Composer
 - Node.js **18+** e npm
 - Docker + Docker Compose (recomendado para o PostgreSQL/pgAdmin)
 
-### 1) Subir o banco (PostgreSQL + pgAdmin)
+## 1) Subir o banco (PostgreSQL + pgAdmin)
 
 Na raiz do projeto:
 
@@ -67,7 +65,7 @@ No pgAdmin, ao criar a conexão com o servidor PostgreSQL (dentro do Docker):
 - **Username**: `tatudoestudado_user`
 - **Password**: `tatudoestudado_password`
 
-### 2) Configurar `.env` e gerar a chave
+## 2) Configurar `.env`, instalar as dependências e gerar a chave
 
 ```bash
 cp .env.example .env
@@ -84,21 +82,26 @@ DB_USERNAME=tatudoestudado_user
 DB_PASSWORD=tatudoestudado_password
 ```
 
+Instalar dependências:
+```bash
+composer install
+npm install
+```
+
 Gere o `APP_KEY`:
 
 ```bash
 php artisan key:generate
 ```
 
-### 3) Instalar dependências e criar as tabelas
+
+## 3) criar as tabelas
 
 ```bash
-composer install
-npm install
 php artisan migrate
 ```
 
-### 4) Rodar a aplicação
+## 4) Rodar a aplicação
 
 Opção A (recomendada): tudo junto (server + queue + vite):
 
@@ -118,7 +121,7 @@ npm run dev
 
 A aplicação fica disponível em `http://localhost:8000`.
 
-### Comandos úteis
+## Comandos úteis
 
 - Setup automatizado (assumindo `.env` pronto e banco acessível): `composer run setup`
 - Resetar o banco (apaga todas as tabelas e recria): `php artisan migrate:fresh`
@@ -127,6 +130,6 @@ A aplicação fica disponível em `http://localhost:8000`.
 - Rodar testes: `composer test`
 - Build do front (produção): `npm run build`
 
-## Licença
+# Licença
 
 Este projeto está licenciado sob a Licença MIT.
