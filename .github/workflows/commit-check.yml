@@ -1,8 +1,8 @@
-name: Lint Commit Messages
+name: CI Shield
 on: [pull_request]
 
 jobs:
-  check-commit:
+  check-everything:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -10,5 +10,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          coverage: none
+
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
       - name: Check Commit Standard
-        uses: wagoid/commitlint-github-action@v5
+        uses: wagoid/commitlint-github-action@v6
+
+      - name: Run Laravel Pint (Formatting Check)
+        run: ./vendor/bin/pint --test
