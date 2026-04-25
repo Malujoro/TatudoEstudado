@@ -1,7 +1,21 @@
-
 services:
+  app:
+    build: .
+    container_name: tatudoestudado_app
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+      - /var/www/vendor
+      - /var/www/node_modules
+    ports:
+      - "8000:8000"
+      - "5173:5173"
+    depends_on:
+      - postgres
+
   postgres:
     image: 'postgres:latest'
+    container_name: tatudoestudado_db
     environment:
       - 'POSTGRES_DB=tatudoestudado_db'
       - 'POSTGRES_PASSWORD=tatudoestudado_password'
@@ -11,6 +25,7 @@ services:
 
   pgadmin:
     image: 'dpage/pgadmin4:latest'
+    container_name: tatudoestudado_pgadmin
     environment:
       - 'PGADMIN_DEFAULT_EMAIL=tatudoestudado@gmail.com'
       - 'PGADMIN_DEFAULT_PASSWORD=admin'
