@@ -46,8 +46,8 @@ setup: build
 
 # Comando para rodar Laravel + Vite dentro do Docker
 dev:
-	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) npm run dev -- --host &
-	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) php artisan serve --host=0.0.0.0 --port=8000
+	$(DOCKER_COMPOSE) exec -T $(APP_CONTAINER) npm run dev -- --host &
+	$(DOCKER_COMPOSE) exec -T $(APP_CONTAINER) php artisan serve --host=0.0.0.0 --port=8000
 
 # Atalho para artisan genérico
 artisan:
