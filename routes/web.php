@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -48,4 +49,5 @@ Route::middleware('auth')
     ->name('api.')
     ->group(function () {
         Route::apiResource('users', UserController::class);
+        Route::apiResource('materias', MateriaController::class);
     });
