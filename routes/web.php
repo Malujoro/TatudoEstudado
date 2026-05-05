@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AssuntoController;
+use App\Http\Controllers\CadernoController;
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -52,4 +53,5 @@ Route::middleware('auth')
         Route::apiResource('users', UserController::class);
         Route::apiResource('materias', MateriaController::class);
         Route::apiResource('assuntos', AssuntoController::class);
+        Route::apiResource('cadernos', CadernoController::class);
     });
