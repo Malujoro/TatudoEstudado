@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AssuntoController;
 use App\Http\Controllers\CadernoController;
 use App\Http\Controllers\MateriaController;
+use App\Http\Controllers\MetricaController;
+use App\Http\Controllers\SessaoEstudoController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -54,4 +56,7 @@ Route::middleware('auth')
         Route::apiResource('materias', MateriaController::class);
         Route::apiResource('assuntos', AssuntoController::class);
         Route::apiResource('cadernos', CadernoController::class);
+        Route::apiResource('metricas', MetricaController::class);
+        Route::apiResource('sessoes-estudo', SessaoEstudoController::class)
+            ->parameters(['sessoes-estudo' => 'sessaoEstudo']);
     });
