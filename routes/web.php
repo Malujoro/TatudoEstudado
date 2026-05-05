@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     if (auth()->check()) {
-        return view('welcome');
+        return view('home');
     }
 
     return redirect()->route('login');
