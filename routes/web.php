@@ -9,7 +9,7 @@ Route::get('/', function () {
     }
 
     return redirect()->route('login');
-});
+})->name('home');
 
 Route::get('/login', [AuthController::class, 'showLogin'])
     ->name('login')
@@ -30,3 +30,7 @@ Route::post('/register', [AuthController::class, 'register'])
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
+
+Route::get('/materias', function () {
+    return view('materias.index');
+})->name('materias.index')->middleware('auth');
