@@ -30,3 +30,13 @@ Route::post('/register', [AuthController::class, 'register'])
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
+
+// Recuperação de senha:
+Route::view('/forgot-password', 'auth.forgot-password')->name('password.request');
+
+Route::view('/reset-password', 'auth.reset-password')->name('password.reset');
+
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+// ###

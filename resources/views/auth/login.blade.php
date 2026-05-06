@@ -66,7 +66,7 @@
                                         </svg>
                                     </span>
                                 </div>
-                                <a href="#" class="mt-2 block text-xs text-[#6C4A8F] hover:text-[#553574]">Esqueci minha senha</a>
+                                <a href="{{ route('password.request') }}" class="mt-2 block text-xs text-[#6C4A8F] hover:text-[#553574]">Esqueci minha senha</a>
                             </div>
 
                             <button
