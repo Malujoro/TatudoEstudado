@@ -15,7 +15,7 @@ Route::get('/', function () {
     }
 
     return redirect()->route('login');
-});
+})->name('home');
 
 Route::get('/login', [AuthController::class, 'showLogin'])
     ->name('login')
@@ -37,6 +37,13 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
 
+Route::get('/materias', function () {
+    return view('materias.index');
+})->name('materias.index')->middleware('auth');
+
+Route::get('/assuntos', function () {
+    return view('assuntos.index');
+})->name('assuntos.index')->middleware('auth');
 /*
 |--------------------------------------------------------------------------
 | API (JSON) - Exemplo de CRUD
