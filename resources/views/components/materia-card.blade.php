@@ -2,7 +2,9 @@
 
 <div class="bg-[#A084C3] rounded-[20px] p-6 pb-4 flex flex-col justify-between min-h-[170px] text-[#1F1F1F] shadow-sm">
     <div>
-        <h2 class="text-[28px] font-bold tracking-wide leading-tight">{{ $nome }}</h2>
+        <a href="{{ route('assuntos.index') }}" class="hover:underline transition-all">
+            <h2 class="text-[28px] font-bold tracking-wide leading-tight">{{ $nome }}</h2>
+        </a>
         <p class="text-sm font-medium mt-1 opacity-90">{{ $assuntos }}</p>
     </div>
     <div class="flex justify-end gap-2 mt-4">

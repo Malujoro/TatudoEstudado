@@ -34,3 +34,7 @@ Route::post('/logout', [AuthController::class, 'logout'])
 Route::get('/materias', function () {
     return view('materias.index');
 })->name('materias.index')->middleware('auth');
+
+Route::get('/assuntos', function () {
+    return view('assuntos.index');
+})->name('assuntos.index')->middleware('auth');
