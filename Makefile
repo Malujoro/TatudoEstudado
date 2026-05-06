@@ -37,7 +37,7 @@ wait:
 
 # Setup inicial dentro do Docker
 setup: build
-	cp --update=none .env.example .env || true
+	test -f .env || cp .env.example .env
 	$(MAKE) wait
 	${MAKE} install
 	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) php artisan key:generate
