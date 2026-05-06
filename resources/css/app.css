@@ -14,7 +14,7 @@
     --font-poppins: 'Poppins', ui-sans-serif, system-ui, sans-serif;
     /* Cores Main */
     --color-main-dark: #1F1F1F;
-    --color-main-light: #E6E6E6;
+    --color-main-light: #F1E8FA;
     --color-main-paper: #F6F4F1;
 
     /* Cores Purple */
@@ -26,7 +26,7 @@
     --color-purple-dark: #6C4A8F;
     --color-purple-deep: #553574;
     --color-purple-night: #3E2F4D;
-    --color-purple-twilight: #4C3D5F
+    --color-purple-twilight: #4C3D5F;
 
     /* Cores Secondary */
     --color-secondary-green: #9FA089;
