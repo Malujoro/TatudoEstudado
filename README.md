@@ -48,21 +48,21 @@ O sistema segue o padrão MVC (Model-View-Controller) utilizando:
 ## 1) Setup inicial (primeira execução)
 
 Na raiz do projeto:
-
 ```bash
 make setup
 ```
 
-Configuração do banco de dados (editando o `.env` para usar PostgreSQL):
-
-```dotenv
-DB_CONNECTION=pgsql
-DB_HOST=postgres
-DB_PORT=5432
-DB_DATABASE=tatudoestudado_db
-DB_USERNAME=tatudoestudado_user
-DB_PASSWORD=tatudoestudado_password
-```
+> [!TIP]
+> Caso o comando `make setup` falhe, você pode configurar o ambiente manualmente criando (copiando) o arquivo `.env` a partir do exemplo.
+> Para alterar a configuração do banco de dados, edite (no .env)
+> ```dotenv
+> DB_CONNECTION=pgsql
+> DB_HOST=postgres
+> DB_PORT=5432
+> DB_DATABASE=tatudoestudado_db
+> DB_USERNAME=tatudoestudado_user
+> DB_PASSWORD=tatudoestudado_password
+> ```
 
 ## 2) Rodar a aplicação
 
