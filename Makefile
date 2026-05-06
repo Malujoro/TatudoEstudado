@@ -1,7 +1,7 @@
 DOCKER_COMPOSE = docker compose
 APP_CONTAINER = app
 
-.PHONY: up build stop down destroy install setup dev migrate fresh lint
+.PHONY: up build stop down destroy install setup dev artisan composer migrate fresh lint shell
 
 # Sobe os containers e inicia o servidor
 up:
@@ -53,6 +53,10 @@ dev:
 artisan:
 	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) php artisan $(cmd)
 
+# Atalho para composer genérico
+composer:
+	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) composer $(cmd)
+
 # Atalhos para comandos artisan
 migrate:
 	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) php artisan migrate
@@ -62,3 +66,7 @@ fresh:
 
 lint:
 	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) ./vendor/bin/pint
+
+# Abre o terminal dentro do container
+shell:
+	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) bash

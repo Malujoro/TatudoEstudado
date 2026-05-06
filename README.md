@@ -97,6 +97,7 @@ No pgAdmin, ao criar a conexão com o servidor PostgreSQL (dentro do Docker):
 | `make down`    | Remove os containers                      |
 | `make destroy` | Remove containers e volumes (reset total) |
 | `make build`   | Sobe os containers com rebuild            |
+| `make shell`   | Entra no terminal (bash) do container     |
 
 ---
 
@@ -126,17 +127,23 @@ No pgAdmin, ao criar a conexão com o servidor PostgreSQL (dentro do Docker):
 
 ---
 
-### Artisan
+### Artisan & Composer
 
-| Comando                  | Descrição                        |
-| ------------------------ | -------------------------------- |
-| `make artisan cmd="..."` | Executa qualquer comando artisan |
+| Comando                   | Descrição                         |
+| ------------------------  | --------------------------------  |
+| `make artisan cmd="..."`  | Executa qualquer comando artisan  |
+| `make composer cmd="..."` | Executa qualquer comando composer |
 
 Exemplos:
 
 ```bash
+# Artisan
 make artisan cmd="migrate:status"
 make artisan cmd="make:model User -m"
+
+# Composer
+make composer cmd="require laravel/telescope"
+make composer cmd="update"
 ```
 
 ---
