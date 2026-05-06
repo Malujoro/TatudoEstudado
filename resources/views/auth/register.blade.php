@@ -15,9 +15,7 @@
             <div class="w-full max-w-6xl grid gap-6 lg:gap-0 lg:grid-cols-[1.4fr_1.05fr]">
                 <section class="bg-[#B9BBA2] rounded-[28px] lg:rounded-r-none p-10 sm:p-12 flex flex-col items-center justify-center text-center text-[#2C2C2C]">
                     <div class="w-full max-w-md">
-                        <div class="mx-auto mb-6 w-52">
-                            <img src="{{ Vite::asset('resources/assets/logo.png') }}" alt="Logo Tatu do Estudado" class="w-full" />
-                        </div>
+                        <x-logo class="mb-6 w-52" />
                         <h2 class="text-3xl font-bold tracking-wide">TATU<span class="text-[#7B6AA7]">DO</span>ESTUDADO</h2>
                         <p class="mt-3 text-sm font-semibold text-[#F6F4F1]">
                             COM A GENTE VOCÊ PODE FICAR TRANQUILO
@@ -104,18 +102,9 @@
                                 </div>
                             </div>
 
-                            <button
-                                type="submit"
-                                class="group inline-flex items-center justify-between gap-4 rounded-full bg-[#B195D4] px-6 py-3 text-sm font-semibold text-[#2F233B] shadow-[0_12px_30px_rgba(98,72,132,0.25)] hover:bg-[#A486CF] transition"
-                            >
-                                <span>Registrar</span>
-                                <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/70 text-[#6C4A8F] group-hover:bg-white">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5 12h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                                        <path d="M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </span>
-                            </button>
+                            <x-button>
+                                Registrar
+                            </x-button>
 
                             <div class="flex items-center gap-4 text-xs text-[#8B7AA0]">
                                 <span class="h-px flex-1 bg-[#C7B7DD]"></span>
