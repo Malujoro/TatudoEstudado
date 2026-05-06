@@ -6,8 +6,8 @@ use App\Models\Assunto;
 use App\Models\Materia;
 use App\Models\SessaoEstudo;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class SessaoEstudoCrudTest extends TestCase

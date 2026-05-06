@@ -21,8 +21,6 @@ class UserController extends Controller
      *
      * Query params suportados:
      * - `per_page` (int): quantidade por página (default: 15)
-     *
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -39,8 +37,6 @@ class UserController extends Controller
 
     /**
      * Exibe um usuário específico.
-     *
-     * @return JsonResponse
      */
     public function show(User $user): JsonResponse
     {
@@ -51,9 +47,6 @@ class UserController extends Controller
 
     /**
      * Cria um novo usuário.
-     *
-     *
-     * @return JsonResponse
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
@@ -71,9 +64,6 @@ class UserController extends Controller
 
     /**
      * Atualiza um usuário existente.
-     *
-     *
-     * @return JsonResponse
      */
     public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
@@ -93,8 +83,6 @@ class UserController extends Controller
 
     /**
      * Remove um usuário.
-     *
-     * @return JsonResponse
      */
     public function destroy(User $user): JsonResponse
     {

@@ -6,8 +6,8 @@ use App\Models\Assunto;
 use App\Models\Materia;
 use App\Models\Metrica;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class MetricaCrudTest extends TestCase

@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AssuntoController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CadernoController;
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\MetricaController;
