@@ -31,75 +31,41 @@
 
                         <form class="mt-10 space-y-5" method="POST" action="{{ route('register.store') }}">
                             @csrf
-                            @if ($errors->any())
-                                <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
-                                    <ul class="list-disc space-y-1 pl-4">
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif
+
+                            <x-validation-errors />
+
                             <div>
                                 <label for="name" class="sr-only">Nome</label>
-                                <input
-                                    id="name"
-                                    name="name"
-                                    type="text"
-                                    placeholder="Nome"
-                                    value="{{ old('name') }}"
-                                    class="w-full rounded-full border border-[#3E2F4D] bg-white/80 px-4 py-3 text-sm text-[#4C3D5F] placeholder:text-[#8B7AA0] focus:outline-none focus:ring-2 focus:ring-[#A78AC9]"
-                                />
+                                <x-input id="name" name="name" type="text" placeholder="Nome" value="{{ old('name') }}" />
                             </div>
 
                             <div>
                                 <label for="email" class="sr-only">Email</label>
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    placeholder="Email"
-                                    value="{{ old('email') }}"
-                                    class="w-full rounded-full border border-[#3E2F4D] bg-white/80 px-4 py-3 text-sm text-[#4C3D5F] placeholder:text-[#8B7AA0] focus:outline-none focus:ring-2 focus:ring-[#A78AC9]"
-                                />
+                                <x-input id="email" name="email" type="email" placeholder="Email" value="{{ old('email') }}" />
                             </div>
 
                             <div>
                                 <label for="password" class="sr-only">Senha</label>
-                                <div class="relative">
-                                    <input
-                                        id="password"
-                                        name="password"
-                                        type="password"
-                                        placeholder="Senha"
-                                        class="w-full rounded-full border border-[#3E2F4D] bg-white/80 px-4 py-3 text-sm text-[#4C3D5F] placeholder:text-[#8B7AA0] focus:outline-none focus:ring-2 focus:ring-[#A78AC9]"
-                                    />
-                                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#A78AC9]">
+                                <x-input id="password" name="password" type="password" placeholder="Senha">
+                                    <x-slot name="icon">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M3 12c2.7-4.2 5.7-6.3 9-6.3s6.3 2.1 9 6.3c-2.7 4.2-5.7 6.3-9 6.3S5.7 16.2 3 12Z" stroke="currentColor" stroke-width="1.6"/>
                                             <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
                                         </svg>
-                                    </span>
-                                </div>
+                                    </x-slot>
+                                </x-input>
                             </div>
 
                             <div>
                                 <label for="password_confirmation" class="sr-only">Confirmar a senha</label>
-                                <div class="relative">
-                                    <input
-                                        id="password_confirmation"
-                                        name="password_confirmation"
-                                        type="password"
-                                        placeholder="Confirmar a senha"
-                                        class="w-full rounded-full border border-[#3E2F4D] bg-white/80 px-4 py-3 text-sm text-[#4C3D5F] placeholder:text-[#8B7AA0] focus:outline-none focus:ring-2 focus:ring-[#A78AC9]"
-                                    />
-                                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#A78AC9]">
+                                <x-input id="password_confirmation" name="password_confirmation" type="password" placeholder="Confirmar a senha">
+                                    <x-slot name="icon">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M3 12c2.7-4.2 5.7-6.3 9-6.3s6.3 2.1 9 6.3c-2.7 4.2-5.7 6.3-9 6.3S5.7 16.2 3 12Z" stroke="currentColor" stroke-width="1.6"/>
                                             <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
                                         </svg>
-                                    </span>
-                                </div>
+                                    </x-slot>
+                                </x-input>
                             </div>
 
                             <x-button>

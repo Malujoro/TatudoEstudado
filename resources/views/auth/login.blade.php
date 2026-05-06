@@ -20,52 +20,31 @@
 
                         <form class="mt-10 space-y-5" method="POST" action="{{ route('login.store') }}">
                             @csrf
-                            @if ($errors->any())
-                                <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
-                                    <ul class="list-disc space-y-1 pl-4">
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif
+
+                            <x-validation-errors />
+
                             <div>
                                 <label for="email" class="sr-only">Email</label>
-                                <div class="relative">
-                                    <input
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        placeholder="Email"
-                                        value="{{ old('email') }}"
-                                        class="w-full rounded-full border border-[#3E2F4D] bg-white/80 px-4 py-3 text-sm text-[#4C3D5F] placeholder:text-[#8B7AA0] focus:outline-none focus:ring-2 focus:ring-[#A78AC9]"
-                                    />
-                                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#A78AC9]">
+                                <x-input id="email" name="email" type="email" placeholder="Email" value="{{ old('email') }}">
+                                    <x-slot name="icon">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5Z" stroke="currentColor" stroke-width="1.6"/>
                                             <path d="M4 20c0-3.314 3.582-6 8-6s8 2.686 8 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
                                         </svg>
-                                    </span>
-                                </div>
+                                    </x-slot>
+                                </x-input>
                             </div>
 
                             <div>
                                 <label for="password" class="sr-only">Senha</label>
-                                <div class="relative">
-                                    <input
-                                        id="password"
-                                        name="password"
-                                        type="password"
-                                        placeholder="Senha"
-                                        class="w-full rounded-full border border-[#3E2F4D] bg-white/80 px-4 py-3 text-sm text-[#4C3D5F] placeholder:text-[#8B7AA0] focus:outline-none focus:ring-2 focus:ring-[#A78AC9]"
-                                    />
-                                    <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#A78AC9]">
+                                <x-input id="password" name="password" type="password" placeholder="Senha">
+                                    <x-slot name="icon">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M3 12c2.7-4.2 5.7-6.3 9-6.3s6.3 2.1 9 6.3c-2.7 4.2-5.7 6.3-9 6.3S5.7 16.2 3 12Z" stroke="currentColor" stroke-width="1.6"/>
                                             <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
                                         </svg>
-                                    </span>
-                                </div>
+                                    </x-slot>
+                                </x-input>
                                 <a href="#" class="mt-2 block text-xs text-[#6C4A8F] hover:text-[#553574]">Esqueci minha senha</a>
                             </div>
 
