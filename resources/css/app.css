@@ -12,6 +12,26 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
     --font-rem: 'REM', ui-sans-serif, system-ui, sans-serif;
     --font-poppins: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    /* Cores Main */
+    --color-main-dark: #1F1F1F;
+    --color-main-light: #E6E6E6;
+    --color-main-paper: #F6F4F1;
+
+    /* Cores Purple */
+    --color-purple-lightest: #F0E6FA;
+    --color-purple-light: #BEA2E0;
+    --color-purple: #A084C3;
+    --color-purple-dim: #7B6AA7;
+    --color-purple-muted: #7C6A90;
+    --color-purple-dark: #6C4A8F;
+    --color-purple-deep: #553574;
+    --color-purple-night: #3E2F4D;
+    --color-purple-twilight: #4C3D5F
+
+    /* Cores Secondary */
+    --color-secondary-green: #9FA089;
+    --color-secondary-blue: #6BC5D2;
+    --color-secondary-red: #D77979;
 }
 
 @layer utilities {

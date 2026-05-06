@@ -2,10 +2,10 @@
 
 @php
     $config = match ($tipo) {
-        'teoria' => ['class' => 'bg-[#B195D4] text-[#2F233B]', 'label' => 'Teoria'],
-        'exercicio' => ['class' => 'bg-[#6BC5D2] text-[#114650]', 'label' => 'Exercício'],
-        'revisao' => ['class' => 'bg-[#D77979] text-[#4E1D1D]', 'label' => 'Revisão'],
-        default => ['class' => 'bg-[#B195D4] text-[#2F233B]', 'label' => $slot],
+        'teoria' => ['class' => 'bg-purple-light text-main-dark', 'label' => 'Teoria'],
+        'exercicio' => ['class' => 'bg-secondary-blue text-main-dark', 'label' => 'Exercício'],
+        'revisao' => ['class' => 'bg-secondary-red text-main-dark', 'label' => 'Revisão'],
+        default => ['class' => 'bg-purple-light text-main-dark', 'label' => $slot],
     };
 @endphp
 

@@ -9,8 +9,8 @@
             <!-- Botão: Adicionar Matéria -->
             <x-button id="btnOpenAddModal">
                 Adicionar Matéria
-                <div class="bg-[#F0E6FA] rounded-full p-1 flex items-center justify-center">
-                    <x-icons.plus class="text-[#BEA2E0]" />
+                <div class="bg-purple-lightest rounded-full p-1 flex items-center justify-center">
+                    <x-icons.plus class="text-purple-light" />
                 </div>
             </x-button>
 

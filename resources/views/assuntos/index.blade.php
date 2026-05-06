@@ -9,8 +9,8 @@
             <!-- Botão: Adicionar Assunto -->
             <x-button id="btnOpenAddAssuntoModal">
                 Adicionar Assunto
-                <div class="bg-[#F0E6FA] rounded-full p-1 flex items-center justify-center">
-                    <x-icons.plus class="text-[#BEA2E0]" />
+                <div class="bg-purple-lightest rounded-full p-1 flex items-center justify-center">
+                    <x-icons.plus class="text-purple-light" />
                 </div>
             </x-button>
 
@@ -20,15 +20,15 @@
             <!-- Select da Matéria Atual -->
             <div class="relative w-full sm:w-auto min-w-50">
                 <select
-                    class="w-full appearance-none bg-[#BEA2E0] text-[#1F1F1F] px-5 py-2.5 rounded-full outline-none focus:ring-2 focus:ring-[#9E82C0] font-semibold text-[18px] pr-12 cursor-pointer">
+                    class="w-full appearance-none bg-purple-light text-main-dark px-5 py-2.5 rounded-full outline-none focus:ring-2 focus:ring-purple font-semibold text-[18px] pr-12 cursor-pointer">
                     <option value="geologia" selected>Geologia</option>
                     <option value="mineracao">Mineração</option>
                     <option value="biologia">Biologia</option>
                 </select>
                 <div
-                    class="absolute right-3 top-1/2 -translate-y-1/2 bg-[#F0E6FA] rounded-full p-1 flex items-center justify-center pointer-events-none">
+                    class="absolute right-3 top-1/2 -translate-y-1/2 bg-purple-lightest rounded-full p-1 flex items-center justify-center pointer-events-none">
 
-                    <x-icons.chevron-down class="text-[#BEA2E0]" />
+                    <x-icons.chevron-down class="text-purple-light" />
                 </div>
             </div>
         </div>
