@@ -5,9 +5,23 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 
+/**
+ * Model de usuário.
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property float $horas_por_dia
+ * @property string $role
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -49,7 +63,10 @@ class User extends Authenticatable
         ];
     }
 
-    public function materias()
+    /**
+     * Matérias cadastradas pelo usuário.
+     */
+    public function materias(): HasMany
     {
         return $this->hasMany(Materia::class);
     }
