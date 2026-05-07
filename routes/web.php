@@ -37,6 +37,15 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
 
+// Recuperação de senha:
+Route::view('/forgot-password', 'auth.forgot-password')->name('password.request');
+
+Route::view('/reset-password', 'auth.reset-password')->name('password.reset');
+
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+// ###
 Route::get('/materias', function () {
     return view('materias.index');
 })->name('materias.index')->middleware('auth');
