@@ -22,7 +22,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             @foreach ($materias as $materia)
                 <div class="materia-card-wrapper" data-nome="{{ strtolower($materia->nome) }}" data-id="{{ $materia->id }}">
-                    <x-materia-card :nome="$materia->nome" :id="$materia->id" assuntos="0" />
+                    <x-materia-card :nome="$materia->nome" :id="$materia->id" :quantidade="$materia->assuntos_count" />
                 </div>
             @endforeach
         </div>

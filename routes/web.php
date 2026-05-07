@@ -53,7 +53,7 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::middleware('auth')->group(function () {
     Route::get('/materias', function (Request $request) {
         // Carrega todas as matérias do usuário
-        $materias = Materia::where('user_id', $request->user()->id)->orderBy('nome')->get();
+        $materias = Materia::where('user_id', $request->user()->id)->withCount('assuntos')->orderBy('nome')->get();
 
         return view('materias.index', compact('materias'));
     })->name('materias.index');
