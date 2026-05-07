@@ -7,6 +7,9 @@ use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\MetricaController;
 use App\Http\Controllers\SessaoEstudoController;
 use App\Http\Controllers\UserController;
+use App\Models\Assunto;
+use App\Models\Materia;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -46,13 +49,23 @@ Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 // ###
-Route::get('/materias', function () {
-    return view('materias.index');
-})->name('materias.index')->middleware('auth');
 
-Route::get('/assuntos', function () {
-    return view('assuntos.index');
-})->name('assuntos.index')->middleware('auth');
+Route::middleware('auth')->group(function () {
+    Route::get('/materias', function (Request $request) {
+        // Carrega todas as matérias do usuário
+        $materias = Materia::where('user_id', $request->user()->id)->withCount('assuntos')->orderBy('nome')->get();
+
+        return view('materias.index', compact('materias'));
+    })->name('materias.index');
+
+    Route::get('/assuntos', function (Request $request) {
+        // Carrega as matérias e seus respectivos assuntos
+        $materias = Materia::where('user_id', $request->user()->id)->orderBy('nome')->get();
+        $assuntos = Assunto::whereIn('materia_id', $materias->pluck('id'))->with('materia')->orderBy('nome')->get();
+
+        return view('assuntos.index', compact('materias', 'assuntos'));
+    })->name('assuntos.index');
+});
 /*
 |--------------------------------------------------------------------------
 | API (JSON) - Exemplo de CRUD

@@ -1,4 +1,4 @@
-@props(['nome'])
+@props(['nome', 'id' => null])
 
 
 <div
@@ -19,12 +19,12 @@
                 <x-icons.document class="text-main-dark/60 hover:text-main-dark" />
             </button>
             <!-- Ícone de Edição -->
-            <button class="hover:opacity-70 transition-opacity">
-                <x-icons.edit class="text-main-dark/60 hover:text-main-dark" />
+            <button class="hover:opacity-70 transition-opacity btn-edit-assunto">
+                <x-icons.edit class="text-main-dark/60 hover:text-main-dark pointer-events-none" />
             </button>
             <!-- Ícone de Lixeira -->
-            <button class="hover:opacity-70 transition-opacity">
-                <x-icons.trash class="text-main-dark/60 hover:text-main-dark" />
+            <button class="hover:opacity-70 transition-opacity btn-delete-assunto">
+                <x-icons.trash class="text-main-dark/60 hover:text-main-dark pointer-events-none" />
             </button>
         </div>
     </div>
