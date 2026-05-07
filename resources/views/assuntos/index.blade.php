@@ -19,11 +19,14 @@
 
             <!-- Select da Matéria Atual -->
             <div class="relative w-full sm:w-auto min-w-50">
-                <select
+                @php
+                    $selectedMateriaId = request('materia_id');
+                @endphp
+                <select id="materiaSelect"
                     class="w-full appearance-none bg-purple-light text-main-dark px-5 py-2.5 rounded-full outline-none focus:ring-2 focus:ring-purple font-semibold text-[18px] pr-12 cursor-pointer">
-                    <option value="geologia" selected>Geologia</option>
-                    <option value="mineracao">Mineração</option>
-                    <option value="biologia">Biologia</option>
+                    @foreach ($materias as $materia)
+                        <option value="{{ $materia->id }}" @selected($materia->id == $selectedMateriaId)>{{ $materia->nome }}</option>
+                    @endforeach
                 </select>
                 <div
                     class="absolute right-3 top-1/2 -translate-y-1/2 bg-purple-lightest rounded-full p-1 flex items-center justify-center pointer-events-none">
@@ -35,9 +38,12 @@
 
         <!-- Grid de Cards dos Assuntos -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <x-assunto-card nome="Escavação II" />
-            <x-assunto-card nome="Criação de Paleotocas" />
-            <x-assunto-card nome="Reviramento de Solo" />
+            @foreach ($assuntos as $assunto)
+                <div class="assunto-card-wrapper" data-nome="{{ strtolower($assunto->nome) }}"
+                    data-materia-id="{{ $assunto->materia_id }}" data-id="{{ $assunto->id }}">
+                    <x-assunto-card :nome="$assunto->nome" :id="$assunto->id" />
+                </div>
+            @endforeach
         </div>
     </div>
 
@@ -47,12 +53,117 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const modal = document.getElementById('modalAdicionarAssunto');
-            const toggleModal = () => modal.classList.toggle('hidden');
+            const form = document.getElementById('formAdicionarAssunto');
+            const searchInput = document.querySelector('.mb-8 input') || document.querySelector(
+                'input[type="search"]');
+            const materiaSelect = document.getElementById('materiaSelect');
+
+            const toggleModal = () => {
+                modal.classList.toggle('hidden');
+                // Preenche o campo oculto na inicialização com a matéria visível
+                if (!modal.classList.contains('hidden') && materiaSelect) {
+                    document.getElementById('hiddenMateriaId').value = materiaSelect.value;
+                }
+            };
 
             document.getElementById('btnOpenAddAssuntoModal')?.addEventListener('click', toggleModal);
             document.getElementById('btnCancelarAssunto')?.addEventListener('click', toggleModal);
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) toggleModal();
+            });
+
+            // 1. Filtro Local Integrado (Pesquisa + Dropdown de Matéria)
+            function filterAssuntos() {
+                const term = searchInput ? searchInput.value.toLowerCase() : '';
+                const materiaId = materiaSelect ? materiaSelect.value : '';
+
+                document.querySelectorAll('.assunto-card-wrapper').forEach(card => {
+                    const matchesNome = (card.dataset.nome || '').includes(term);
+                    const matchesMateria = !materiaId || card.dataset.materiaId === materiaId;
+
+                    card.style.display = (matchesNome && matchesMateria) ? 'block' : 'none';
+                });
+            }
+            if (searchInput) searchInput.addEventListener('input', filterAssuntos);
+            if (materiaSelect) materiaSelect.addEventListener('change', filterAssuntos);
+
+            filterAssuntos(); // Oculta itens de outras matérias que não sejam a padrão na hora que carrega a tela
+
+            // 2. Adicionar Assunto consumindo a API
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(form);
+                    try {
+                        const response = await fetch('/api/assuntos', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]')?.getAttribute('content')
+                            },
+                            body: JSON.stringify(Object.fromEntries(formData))
+                        });
+                        if (response.ok) window.location.reload();
+                    } catch (error) {
+                        console.error("Erro ao adicionar:", error);
+                    }
+                });
+            }
+
+            // 3. Editar Assunto
+            document.querySelectorAll('.btn-edit-assunto').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const wrapper = e.target.closest('.assunto-card-wrapper');
+                    const id = wrapper.dataset.id;
+                    const currentName = wrapper.querySelector('h2').innerText;
+                    const novoNome = prompt("Editar nome do assunto:", currentName);
+                    if (novoNome && novoNome.trim() !== "" && novoNome !== currentName) {
+                        try {
+                            const materiaId = wrapper.dataset
+                            .materiaId; // Pega o ID da Matéria mãe
+                            const response = await fetch(`/api/assuntos/${id}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector(
+                                        'meta[name="csrf-token"]')?.getAttribute(
+                                        'content')
+                                },
+                                body: JSON.stringify({
+                                    nome: novoNome,
+                                    materia_id: materiaId
+                                })
+                            });
+                            if (response.ok) window.location.reload();
+                        } catch (error) {
+                            console.error("Erro ao editar:", error);
+                        }
+                    }
+                });
+            });
+
+            // 4. Deletar Assunto
+            document.querySelectorAll('.btn-delete-assunto').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    if (!confirm("Tem certeza que deseja excluir este assunto?")) return;
+                    const id = e.target.closest('.assunto-card-wrapper').dataset.id;
+                    try {
+                        const response = await fetch(`/api/assuntos/${id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]')?.getAttribute(
+                                    'content')
+                            }
+                        });
+                        if (response.ok) window.location.reload();
+                    } catch (error) {
+                        console.error("Erro ao excluir:", error);
+                    }
+                });
             });
         });
     </script>

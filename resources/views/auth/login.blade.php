@@ -56,7 +56,7 @@
                                     </svg>
                                 </x-slot>
                             </x-input>
-                            <a href="#" class="mt-2 block text-xs text-purple-dark hover:text-purple-deep">Esqueci
+                            <a href="{{ route('password.request') }}" class="mt-2 block text-xs text-purple-dark hover:text-purple-deep">Esqueci
                                 minha senha</a>
                         </div>
 
