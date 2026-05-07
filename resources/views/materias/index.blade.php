@@ -32,22 +32,34 @@
     <x-modals.adicionar-materia />
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const btnAdicionar = document.getElementById('btnOpenAddModal');
+        (function() {
             const modal = document.getElementById('modalAdicionarMateria');
+            if (!modal) return; // Evita erros caso o modal não exista no DOM
+
+            const btnAdicionar = document.getElementById('btnOpenAddModal');
             const btnCancelar = document.getElementById('btnCancelarMateria');
             const form = document.getElementById('formAdicionarMateria');
             const searchInput = document.querySelector('.mb-8 input') || document.querySelector(
                 'input[type="search"]');
+            const modalTitle = modal.querySelector('h2');
 
-            const toggleModal = () => modal.classList.toggle('hidden');
+            let currentMateriaId = null;
 
-            if (btnAdicionar) btnAdicionar.addEventListener('click', toggleModal);
-            if (btnCancelar) btnCancelar.addEventListener('click', toggleModal);
+            const openModal = (id = null, nome = '') => {
+                currentMateriaId = id;
+                modalTitle.innerText = id ? 'Editar Matéria' : 'Adicionar Matéria';
+                form.elements['nome'].value = nome;
+                modal.classList.remove('hidden');
+            };
+
+            const closeModal = () => modal.classList.add('hidden');
+
+            if (btnAdicionar) btnAdicionar.addEventListener('click', () => openModal());
+            if (btnCancelar) btnCancelar.addEventListener('click', closeModal);
 
             // Fechar ao clicar fora da caixa principal do modal
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) toggleModal();
+                if (e.target === modal) closeModal();
             });
 
             // 1. Pesquisa Local
@@ -61,13 +73,17 @@
                 });
             }
 
-            // 2. Adicionar Matéria consumindo a API
+            // 2 & 3. Salvar Matéria (Adição e Edição via API)
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const formData = new FormData(form);
+                const isEditing = !!currentMateriaId;
+                const url = isEditing ? `/api/materias/${currentMateriaId}` : '/api/materias';
+                const method = isEditing ? 'PUT' : 'POST';
+
                 try {
-                    const response = await fetch('/api/materias', {
-                        method: 'POST',
+                    const response = await fetch(url, {
+                        method: method,
                         headers: {
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
@@ -77,8 +93,12 @@
                         body: JSON.stringify(Object.fromEntries(formData))
                     });
                     if (response.ok) {
-                        window.location
-                            .reload(); // Recarrega a página para atualizar a listagem com a nova matéria
+                        closeModal();
+                        typeof Turbo !== 'undefined' ?
+                            Turbo.visit(window.location.href, {
+                                action: "replace"
+                            }) :
+                            window.location.reload();
                     } else {
                         const errorData = await response.json();
                         console.error("Erro retornado pela API:", errorData);
@@ -89,33 +109,13 @@
                 }
             });
 
-            // 3. Editar Matéria
+            // Abrir edição
             document.querySelectorAll('.btn-edit-materia').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
+                btn.addEventListener('click', (e) => {
                     const wrapper = e.target.closest('.materia-card-wrapper');
                     const id = wrapper.dataset.id;
                     const currentName = wrapper.querySelector('h2').innerText;
-                    const novoNome = prompt("Editar nome da matéria:", currentName);
-                    if (novoNome && novoNome.trim() !== "" && novoNome !== currentName) {
-                        try {
-                            const response = await fetch(`/api/materias/${id}`, {
-                                method: 'PUT',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Accept': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector(
-                                        'meta[name="csrf-token"]')?.getAttribute(
-                                        'content')
-                                },
-                                body: JSON.stringify({
-                                    nome: novoNome
-                                })
-                            });
-                            if (response.ok) window.location.reload();
-                        } catch (error) {
-                            console.error("Erro ao editar:", error);
-                        }
-                    }
+                    openModal(id, currentName);
                 });
             });
 
@@ -135,12 +135,15 @@
                                     'content')
                             }
                         });
-                        if (response.ok) window.location.reload();
+                        if (response.ok) typeof Turbo !== 'undefined' ? Turbo.visit(window
+                            .location.href, {
+                                action: "replace"
+                            }) : window.location.reload();
                     } catch (error) {
                         console.error("Erro ao excluir:", error);
                     }
                 });
             });
-        });
+        })();
     </script>
 @endsection

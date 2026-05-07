@@ -51,25 +51,43 @@
     <x-modals.adicionar-assunto />
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        (function() {
             const modal = document.getElementById('modalAdicionarAssunto');
+            if (!modal) return; // Evita erros se o modal não existir na visualização
+
             const form = document.getElementById('formAdicionarAssunto');
             const searchInput = document.querySelector('.mb-8 input') || document.querySelector(
                 'input[type="search"]');
             const materiaSelect = document.getElementById('materiaSelect');
+            const btnAdicionar = document.getElementById('btnOpenAddAssuntoModal');
+            const btnCancelar = document.getElementById('btnCancelarAssunto');
+            const modalTitle = modal.querySelector('h2');
 
-            const toggleModal = () => {
-                modal.classList.toggle('hidden');
-                // Preenche o campo oculto na inicialização com a matéria visível
-                if (!modal.classList.contains('hidden') && materiaSelect) {
-                    document.getElementById('hiddenMateriaId').value = materiaSelect.value;
+            let currentAssuntoId = null;
+
+            const openModal = (id = null, nome = '', materiaId = null) => {
+                currentAssuntoId = id;
+                if (id) {
+                    modalTitle.innerText = 'Editar Assunto';
+                    form.elements['nome'].value = nome;
+                    document.getElementById('hiddenMateriaId').value = materiaId;
+                } else {
+                    modalTitle.innerText = 'Adicionar Assunto';
+                    form.elements['nome'].value = '';
+                    if (materiaSelect) {
+                        document.getElementById('hiddenMateriaId').value = materiaSelect.value;
+                    }
                 }
+                modal.classList.remove('hidden');
             };
 
-            document.getElementById('btnOpenAddAssuntoModal')?.addEventListener('click', toggleModal);
-            document.getElementById('btnCancelarAssunto')?.addEventListener('click', toggleModal);
+            const closeModal = () => modal.classList.add('hidden');
+
+            if (btnAdicionar) btnAdicionar.addEventListener('click', () => openModal());
+            if (btnCancelar) btnCancelar.addEventListener('click', closeModal);
+
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) toggleModal();
+                if (e.target === modal) closeModal();
             });
 
             // 1. Filtro Local Integrado (Pesquisa + Dropdown de Matéria)
@@ -89,14 +107,18 @@
 
             filterAssuntos(); // Oculta itens de outras matérias que não sejam a padrão na hora que carrega a tela
 
-            // 2. Adicionar Assunto consumindo a API
+            // 2 & 3. Salvar Assunto (Adição e Edição via API)
             if (form) {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const formData = new FormData(form);
+                    const isEditing = !!currentAssuntoId;
+                    const url = isEditing ? `/api/assuntos/${currentAssuntoId}` : '/api/assuntos';
+                    const method = isEditing ? 'PUT' : 'POST';
+
                     try {
-                        const response = await fetch('/api/assuntos', {
-                            method: 'POST',
+                        const response = await fetch(url, {
+                            method: method,
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Accept': 'application/json',
@@ -105,43 +127,26 @@
                             },
                             body: JSON.stringify(Object.fromEntries(formData))
                         });
-                        if (response.ok) window.location.reload();
+                        if (response.ok) {
+                            closeModal();
+                            typeof Turbo !== 'undefined' ? Turbo.visit(window.location.href, {
+                                action: "replace"
+                            }) : window.location.reload();
+                        }
                     } catch (error) {
-                        console.error("Erro ao adicionar:", error);
+                        console.error("Erro ao salvar:", error);
                     }
                 });
             }
 
-            // 3. Editar Assunto
+            // Abrir edição
             document.querySelectorAll('.btn-edit-assunto').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
+                btn.addEventListener('click', (e) => {
                     const wrapper = e.target.closest('.assunto-card-wrapper');
                     const id = wrapper.dataset.id;
+                    const materiaId = wrapper.dataset.materiaId;
                     const currentName = wrapper.querySelector('h2').innerText;
-                    const novoNome = prompt("Editar nome do assunto:", currentName);
-                    if (novoNome && novoNome.trim() !== "" && novoNome !== currentName) {
-                        try {
-                            const materiaId = wrapper.dataset
-                            .materiaId; // Pega o ID da Matéria mãe
-                            const response = await fetch(`/api/assuntos/${id}`, {
-                                method: 'PUT',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Accept': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector(
-                                        'meta[name="csrf-token"]')?.getAttribute(
-                                        'content')
-                                },
-                                body: JSON.stringify({
-                                    nome: novoNome,
-                                    materia_id: materiaId
-                                })
-                            });
-                            if (response.ok) window.location.reload();
-                        } catch (error) {
-                            console.error("Erro ao editar:", error);
-                        }
-                    }
+                    openModal(id, currentName, materiaId);
                 });
             });
 
@@ -159,12 +164,15 @@
                                     'content')
                             }
                         });
-                        if (response.ok) window.location.reload();
+                        if (response.ok) typeof Turbo !== 'undefined' ? Turbo.visit(window
+                            .location.href, {
+                                action: "replace"
+                            }) : window.location.reload();
                     } catch (error) {
                         console.error("Erro ao excluir:", error);
                     }
                 });
             });
-        });
+        })();
     </script>
 @endsection
