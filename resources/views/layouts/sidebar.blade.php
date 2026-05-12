@@ -54,9 +54,10 @@
             <div class="px-6 py-5 border-t border-secondary-green">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="font-poppins text-[20px] font-medium leading-none text-main-dark">
+                        <a href="{{ route('profile') }}"
+                            class="font-poppins text-[20px] font-medium leading-none text-main-dark hover:underline">
                             {{ auth()->user()->name ?? 'Usuário' }}
-                        </p>
+                        </a>
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
