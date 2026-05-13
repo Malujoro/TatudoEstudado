@@ -65,6 +65,24 @@ Route::middleware('auth')->group(function () {
 
         return view('assuntos.index', compact('materias', 'assuntos'));
     })->name('assuntos.index');
+
+    Route::get('/perfil', function (Request $request) {
+        $user = $request->user();
+        // Carrega as matérias com a contagem de assuntos
+        $materias = Materia::where('user_id', $user->id)->withCount('assuntos')->orderBy('nome')->get();
+
+        return view('profile', compact('user', 'materias'));
+    })->name('profile');
+
+    Route::post('/perfil', function (Request $request) {
+        $data = $request->validate([
+            'horas_por_dia' => ['required', 'numeric', 'min:0', 'max:24'],
+        ]);
+
+        $request->user()->update($data);
+
+        return back()->with('status', 'Disponibilidade atualizada!');
+    })->name('profile.update');
 });
 /*
 |--------------------------------------------------------------------------
