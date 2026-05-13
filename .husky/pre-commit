@@ -1,1 +1,1 @@
-vendor/bin/pint
+docker compose exec -T app ./vendor/bin/pint
