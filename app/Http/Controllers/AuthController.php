@@ -50,8 +50,16 @@ class AuthController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'horas_por_dia' => 0,
             'role' => 'user',
+            'horario_semanal' => [
+                'domingo' => 0,
+                'segunda' => 0,
+                'terca' => 0,
+                'quarta' => 0,
+                'quinta' => 0,
+                'sexta' => 0,
+                'sabado' => 0,
+            ],
         ]);
 
         Auth::login($user);

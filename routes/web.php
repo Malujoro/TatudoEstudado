@@ -76,7 +76,14 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/perfil', function (Request $request) {
         $data = $request->validate([
-            'horas_por_dia' => ['required', 'numeric', 'min:0', 'max:24'],
+            'horario_semanal' => ['required', 'array'],
+            'horario_semanal.domingo' => ['required', 'numeric', 'min:0', 'max:24'],
+            'horario_semanal.segunda' => ['required', 'numeric', 'min:0', 'max:24'],
+            'horario_semanal.terca' => ['required', 'numeric', 'min:0', 'max:24'],
+            'horario_semanal.quarta' => ['required', 'numeric', 'min:0', 'max:24'],
+            'horario_semanal.quinta' => ['required', 'numeric', 'min:0', 'max:24'],
+            'horario_semanal.sexta' => ['required', 'numeric', 'min:0', 'max:24'],
+            'horario_semanal.sabado' => ['required', 'numeric', 'min:0', 'max:24'],
         ]);
 
         $request->user()->update($data);
