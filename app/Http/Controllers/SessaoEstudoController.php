@@ -6,8 +6,10 @@ use App\Http\Requests\StoreSessaoEstudoRequest;
 use App\Http\Requests\UpdateSessaoEstudoRequest;
 use App\Models\Assunto;
 use App\Models\SessaoEstudo;
+use App\Services\CronogramaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 /**
  * CRUD de sessões de estudo.
@@ -101,6 +103,24 @@ class SessaoEstudoController extends Controller
         $sessaoEstudo->delete();
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * Gera o cronograma de estudo para os próximos 15 dias.
+     */
+    public function gerarCronograma(Request $request, CronogramaService $cronogramaService): JsonResponse
+    {
+        $inicio = $request->query('inicio');
+        $limpar = $request->boolean('limpar', true);
+
+        $resultado = $cronogramaService->gerar(
+            $request->user(),
+            $inicio ? Carbon::parse($inicio) : null,
+            15,
+            $limpar
+        );
+
+        return response()->json($resultado, 201);
     }
 
     /**

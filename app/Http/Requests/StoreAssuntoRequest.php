@@ -27,6 +27,7 @@ class StoreAssuntoRequest extends FormRequest
         return [
             'nome' => ['required', 'string', 'max:255'],
             'materia_id' => ['required', 'uuid', 'exists:materias,id'],
+            'teoria_finalizada' => ['sometimes', 'boolean'],
         ];
     }
 }

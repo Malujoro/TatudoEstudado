@@ -9,12 +9,54 @@ use App\Http\Controllers\SessaoEstudoController;
 use App\Http\Controllers\UserController;
 use App\Models\Assunto;
 use App\Models\Materia;
+use App\Models\SessaoEstudo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     if (auth()->check()) {
-        return view('home');
+        $user = auth()->user();
+        $inicio = Carbon::today();
+        $fim = $inicio->copy()->addDays(14);
+
+        $sessoes = SessaoEstudo::query()
+            ->whereHas('assunto.materia', fn ($q) => $q->where('user_id', $user->id))
+            ->whereBetween('data', [$inicio->toDateString(), $fim->toDateString()])
+            ->with([
+                'assunto:id,nome,materia_id',
+                'assunto.materia:id,nome',
+            ])
+            ->orderBy('data')
+            ->orderBy('created_at')
+            ->get();
+
+        $sessoesPorDia = $sessoes->groupBy(fn ($sessao) => $sessao->data->toDateString());
+
+        $diaLabels = [
+            0 => 'Domingo',
+            1 => 'Segunda',
+            2 => 'Terça',
+            3 => 'Quarta',
+            4 => 'Quinta',
+            5 => 'Sexta',
+            6 => 'Sábado',
+        ];
+
+        $dias = collect(range(0, 14))->map(function ($offset) use ($inicio, $sessoesPorDia, $diaLabels) {
+            $data = $inicio->copy()->addDays($offset);
+            $key = $data->toDateString();
+
+            return [
+                'data' => $key,
+                'label' => $diaLabels[$data->dayOfWeek] ?? $data->isoFormat('dddd'),
+                'sessoes' => $sessoesPorDia->get($key, collect()),
+            ];
+        });
+
+        return view('home', [
+            'dias' => $dias,
+        ]);
     }
 
     return redirect()->route('login');
@@ -111,6 +153,8 @@ Route::middleware('auth')
         Route::apiResource('assuntos', AssuntoController::class);
         Route::apiResource('cadernos', CadernoController::class);
         Route::apiResource('metricas', MetricaController::class);
+        Route::post('cronograma/gerar', [SessaoEstudoController::class, 'gerarCronograma'])
+            ->name('cronograma.gerar');
         Route::apiResource('sessoes-estudo', SessaoEstudoController::class)
             ->parameters(['sessoes-estudo' => 'sessaoEstudo']);
     });
