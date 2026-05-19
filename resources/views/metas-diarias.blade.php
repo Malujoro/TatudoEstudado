@@ -112,15 +112,15 @@
         @endif
     </div>
 
-    <div class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50" data-modal-caderno>
-        <div class="w-full max-w-xl rounded-3xl bg-white p-6">
+    <div class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-3" data-modal-caderno>
+        <div class="flex h-[94vh] w-full max-w-6xl flex-col rounded-3xl bg-white p-6">
             <div class="flex items-center justify-between">
                 <h3 class="font-rem text-lg font-semibold text-purple-night">Caderno de erros</h3>
                 <button type="button" class="text-purple-night" data-close-modal-caderno>✕</button>
             </div>
             <textarea
-                class="mt-4 w-full rounded-2xl border border-purple-dim/50 bg-white px-4 py-3 text-sm text-purple-night"
-                rows="6" data-caderno-texto></textarea>
+                class="mt-4 min-h-0 flex-1 w-full rounded-2xl border border-purple-dim/50 bg-white px-4 py-3 text-sm text-purple-night"
+                data-caderno-texto></textarea>
             <div class="mt-4 flex justify-end gap-2">
                 <button type="button"
                     class="rounded-full border border-purple-dim px-4 py-2 text-xs font-semibold text-purple-dim hover:bg-purple-dim hover:text-white transition"
