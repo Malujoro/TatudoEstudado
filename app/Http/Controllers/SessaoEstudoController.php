@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSessaoEstudoRequest;
 use App\Http\Requests\UpdateSessaoEstudoRequest;
 use App\Models\Assunto;
+use App\Models\Metrica;
 use App\Models\SessaoEstudo;
 use App\Services\CronogramaService;
 use Illuminate\Http\JsonResponse;
@@ -121,6 +122,60 @@ class SessaoEstudoController extends Controller
         );
 
         return response()->json($resultado, 201);
+    }
+
+    /**
+     * Finaliza uma sessão de estudo e atualiza métricas (quando aplicável).
+     */
+    public function finalizar(Request $request, SessaoEstudo $sessaoEstudo): JsonResponse
+    {
+        $this->ensureOwnership($request, $sessaoEstudo);
+
+        $data = $request->validate([
+            'questoes' => ['sometimes', 'integer', 'min:0'],
+            'acertos' => ['sometimes', 'integer', 'min:0'],
+        ]);
+
+        if ($sessaoEstudo->finalizado) {
+            return response()->json(
+                $sessaoEstudo->only(['id', 'data', 'tipo', 'horas', 'finalizado', 'assunto_id', 'created_at', 'updated_at'])
+            );
+        }
+
+        if ($sessaoEstudo->tipo === 'exercicio') {
+            $questoes = $data['questoes'] ?? null;
+            $acertos = $data['acertos'] ?? null;
+
+            if ($questoes === null || $acertos === null) {
+                return response()->json([
+                    'message' => 'Informe a quantidade de questões e acertos.',
+                ], 422);
+            }
+
+            if ($acertos > $questoes) {
+                return response()->json([
+                    'message' => 'Acertos não podem ser maiores que questões.',
+                ], 422);
+            }
+
+            $erros = $questoes - $acertos;
+
+            $metrica = Metrica::firstOrCreate(
+                ['assunto_id' => $sessaoEstudo->assunto_id],
+                ['acertos' => 0, 'erros' => 0]
+            );
+
+            $metrica->acertos += $acertos;
+            $metrica->erros += $erros;
+            $metrica->save();
+        }
+
+        $sessaoEstudo->finalizado = true;
+        $sessaoEstudo->save();
+
+        return response()->json(
+            $sessaoEstudo->only(['id', 'data', 'tipo', 'horas', 'finalizado', 'assunto_id', 'created_at', 'updated_at'])
+        );
     }
 
     /**

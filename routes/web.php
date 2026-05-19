@@ -14,24 +14,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+Route::get('/', function (Request $request) {
     if (auth()->check()) {
-        $user = auth()->user();
-        $inicio = Carbon::today();
-        $fim = $inicio->copy()->addDays(14);
+        $user = $request->user();
+        $weekOffset = (int) $request->query('week', 0);
+        $inicioSemana = Carbon::today()->startOfWeek(Carbon::SUNDAY)->addWeeks($weekOffset);
+        $fimSemana = $inicioSemana->copy()->addDays(6);
 
-        $sessoes = SessaoEstudo::query()
+        $sessoesSemana = SessaoEstudo::query()
             ->whereHas('assunto.materia', fn ($q) => $q->where('user_id', $user->id))
-            ->whereBetween('data', [$inicio->toDateString(), $fim->toDateString()])
+            ->whereBetween('data', [$inicioSemana->toDateString(), $fimSemana->toDateString()])
             ->with([
                 'assunto:id,nome,materia_id',
                 'assunto.materia:id,nome',
+                'assunto.metrica:id,assunto_id,acertos,erros',
+                'assunto.caderno:id,assunto_id,conteudo',
             ])
             ->orderBy('data')
             ->orderBy('created_at')
             ->get();
 
-        $sessoesPorDia = $sessoes->groupBy(fn ($sessao) => $sessao->data->toDateString());
+        $sessoesPorDia = $sessoesSemana->groupBy(fn ($sessao) => $sessao->data->toDateString());
 
         $diaLabels = [
             0 => 'Domingo',
@@ -43,8 +46,8 @@ Route::get('/', function () {
             6 => 'Sábado',
         ];
 
-        $dias = collect(range(0, 14))->map(function ($offset) use ($inicio, $sessoesPorDia, $diaLabels) {
-            $data = $inicio->copy()->addDays($offset);
+        $dias = collect(range(0, 6))->map(function ($offset) use ($inicioSemana, $sessoesPorDia, $diaLabels) {
+            $data = $inicioSemana->copy()->addDays($offset);
             $key = $data->toDateString();
 
             return [
@@ -56,11 +59,63 @@ Route::get('/', function () {
 
         return view('home', [
             'dias' => $dias,
+            'weekOffset' => $weekOffset,
+            'inicioSemana' => $inicioSemana,
+            'fimSemana' => $fimSemana,
         ]);
     }
 
     return redirect()->route('login');
 })->name('home');
+
+Route::get('/metas-diarias', function (Request $request) {
+    if (auth()->check()) {
+        $user = $request->user();
+
+        $pendentes = SessaoEstudo::query()
+            ->whereHas('assunto.materia', fn ($q) => $q->where('user_id', $user->id))
+            ->whereDate('data', '<=', Carbon::today()->toDateString())
+            ->where('finalizado', false)
+            ->with([
+                'assunto:id,nome,materia_id',
+                'assunto.materia:id,nome',
+                'assunto.metrica:id,assunto_id,acertos,erros',
+                'assunto.caderno:id,assunto_id,conteudo',
+            ])
+            ->orderBy('data')
+            ->orderBy('created_at')
+            ->get();
+
+        $diaLabels = [
+            0 => 'Domingo',
+            1 => 'Segunda',
+            2 => 'Terça',
+            3 => 'Quarta',
+            4 => 'Quinta',
+            5 => 'Sexta',
+            6 => 'Sábado',
+        ];
+
+        $pendentesPorDia = $pendentes->groupBy(fn ($sessao) => $sessao->data->toDateString());
+
+        $diasPendentes = $pendentesPorDia->map(function ($sessoes, $data) use ($diaLabels) {
+            $carbon = Carbon::parse($data);
+
+            return [
+                'data' => $data,
+                'label' => $diaLabels[$carbon->dayOfWeek] ?? $carbon->isoFormat('dddd'),
+                'atrasada' => $carbon->isBefore(Carbon::today()),
+                'sessoes' => $sessoes,
+            ];
+        })->values();
+
+        return view('metas-diarias', [
+            'diasPendentes' => $diasPendentes,
+        ]);
+    }
+
+    return redirect()->route('login');
+})->name('metas.diarias');
 
 Route::get('/login', [AuthController::class, 'showLogin'])
     ->name('login')
@@ -155,6 +210,8 @@ Route::middleware('auth')
         Route::apiResource('metricas', MetricaController::class);
         Route::post('cronograma/gerar', [SessaoEstudoController::class, 'gerarCronograma'])
             ->name('cronograma.gerar');
+        Route::post('sessoes-estudo/{sessaoEstudo}/finalizar', [SessaoEstudoController::class, 'finalizar'])
+            ->name('sessoes-estudo.finalizar');
         Route::apiResource('sessoes-estudo', SessaoEstudoController::class)
             ->parameters(['sessoes-estudo' => 'sessaoEstudo']);
     });

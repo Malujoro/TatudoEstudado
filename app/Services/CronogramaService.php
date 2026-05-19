@@ -99,7 +99,7 @@ class CronogramaService
             $ultimosTipos = [];
 
             while ($minutosRestantes >= self::SESSION_MINUTES['revisao']) {
-                $candidatos = !empty($remainingAssuntos) ? $remainingAssuntos : array_keys($states);
+                $candidatos = ! empty($remainingAssuntos) ? $remainingAssuntos : array_keys($states);
                 $assuntoId = $this->escolherAssunto($states, $candidatos, $dia);
                 if ($assuntoId === null) {
                     break;
@@ -162,8 +162,8 @@ class CronogramaService
     }
 
     /**
-     * @param array<string, mixed> $states
-     * @param array<int, string> $candidatos
+     * @param  array<string, mixed>  $states
+     * @param  array<int, string>  $candidatos
      */
     private function escolherAssunto(array $states, array $candidatos, Carbon $dia): ?string
     {
@@ -184,7 +184,7 @@ class CronogramaService
     }
 
     /**
-     * @param array<string, mixed> $state
+     * @param  array<string, mixed>  $state
      */
     private function calcularScore(array $state, Carbon $dia): float
     {
@@ -200,8 +200,8 @@ class CronogramaService
     }
 
     /**
-     * @param array<string, mixed> $state
-     * @param array<int, string> $ultimosTipos
+     * @param  array<string, mixed>  $state
+     * @param  array<int, string>  $ultimosTipos
      */
     private function escolherTipo(array $state, int $minutosRestantes, array $ultimosTipos): ?string
     {
