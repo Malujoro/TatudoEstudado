@@ -67,6 +67,7 @@ class CronogramaService
 
             $states[$assunto->id] = [
                 'assunto' => $assunto,
+                'materia_id' => $assunto->materia_id,
                 'error_rate' => $errorRate,
                 'last_date' => $lastSessions[$assunto->id]->last_date ?? null,
                 'scheduled_count' => 0,
@@ -97,10 +98,11 @@ class CronogramaService
             $minutosRestantes = (int) round($horas * 60);
 
             $ultimosTipos = [];
+            $ultimasMaterias = [];
 
             while ($minutosRestantes >= self::SESSION_MINUTES['revisao']) {
                 $candidatos = ! empty($remainingAssuntos) ? $remainingAssuntos : array_keys($states);
-                $assuntoId = $this->escolherAssunto($states, $candidatos, $dia);
+                $assuntoId = $this->escolherAssunto($states, $candidatos, $dia, $ultimasMaterias);
                 if ($assuntoId === null) {
                     break;
                 }
@@ -131,6 +133,11 @@ class CronogramaService
                 $ultimosTipos[] = $tipo;
                 if (count($ultimosTipos) > 2) {
                     array_shift($ultimosTipos);
+                }
+
+                $ultimasMaterias[] = $states[$assuntoId]['materia_id'];
+                if (count($ultimasMaterias) > 2) {
+                    array_shift($ultimasMaterias);
                 }
 
                 $remainingAssuntos = array_values(array_diff($remainingAssuntos, [$assuntoId]));
@@ -165,10 +172,25 @@ class CronogramaService
      * @param  array<string, mixed>  $states
      * @param  array<int, string>  $candidatos
      */
-    private function escolherAssunto(array $states, array $candidatos, Carbon $dia): ?string
+    private function escolherAssunto(array $states, array $candidatos, Carbon $dia, array $ultimasMaterias): ?string
     {
         $melhorId = null;
         $melhorScore = null;
+
+        $materiaBloqueada = null;
+        if (count($ultimasMaterias) >= 2) {
+            $ultima = $ultimasMaterias[count($ultimasMaterias) - 1];
+            $penultima = $ultimasMaterias[count($ultimasMaterias) - 2];
+            if ($ultima === $penultima) {
+                $materiaBloqueada = $ultima;
+            }
+        }
+
+        $filtrados = $materiaBloqueada
+            ? array_values(array_filter($candidatos, fn ($id) => $states[$id]['materia_id'] !== $materiaBloqueada))
+            : $candidatos;
+
+        $candidatos = ! empty($filtrados) ? $filtrados : $candidatos;
 
         foreach ($candidatos as $assuntoId) {
             $state = $states[$assuntoId];
@@ -207,7 +229,7 @@ class CronogramaService
     {
         $permitidos = $state['teoria_finalizada']
             ? ['exercicio', 'revisao']
-            : ['teoria', 'exercicio', 'revisao'];
+            : ['teoria', 'revisao'];
 
         $permitidos = array_values(array_filter(
             $permitidos,
