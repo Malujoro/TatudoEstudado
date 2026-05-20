@@ -102,7 +102,7 @@
                                     Total na semana: <span class="font-semibold text-purple-night" data-week-total>0h</span>
                                 </p>
                                 <p class="text-xs text-purple-night/70">
-                                    Média/dia (salva no sistema):
+                                    Média/dia:
                                     <span class="font-semibold text-purple-night" data-day-avg>0h</span>
                                 </p>
                             </div>
