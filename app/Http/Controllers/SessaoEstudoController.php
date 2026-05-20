@@ -170,6 +170,11 @@ class SessaoEstudoController extends Controller
             $metrica->save();
         }
 
+        if ($sessaoEstudo->tipo === 'teoria') {
+            $sessaoEstudo->assunto->teoria_finalizada = true;
+            $sessaoEstudo->assunto->save();
+        }
+
         $sessaoEstudo->finalizado = true;
         $sessaoEstudo->save();
 
