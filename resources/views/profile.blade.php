@@ -36,8 +36,7 @@
                     Tempo de estudo por dia
                 </p>
 
-                <form action="{{ route('profile.update') }}" method="POST"
-                    class="rounded-3xl bg-purple-light px-6 py-6">
+                <form action="{{ route('profile.update') }}" method="POST" class="rounded-3xl bg-purple-light px-6 py-6">
                     @csrf
 
                     <div class="flex flex-col gap-4" data-study-hours>
@@ -68,11 +67,26 @@
 
                         <div class="grid grid-cols-1 gap-3">
                             @foreach ($dias as $key => $label)
-                                <div class="grid grid-cols-[100px_1fr] items-center gap-3">
+                                @php
+                                    $valorDecimal = old('horario_semanal.' . $key, $horario[$key] ?? 0);
+                                    $minutosTotais = (int) round($valorDecimal * 60);
+                                    $horas = intdiv($minutosTotais, 60);
+                                    $minutos = $minutosTotais % 60;
+                                @endphp
+                                <div class="grid grid-cols-[100px_1fr_1fr] items-center gap-2" data-day-row>
                                     <span class="font-rem text-sm font-medium text-purple-night">{{ $label }}</span>
-                                    <x-input name="horario_semanal[{{ $key }}]" type="number" step="0.5" min="0" max="24"
-                                        inputmode="decimal" placeholder="Ex: 2"
-                                        value="{{ old('horario_semanal.' . $key, $horario[$key] ?? 0) }}" />
+                                    <div class="flex items-center gap-1.5">
+                                        <x-input type="number" min="0" max="24" inputmode="numeric"
+                                            placeholder="0" value="{{ $horas }}" data-hours-input />
+                                        <span class="text-sm font-medium text-purple-night">h</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <x-input type="number" min="0" max="59" inputmode="numeric"
+                                            placeholder="0" value="{{ $minutos }}" data-minutes-input />
+                                        <span class="text-sm font-medium text-purple-night">m</span>
+                                    </div>
+                                    <input type="hidden" name="horario_semanal[{{ $key }}]"
+                                        value="{{ $valorDecimal }}" data-hidden-input />
                                 </div>
                             @endforeach
                         </div>
@@ -80,11 +94,11 @@
                         <div class="rounded-2xl bg-white/50 px-4 py-3">
                             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 <p class="text-xs text-purple-night/70">
-                                    Total na semana: <span class="font-semibold text-purple-night" data-week-total>0</span>h
+                                    Total na semana: <span class="font-semibold text-purple-night" data-week-total>0h</span>
                                 </p>
                                 <p class="text-xs text-purple-night/70">
                                     Média/dia (salva no sistema):
-                                    <span class="font-semibold text-purple-night" data-day-avg>0</span>h
+                                    <span class="font-semibold text-purple-night" data-day-avg>0h</span>
                                 </p>
                             </div>
                         </div>
@@ -133,51 +147,52 @@
             const root = document.querySelector('[data-study-hours]');
             if (!root) return;
 
-            const dayOrder = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
-
-            const inputs = Array.from(root.querySelectorAll('input[name^="horario_semanal"]'));
+            const dayRows = Array.from(root.querySelectorAll('[data-day-row]'));
             const totalEl = root.querySelector('[data-week-total]');
             const avgEl = root.querySelector('[data-day-avg]');
 
-            const toNumber = (value) => {
-                if (value === null || value === undefined) return 0;
-                const normalized = String(value).replace(',', '.');
-                const number = Number(normalized);
-                return Number.isFinite(number) ? number : 0;
-            };
-
-            const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-
-            const getCurrentStateFromInputs = () => {
-                const state = {};
-                for (const input of inputs) {
-                    const match = input.name.match(/horario_semanal\[(\w+)\]/);
-                    if (match) {
-                        state[match[1]] = input.value;
-                    }
-                }
-                return state;
+            const formatTime = (decimalHours) => {
+                const totalMins = Math.round(decimalHours * 60);
+                const h = Math.floor(totalMins / 60);
+                const m = totalMins % 60;
+                return m > 0 ? `${h}h${m}m` : `${h}h`;
             };
 
             const updateSummary = () => {
-                const state = getCurrentStateFromInputs();
                 let weekTotal = 0;
 
-                for (const day of dayOrder) {
-                    weekTotal += clamp(toNumber(state[day]), 0, 24);
-                }
+                dayRows.forEach(row => {
+                    const hoursInput = row.querySelector('[data-hours-input]');
+                    const minutesInput = row.querySelector('[data-minutes-input]');
+                    const hiddenInput = row.querySelector('[data-hidden-input]');
+
+                    const hours = parseInt(hoursInput.value) || 0;
+                    const minutes = parseInt(minutesInput.value) || 0;
+
+                    const totalDecimal = hours + (minutes / 60);
+
+                    if (hiddenInput) {
+                        hiddenInput.value = totalDecimal;
+                    }
+
+                    weekTotal += totalDecimal;
+                });
 
                 const dayAvg = weekTotal / 7;
 
-                if (totalEl) totalEl.textContent = (Math.round(weekTotal * 10) / 10).toString();
-                if (avgEl) avgEl.textContent = (Math.round(dayAvg * 10) / 10).toString();
+                if (totalEl) totalEl.textContent = formatTime(weekTotal);
+                if (avgEl) avgEl.textContent = formatTime(dayAvg);
             };
 
             updateSummary();
 
-            for (const input of inputs) {
-                input.addEventListener('input', updateSummary);
-            }
+            dayRows.forEach(row => {
+                const hoursInput = row.querySelector('[data-hours-input]');
+                const minutesInput = row.querySelector('[data-minutes-input]');
+
+                if (hoursInput) hoursInput.addEventListener('input', updateSummary);
+                if (minutesInput) minutesInput.addEventListener('input', updateSummary);
+            });
         })();
     </script>
 @endsection
