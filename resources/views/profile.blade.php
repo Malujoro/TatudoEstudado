@@ -81,8 +81,13 @@
                                         <span class="text-sm font-medium text-purple-night">h</span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
-                                        <x-input type="number" min="0" max="59" inputmode="numeric"
-                                            placeholder="0" value="{{ $minutos }}" data-minutes-input />
+                                        <select data-minutes-input
+                                            class="rounded-xl border border-purple-dim/50 bg-white px-3 py-2 text-sm text-purple-night outline-none focus:border-purple focus:ring-1 focus:ring-purple">
+                                            <option value="0" @selected($minutos == 0)>00</option>
+                                            <option value="15" @selected($minutos == 15)>15</option>
+                                            <option value="30" @selected($minutos == 30)>30</option>
+                                            <option value="45" @selected($minutos == 45)>45</option>
+                                        </select>
                                         <span class="text-sm font-medium text-purple-night">m</span>
                                     </div>
                                     <input type="hidden" name="horario_semanal[{{ $key }}]"
