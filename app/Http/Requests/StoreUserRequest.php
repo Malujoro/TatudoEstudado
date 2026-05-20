@@ -30,8 +30,15 @@ class StoreUserRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'confirmed', 'min:6'],
-            'horas_por_dia' => ['sometimes', 'numeric', 'min:0'],
             'role' => ['sometimes', 'string', 'max:50'],
+            'horario_semanal' => ['sometimes', 'array'],
+            'horario_semanal.domingo' => ['sometimes', 'numeric', 'min:0', 'max:24'],
+            'horario_semanal.segunda' => ['sometimes', 'numeric', 'min:0', 'max:24'],
+            'horario_semanal.terca' => ['sometimes', 'numeric', 'min:0', 'max:24'],
+            'horario_semanal.quarta' => ['sometimes', 'numeric', 'min:0', 'max:24'],
+            'horario_semanal.quinta' => ['sometimes', 'numeric', 'min:0', 'max:24'],
+            'horario_semanal.sexta' => ['sometimes', 'numeric', 'min:0', 'max:24'],
+            'horario_semanal.sabado' => ['sometimes', 'numeric', 'min:0', 'max:24'],
         ];
     }
 }

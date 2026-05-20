@@ -22,6 +22,11 @@ class Assunto extends Model
     protected $fillable = [
         'nome',
         'materia_id',
+        'teoria_finalizada',
+    ];
+
+    protected $casts = [
+        'teoria_finalizada' => 'boolean',
     ];
 
     public function materia(): BelongsTo

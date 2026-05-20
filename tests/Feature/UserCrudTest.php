@@ -24,7 +24,6 @@ class UserCrudTest extends TestCase
             'email' => 'fulano@example.com',
             'password' => 'secret123',
             'password_confirmation' => 'secret123',
-            'horas_por_dia' => 2.5,
             'role' => 'user',
         ]);
 
@@ -53,7 +52,6 @@ class UserCrudTest extends TestCase
         // Update (without password)
         $updateResponse = $this->putJson("/api/users/{$createdId}", [
             'name' => 'Fulano Atualizado',
-            'horas_por_dia' => 4,
         ]);
         $updateResponse->assertOk();
         $updateResponse->assertJson([

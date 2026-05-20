@@ -37,7 +37,16 @@
                             <path d="M7 8h10M7 12h10M7 16h10" stroke-linecap="round" />
                         </svg>
                     </span>
-                    Cronograma
+                    Metas da semana
+                </a>
+                <a href="{{ route('metas.diarias') }}"
+                    class="flex items-center gap-3 font-rem text-[20px] font-medium leading-none text-main-dark">
+                    <span class="inline-flex h-5 w-5 items-center justify-center">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
+                            <path d="M8 7h8M8 12h8M8 17h8" stroke-linecap="round" />
+                        </svg>
+                    </span>
+                    Metas diárias
                 </a>
                 <a href="{{ route('materias.index') }}"
                     class="flex items-center gap-3 font-rem text-[20px] font-medium leading-none text-main-dark">

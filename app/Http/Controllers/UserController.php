@@ -28,7 +28,7 @@ class UserController extends Controller
         $perPage = $perPage > 0 ? $perPage : 15;
 
         $users = User::query()
-            ->select(['id', 'name', 'email', 'horas_por_dia', 'role', 'created_at', 'updated_at'])
+            ->select(['id', 'name', 'email', 'role', 'horario_semanal', 'created_at', 'updated_at'])
             ->orderBy('id')
             ->paginate($perPage);
 
@@ -41,7 +41,7 @@ class UserController extends Controller
     public function show(User $user): JsonResponse
     {
         return response()->json(
-            $user->only(['id', 'name', 'email', 'horas_por_dia', 'role', 'created_at', 'updated_at'])
+            $user->only(['id', 'name', 'email', 'role', 'horario_semanal', 'created_at', 'updated_at'])
         );
     }
 
@@ -51,13 +51,21 @@ class UserController extends Controller
     public function store(StoreUserRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $data['horas_por_dia'] = $data['horas_por_dia'] ?? 0;
         $data['role'] = $data['role'] ?? 'user';
+        $data['horario_semanal'] = $data['horario_semanal'] ?? [
+            'domingo' => 0,
+            'segunda' => 0,
+            'terca' => 0,
+            'quarta' => 0,
+            'quinta' => 0,
+            'sexta' => 0,
+            'sabado' => 0,
+        ];
 
         $user = User::create($data);
 
         return response()->json(
-            $user->only(['id', 'name', 'email', 'horas_por_dia', 'role', 'created_at', 'updated_at']),
+            $user->only(['id', 'name', 'email', 'role', 'horario_semanal', 'created_at', 'updated_at']),
             201
         );
     }
@@ -77,7 +85,7 @@ class UserController extends Controller
         $user->save();
 
         return response()->json(
-            $user->only(['id', 'name', 'email', 'horas_por_dia', 'role', 'created_at', 'updated_at'])
+            $user->only(['id', 'name', 'email', 'role', 'horario_semanal', 'created_at', 'updated_at'])
         );
     }
 

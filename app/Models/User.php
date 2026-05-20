@@ -17,8 +17,8 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $email
  * @property string $password
- * @property float $horas_por_dia
  * @property string $role
+ * @property array|null $horario_semanal
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -26,6 +26,15 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * The default attribute values.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'horario_semanal' => '{"domingo":0,"segunda":0,"terca":0,"quarta":0,"quinta":0,"sexta":0,"sabado":0}',
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -36,8 +45,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'horas_por_dia',
         'role',
+        'horario_semanal',
     ];
 
     /**
@@ -60,6 +69,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'horario_semanal' => 'array',
         ];
     }
 

@@ -45,42 +45,36 @@
                             Defina seu tempo disponível por dia
                         </p>
 
+                        @php
+                            $horario = $user->horario_semanal ?? [
+                                'domingo' => 0,
+                                'segunda' => 0,
+                                'terca' => 0,
+                                'quarta' => 0,
+                                'quinta' => 0,
+                                'sexta' => 0,
+                                'sabado' => 0,
+                            ];
+                            $dias = [
+                                'domingo' => 'Domingo',
+                                'segunda' => 'Segunda',
+                                'terca' => 'Terça',
+                                'quarta' => 'Quarta',
+                                'quinta' => 'Quinta',
+                                'sexta' => 'Sexta',
+                                'sabado' => 'Sábado',
+                            ];
+                        @endphp
+
                         <div class="grid grid-cols-1 gap-3">
-                            <div class="grid grid-cols-[100px_1fr] items-center gap-3">
-                                <span class="font-rem text-sm font-medium text-purple-night">Domingo</span>
-                                <x-input data-study-hour data-day="domingo" type="number" step="0.5" min="0" max="24"
-                                    inputmode="decimal" placeholder="Ex: 2" />
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] items-center gap-3">
-                                <span class="font-rem text-sm font-medium text-purple-night">Segunda</span>
-                                <x-input data-study-hour data-day="segunda" type="number" step="0.5" min="0" max="24"
-                                    inputmode="decimal" placeholder="Ex: 2" />
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] items-center gap-3">
-                                <span class="font-rem text-sm font-medium text-purple-night">Terça</span>
-                                <x-input data-study-hour data-day="terca" type="number" step="0.5" min="0" max="24"
-                                    inputmode="decimal" placeholder="Ex: 2" />
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] items-center gap-3">
-                                <span class="font-rem text-sm font-medium text-purple-night">Quarta</span>
-                                <x-input data-study-hour data-day="quarta" type="number" step="0.5" min="0" max="24"
-                                    inputmode="decimal" placeholder="Ex: 2" />
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] items-center gap-3">
-                                <span class="font-rem text-sm font-medium text-purple-night">Quinta</span>
-                                <x-input data-study-hour data-day="quinta" type="number" step="0.5" min="0" max="24"
-                                    inputmode="decimal" placeholder="Ex: 2" />
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] items-center gap-3">
-                                <span class="font-rem text-sm font-medium text-purple-night">Sexta</span>
-                                <x-input data-study-hour data-day="sexta" type="number" step="0.5" min="0" max="24"
-                                    inputmode="decimal" placeholder="Ex: 2" />
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] items-center gap-3">
-                                <span class="font-rem text-sm font-medium text-purple-night">Sábado</span>
-                                <x-input data-study-hour data-day="sabado" type="number" step="0.5" min="0" max="24"
-                                    inputmode="decimal" placeholder="Ex: 2" />
-                            </div>
+                            @foreach ($dias as $key => $label)
+                                <div class="grid grid-cols-[100px_1fr] items-center gap-3">
+                                    <span class="font-rem text-sm font-medium text-purple-night">{{ $label }}</span>
+                                    <x-input name="horario_semanal[{{ $key }}]" type="number" step="0.5" min="0" max="24"
+                                        inputmode="decimal" placeholder="Ex: 2"
+                                        value="{{ old('horario_semanal.' . $key, $horario[$key] ?? 0) }}" />
+                                </div>
+                            @endforeach
                         </div>
 
                         <div class="rounded-2xl bg-white/50 px-4 py-3">
@@ -94,18 +88,6 @@
                                 </p>
                             </div>
                         </div>
-
-                        <!-- <div class="flex flex-col gap-2">
-                            <label for="horas_por_dia" class="font-rem text-sm font-medium text-purple-night">
-                                Média de horas por dia
-                            </label>
-                            <x-input id="horas_por_dia" name="horas_por_dia" type="number" step="0.5" min="0" max="24"
-                                inputmode="decimal" placeholder="Ex: 2"
-                                value="{{ old('horas_por_dia', $user->horas_por_dia) }}" />
-                            <p class="text-xs text-purple-night/70">
-                                Você pode editar manualmente; caso contrário, a média é calculada pelos 7 campos.
-                            </p>
-                        </div> -->
                     </div>
 
                     <div class="mt-5">
@@ -151,14 +133,11 @@
             const root = document.querySelector('[data-study-hours]');
             if (!root) return;
 
-            const userId = @json($user->id);
-            const storageKey = `tatu:profile:study-hours-by-day:v1:user:${userId}`;
             const dayOrder = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
 
-            const inputs = Array.from(root.querySelectorAll('input[data-study-hour]'));
+            const inputs = Array.from(root.querySelectorAll('input[name^="horario_semanal"]'));
             const totalEl = root.querySelector('[data-week-total]');
             const avgEl = root.querySelector('[data-day-avg]');
-            const avgInput = root.querySelector('input[name="horas_por_dia"]');
 
             const toNumber = (value) => {
                 if (value === null || value === undefined) return 0;
@@ -169,28 +148,13 @@
 
             const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
-            const readState = () => {
-                try {
-                    const raw = localStorage.getItem(storageKey);
-                    return raw ? JSON.parse(raw) : {};
-                } catch (_) {
-                    return {};
-                }
-            };
-
-            const writeState = (state) => {
-                try {
-                    localStorage.setItem(storageKey, JSON.stringify(state));
-                } catch (_) {
-                    // ignore
-                }
-            };
-
             const getCurrentStateFromInputs = () => {
                 const state = {};
                 for (const input of inputs) {
-                    const day = input.getAttribute('data-day');
-                    state[day] = input.value;
+                    const match = input.name.match(/horario_semanal\[(\w+)\]/);
+                    if (match) {
+                        state[match[1]] = input.value;
+                    }
                 }
                 return state;
             };
@@ -207,36 +171,12 @@
 
                 if (totalEl) totalEl.textContent = (Math.round(weekTotal * 10) / 10).toString();
                 if (avgEl) avgEl.textContent = (Math.round(dayAvg * 10) / 10).toString();
-
-                if (avgInput && document.activeElement !== avgInput) {
-                    avgInput.value = (Math.round(dayAvg * 10) / 10).toString();
-                }
             };
-
-            // hydrate
-            const state = readState();
-            for (const input of inputs) {
-                const day = input.getAttribute('data-day');
-                if (state && Object.prototype.hasOwnProperty.call(state, day)) {
-                    input.value = state[day];
-                }
-            }
 
             updateSummary();
 
-            // persist
             for (const input of inputs) {
-                input.addEventListener('input', () => {
-                    writeState(getCurrentStateFromInputs());
-                    updateSummary();
-                });
-            }
-
-            if (avgInput) {
-                avgInput.addEventListener('input', () => {
-                    // se o usuário editar manualmente, só atualiza o display
-                    if (avgEl) avgEl.textContent = avgInput.value || '0';
-                });
+                input.addEventListener('input', updateSummary);
             }
         })();
     </script>
