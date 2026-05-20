@@ -11,14 +11,6 @@
             </div>
         </div>
 
-        @php
-            $coresTipo = [
-                'teoria' => 'bg-purple-light text-purple-night',
-                'exercicio' => 'bg-secondary-blue text-main-dark',
-                'revisao' => 'bg-secondary-red text-main-dark',
-            ];
-        @endphp
-
         @if ($diasPendentes->isEmpty())
             <div class="rounded-3xl border border-purple-dim/40 bg-white/70 px-6 py-8 text-center">
                 <p class="font-rem text-sm font-medium text-purple-night">
@@ -41,8 +33,7 @@
                             </div>
 
                             @if ($dia['atrasada'])
-                                <span
-                                    class="rounded-full bg-secondary-red/80 px-3 py-1 text-xs font-semibold text-white">
+                                <span class="rounded-full bg-secondary-red/80 px-3 py-1 text-xs font-semibold text-white">
                                     Meta atrasada
                                 </span>
                             @endif
@@ -57,16 +48,15 @@
                                     $total = $acertos + $erros;
                                     $media = $total > 0 ? round(($acertos / $total) * 100) : 0;
                                     $tipo = $sessao->tipo;
-                                    $classe = $coresTipo[$tipo] ?? 'bg-purple-light text-purple-night';
                                 @endphp
 
                                 <div class="rounded-2xl border border-purple-dim/40 bg-white px-5 py-4 {{ $sessao->finalizado ? 'opacity-60' : '' }}"
-                                    data-session-card
-                                    data-session-id="{{ $sessao->id }}">
+                                    data-session-card data-session-id="{{ $sessao->id }}">
                                     <div class="flex flex-wrap items-center justify-between gap-4">
                                         <div class="flex items-start gap-4">
                                             <div class="flex flex-col gap-1">
-                                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-purple-muted">
+                                                <p
+                                                    class="text-xs font-semibold uppercase tracking-[0.18em] text-purple-muted">
                                                     {{ $sessao->assunto->materia->nome ?? 'Matéria' }}
                                                 </p>
                                                 <p class="font-rem text-base font-semibold text-purple-night {{ $sessao->finalizado ? 'line-through' : '' }}"
@@ -78,7 +68,8 @@
                                                 </p>
                                             </div>
 
-                                            <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $classe }}">
+                                            <span
+                                                class="rounded-full px-3 py-1 text-xs font-semibold tema-{{ $tipo ?: 'default' }}">
                                                 {{ $tipo }}
                                             </span>
                                         </div>
@@ -86,8 +77,7 @@
                                         <div class="flex flex-wrap items-center gap-2" data-session-actions>
                                             <button type="button"
                                                 class="rounded-full border border-purple-dim px-4 py-2 text-xs font-semibold text-purple-dim hover:bg-purple-dim hover:text-white transition"
-                                                data-open-caderno
-                                                data-assunto-id="{{ $sessao->assunto_id }}"
+                                                data-open-caderno data-assunto-id="{{ $sessao->assunto_id }}"
                                                 data-caderno-id="{{ $sessao->assunto->caderno->id ?? '' }}"
                                                 data-caderno-conteudo="{{ $sessao->assunto->caderno->conteudo ?? '' }}">
                                                 Caderno de erros
@@ -95,8 +85,7 @@
 
                                             <button type="button"
                                                 class="rounded-full bg-purple-light px-4 py-2 text-xs font-semibold text-purple-night hover:opacity-80 transition"
-                                                data-finalizar
-                                                data-sessao-id="{{ $sessao->id }}"
+                                                data-finalizar data-sessao-id="{{ $sessao->id }}"
                                                 data-tipo="{{ $sessao->tipo }}"
                                                 data-assunto-id="{{ $sessao->assunto_id }}">
                                                 Finalizar meta
@@ -142,14 +131,12 @@
                 <label class="text-sm font-semibold text-purple-night">
                     Quantas questões você fez?
                     <input type="number" min="0"
-                        class="mt-1 w-full rounded-2xl border border-purple-dim/50 px-4 py-2 text-sm"
-                        data-questoes />
+                        class="mt-1 w-full rounded-2xl border border-purple-dim/50 px-4 py-2 text-sm" data-questoes />
                 </label>
                 <label class="text-sm font-semibold text-purple-night">
                     Quantas você acertou?
                     <input type="number" min="0"
-                        class="mt-1 w-full rounded-2xl border border-purple-dim/50 px-4 py-2 text-sm"
-                        data-acertos />
+                        class="mt-1 w-full rounded-2xl border border-purple-dim/50 px-4 py-2 text-sm" data-acertos />
                 </label>
             </div>
             <div class="mt-4 flex justify-end gap-2">
@@ -172,7 +159,10 @@
             const saveCaderno = document.querySelector('[data-save-caderno]');
             const closeCaderno = document.querySelectorAll('[data-close-modal-caderno]');
 
-            let cadernoState = { assuntoId: null, cadernoId: null };
+            let cadernoState = {
+                assuntoId: null,
+                cadernoId: null
+            };
 
             document.querySelectorAll('[data-open-caderno]').forEach((button) => {
                 button.addEventListener('click', () => {
@@ -204,14 +194,17 @@
 
                 const conteudo = textoCaderno?.value || '';
                 const isUpdate = Boolean(cadernoState.cadernoId);
-                const url = isUpdate
-                    ? `/api/cadernos/${cadernoState.cadernoId}`
-                    : '/api/cadernos';
+                const url = isUpdate ?
+                    `/api/cadernos/${cadernoState.cadernoId}` :
+                    '/api/cadernos';
                 const method = isUpdate ? 'PUT' : 'POST';
 
-                const payload = isUpdate
-                    ? { conteudo }
-                    : { conteudo, assunto_id: cadernoState.assuntoId };
+                const payload = isUpdate ? {
+                    conteudo
+                } : {
+                    conteudo,
+                    assunto_id: cadernoState.assuntoId
+                };
 
                 const response = await fetch(url, {
                     method,
@@ -272,7 +265,10 @@
                     return;
                 }
 
-                await finalizarSessao(sessaoAtual, { questoes, acertos });
+                await finalizarSessao(sessaoAtual, {
+                    questoes,
+                    acertos
+                });
             });
 
             async function finalizarSessao(sessaoId, payload) {

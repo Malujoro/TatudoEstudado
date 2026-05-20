@@ -88,17 +88,48 @@ class CronogramaService
                 ->delete();
         }
 
+        $sessoesExistentes = SessaoEstudo::query()
+            ->whereBetween('data', [$inicio->toDateString(), $fim->toDateString()])
+            ->whereIn('assunto_id', $assuntos->pluck('id'))
+            ->get();
+
+        $minutosExistentesPorDia = [];
+        $ultimosTiposPorDia = [];
+        $ultimasMateriasPorDia = [];
+
+        foreach ($sessoesExistentes as $sessao) {
+            $dataStr = Carbon::parse($sessao->data)->toDateString();
+            $minutos = (int) round((float) $sessao->horas * 60);
+
+            $minutosExistentesPorDia[$dataStr] = ($minutosExistentesPorDia[$dataStr] ?? 0) + $minutos;
+
+            if (isset($states[$sessao->assunto_id])) {
+                $states[$sessao->assunto_id]['scheduled_count']++;
+                $states[$sessao->assunto_id]['type_counts'][$sessao->tipo] =
+                    ($states[$sessao->assunto_id]['type_counts'][$sessao->tipo] ?? 0) + 1;
+
+                $ultimosTiposPorDia[$dataStr][] = $sessao->tipo;
+                $ultimasMateriasPorDia[$dataStr][] = $states[$sessao->assunto_id]['materia_id'];
+            }
+        }
+
         $remainingAssuntos = array_keys($states);
         $sessoesParaCriar = [];
 
         for ($offset = 0; $offset < $dias; $offset++) {
             $dia = $inicio->copy()->addDays($offset);
+            $diaStr = $dia->toDateString();
             $diaKey = self::DAY_KEYS[$dia->dayOfWeek] ?? 'domingo';
             $horas = (float) ($user->horario_semanal[$diaKey] ?? 0);
             $minutosRestantes = (int) round($horas * 60);
 
-            $ultimosTipos = [];
-            $ultimasMaterias = [];
+            $minutosRestantes -= $minutosExistentesPorDia[$diaStr] ?? 0;
+
+            $ultimosTipos = $ultimosTiposPorDia[$diaStr] ?? [];
+            $ultimasMaterias = $ultimasMateriasPorDia[$diaStr] ?? [];
+
+            $ultimosTipos = array_slice($ultimosTipos, -2);
+            $ultimasMaterias = array_slice($ultimasMaterias, -2);
 
             while ($minutosRestantes >= self::SESSION_MINUTES['revisao']) {
                 $candidatos = ! empty($remainingAssuntos) ? $remainingAssuntos : array_keys($states);

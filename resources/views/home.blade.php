@@ -38,15 +38,10 @@
         </div>
 
         @php
-            $temSessoes = collect($dias)->contains(fn ($dia) => $dia['sessoes']->isNotEmpty());
-            $coresTipo = [
-                'teoria' => 'bg-purple-light text-purple-night',
-                'exercicio' => 'bg-secondary-blue text-main-dark',
-                'revisao' => 'bg-secondary-red text-main-dark',
-            ];
+            $temSessoes = collect($dias)->contains(fn($dia) => $dia['sessoes']->isNotEmpty());
         @endphp
 
-        @if (! $temSessoes)
+        @if (!$temSessoes)
             <div class="rounded-3xl border-2 border-dashed border-purple bg-main-light px-8 py-20 text-center">
                 <p class="mx-auto max-w-3xl font-rem text-[22px] font-medium leading-snug text-main-dark">
                     Você ainda não criou um cronograma, defina seu horário disponível no perfil e clique em Gerar Cronograma
@@ -68,19 +63,22 @@
                                         $minutos = (int) round($sessao->horas * 60);
                                         $horas = intdiv($minutos, 60);
                                         $resto = $minutos % 60;
-                                        $duracao = $horas > 0
-                                            ? ($resto > 0 ? $horas . 'h' . $resto : $horas . 'h')
-                                            : $resto . 'min';
+                                        $duracao =
+                                            $horas > 0
+                                                ? ($resto > 0
+                                                    ? $horas . 'h' . $resto
+                                                    : $horas . 'h')
+                                                : $resto . 'min';
                                         $tipo = $sessao->tipo;
-                                        $classe = $coresTipo[$tipo] ?? 'bg-purple-light text-purple-night';
                                     @endphp
 
                                     <div
-                                        class="flex min-w-[190px] flex-col gap-2 rounded-2xl px-5 py-4 {{ $classe }} {{ $sessao->finalizado ? 'opacity-70' : '' }}">
+                                        class="flex min-w-[190px] flex-col gap-2 rounded-2xl px-5 py-4 tema-{{ $tipo ?: 'default' }} {{ $sessao->finalizado ? 'opacity-70' : '' }}">
                                         <p class="font-rem text-xs font-bold uppercase tracking-[0.2em]">
                                             {{ strtoupper($sessao->assunto->materia->nome ?? 'Matéria') }}
                                         </p>
-                                        <p class="font-rem text-sm font-semibold {{ $sessao->finalizado ? 'line-through' : '' }}">
+                                        <p
+                                            class="font-rem text-sm font-semibold {{ $sessao->finalizado ? 'line-through' : '' }}">
                                             {{ $sessao->assunto->nome ?? 'Assunto' }}
                                         </p>
                                         <div class="flex items-center gap-2">
@@ -119,8 +117,7 @@
                 <h3 class="font-rem text-lg font-semibold text-purple-night">Caderno de erros</h3>
                 <button type="button" class="text-purple-night" data-close-modal-caderno>✕</button>
             </div>
-            <textarea
-                class="mt-4 w-full rounded-2xl border border-purple-dim/50 bg-white px-4 py-3 text-sm text-purple-night"
+            <textarea class="mt-4 w-full rounded-2xl border border-purple-dim/50 bg-white px-4 py-3 text-sm text-purple-night"
                 rows="6" data-caderno-texto></textarea>
             <div class="mt-4 flex justify-end gap-2">
                 <button type="button"
@@ -143,14 +140,12 @@
                 <label class="text-sm font-semibold text-purple-night">
                     Quantas questões você fez?
                     <input type="number" min="0"
-                        class="mt-1 w-full rounded-2xl border border-purple-dim/50 px-4 py-2 text-sm"
-                        data-questoes />
+                        class="mt-1 w-full rounded-2xl border border-purple-dim/50 px-4 py-2 text-sm" data-questoes />
                 </label>
                 <label class="text-sm font-semibold text-purple-night">
                     Quantas você acertou?
                     <input type="number" min="0"
-                        class="mt-1 w-full rounded-2xl border border-purple-dim/50 px-4 py-2 text-sm"
-                        data-acertos />
+                        class="mt-1 w-full rounded-2xl border border-purple-dim/50 px-4 py-2 text-sm" data-acertos />
                 </label>
             </div>
             <div class="mt-4 flex justify-end gap-2">
@@ -196,6 +191,5 @@
                 }
             });
         })();
-
     </script>
 @endsection
