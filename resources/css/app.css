@@ -42,4 +42,20 @@
     .font-poppins {
         font-family: var(--font-poppins);
     }
+
+    /* Cores centralizadas por tipo de sessão/tema */
+    .tema-teoria {
+        @apply bg-purple-light text-purple-night;
+    }
+
+    .tema-exercicio {
+        @apply bg-secondary-blue text-main-dark;
+    }
+
+    .tema-revisao {
+        @apply bg-secondary-red text-main-dark;
+    }
+    .tema-default {
+        @apply bg-purple-light text-main-dark;
+    }
 }
