@@ -10,21 +10,15 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * CRUD de cadernos.
- *
- * Regras importantes:
- * - 1 caderno por assunto (assunto_id é UNIQUE).
- * - Sempre escopa por usuário autenticado via `assunto -> materia`.
- * - Para criar, o `assunto_id` deve pertencer ao usuário.
- * - Retorna JSON para consumo pelo front.
+ * CRUD controller for Cadernos, scoped to the authenticated user.
  */
 class CadernoController extends Controller
 {
     /**
-     * Lista cadernos do usuário autenticado com paginação.
+     * List the authenticated user's cadernos (paginated).
      *
-     * Query params suportados:
-     * - `per_page` (int): quantidade por página (default: 15)
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -41,7 +35,11 @@ class CadernoController extends Controller
     }
 
     /**
-     * Exibe um caderno do usuário autenticado.
+        * Show a single caderno (must belong to the authenticated user).
+        *
+        * @param Request $request
+        * @param Caderno $caderno
+        * @return JsonResponse
      */
     public function show(Request $request, Caderno $caderno): JsonResponse
     {
@@ -53,7 +51,10 @@ class CadernoController extends Controller
     }
 
     /**
-     * Cria um caderno para um assunto do usuário autenticado.
+        * Create a new caderno for one of the authenticated user's assuntos.
+        *
+        * @param StoreCadernoRequest $request
+        * @return JsonResponse
      */
     public function store(StoreCadernoRequest $request): JsonResponse
     {
@@ -78,7 +79,11 @@ class CadernoController extends Controller
     }
 
     /**
-     * Atualiza um caderno do usuário autenticado.
+        * Update a caderno (must belong to the authenticated user).
+        *
+        * @param UpdateCadernoRequest $request
+        * @param Caderno $caderno
+        * @return JsonResponse
      */
     public function update(UpdateCadernoRequest $request, Caderno $caderno): JsonResponse
     {
@@ -93,7 +98,11 @@ class CadernoController extends Controller
     }
 
     /**
-     * Remove um caderno do usuário autenticado.
+        * Delete a caderno (must belong to the authenticated user).
+        *
+        * @param Request $request
+        * @param Caderno $caderno
+        * @return JsonResponse
      */
     public function destroy(Request $request, Caderno $caderno): JsonResponse
     {
@@ -105,9 +114,11 @@ class CadernoController extends Controller
     }
 
     /**
-     * Garante que o registro pertence ao usuário autenticado via `assunto -> materia`.
+     * Ensure the record belongs to the authenticated user via `assunto -> materia`.
      *
-     * Retorna 404 para evitar enumeração de IDs por terceiros.
+     * @param Request $request
+     * @param Caderno $caderno
+     * @return void
      */
     private function ensureOwnership(Request $request, Caderno $caderno): void
     {

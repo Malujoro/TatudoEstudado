@@ -5,12 +5,16 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Validação para criação de sessão de estudo.
+ * Validation rules for creating a study session.
  */
 class StoreSessaoEstudoRequest extends FormRequest
 {
     /**
-     * No momento, a autorização é controlada por middleware de rota (`auth`).
+     * Authorize the request.
+     *
+     * Currently handled by route middleware (`auth`).
+     *
+     * @return bool
      */
     public function authorize(): bool
     {
@@ -18,7 +22,7 @@ class StoreSessaoEstudoRequest extends FormRequest
     }
 
     /**
-     * Regras de validação.
+     * Get the validation rules.
      *
      * @return array<string, mixed>
      */

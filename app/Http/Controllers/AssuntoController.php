@@ -10,20 +10,15 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * CRUD de assuntos.
- *
- * Regras importantes:
- * - Sempre escopa por usuário autenticado via relação com `materias`.
- * - Para criar assunto, a `materia_id` deve pertencer ao usuário.
- * - Retorna JSON para consumo pelo front.
+ * CRUD controller for Assuntos, scoped to the authenticated user.
  */
 class AssuntoController extends Controller
 {
     /**
-     * Lista assuntos do usuário autenticado com paginação.
+     * List the authenticated user's assuntos (paginated).
      *
-     * Query params suportados:
-     * - `per_page` (int): quantidade por página (default: 15)
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -40,7 +35,11 @@ class AssuntoController extends Controller
     }
 
     /**
-     * Exibe um assunto do usuário autenticado.
+        * Show a single assunto (must belong to the authenticated user).
+        *
+        * @param Request $request
+        * @param Assunto $assunto
+        * @return JsonResponse
      */
     public function show(Request $request, Assunto $assunto): JsonResponse
     {
@@ -52,7 +51,10 @@ class AssuntoController extends Controller
     }
 
     /**
-     * Cria um assunto para uma matéria do usuário autenticado.
+        * Create a new assunto for one of the authenticated user's materias.
+        *
+        * @param StoreAssuntoRequest $request
+        * @return JsonResponse
      */
     public function store(StoreAssuntoRequest $request): JsonResponse
     {
@@ -78,7 +80,11 @@ class AssuntoController extends Controller
     }
 
     /**
-     * Atualiza um assunto do usuário autenticado.
+        * Update an assunto (must belong to the authenticated user).
+        *
+        * @param UpdateAssuntoRequest $request
+        * @param Assunto $assunto
+        * @return JsonResponse
      */
     public function update(UpdateAssuntoRequest $request, Assunto $assunto): JsonResponse
     {
@@ -93,7 +99,11 @@ class AssuntoController extends Controller
     }
 
     /**
-     * Remove um assunto do usuário autenticado.
+        * Delete an assunto (must belong to the authenticated user).
+        *
+        * @param Request $request
+        * @param Assunto $assunto
+        * @return JsonResponse
      */
     public function destroy(Request $request, Assunto $assunto): JsonResponse
     {
@@ -105,9 +115,11 @@ class AssuntoController extends Controller
     }
 
     /**
-     * Garante que o registro pertence ao usuário autenticado via `materia`.
+     * Ensure the record belongs to the authenticated user via `materia`.
      *
-     * Retorna 404 para evitar enumeração de IDs por terceiros.
+     * @param Request $request
+     * @param Assunto $assunto
+     * @return void
      */
     private function ensureOwnership(Request $request, Assunto $assunto): void
     {

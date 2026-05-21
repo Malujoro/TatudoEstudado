@@ -8,18 +8,37 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 
+/**
+ * Handles authentication views and actions (login/register/logout, password reset).
+ */
 class AuthController extends Controller
 {
+    /**
+     * Show the login page.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
     public function showLogin()
     {
         return view('auth.login');
     }
 
+    /**
+     * Show the registration page.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
     public function showRegister()
     {
         return view('auth.register');
     }
 
+    /**
+     * Attempt to authenticate the user.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -38,6 +57,12 @@ class AuthController extends Controller
             ->onlyInput('email');
     }
 
+    /**
+     * Register a new user and log them in.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -68,6 +93,12 @@ class AuthController extends Controller
         return redirect('/');
     }
 
+    /**
+     * Log out the current user.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function logout(Request $request)
     {
         Auth::logout();
@@ -78,6 +109,12 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
+    /**
+     * Send a password reset link to the given email.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function forgotPassword(Request $request)
     {
         $request->validate([
@@ -93,6 +130,12 @@ class AuthController extends Controller
             : back()->withErrors(['email' => 'Erro ao enviar link']);
     }
 
+    /**
+     * Reset the user's password using the provided token.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function resetPassword(Request $request)
     {
         $request->validate([

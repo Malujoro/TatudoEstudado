@@ -10,18 +10,15 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * CRUD de métricas.
- *
- * Regras importantes:
- * - 1 métrica por assunto (assunto_id é UNIQUE).
- * - Sempre escopa por usuário autenticado via `assunto -> materia`.
- * - Para criar, o `assunto_id` deve pertencer ao usuário.
- * - Retorna JSON para consumo pelo front.
+ * CRUD controller for Metricas, scoped to the authenticated user.
  */
 class MetricaController extends Controller
 {
     /**
-     * Lista métricas do usuário autenticado com paginação.
+     * List the authenticated user's metricas (paginated).
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -38,7 +35,11 @@ class MetricaController extends Controller
     }
 
     /**
-     * Exibe uma métrica do usuário autenticado.
+        * Show a single metrica (must belong to the authenticated user).
+        *
+        * @param Request $request
+        * @param Metrica $metrica
+        * @return JsonResponse
      */
     public function show(Request $request, Metrica $metrica): JsonResponse
     {
@@ -50,7 +51,10 @@ class MetricaController extends Controller
     }
 
     /**
-     * Cria uma métrica para um assunto do usuário autenticado.
+        * Create a new metrica for one of the authenticated user's assuntos.
+        *
+        * @param StoreMetricaRequest $request
+        * @return JsonResponse
      */
     public function store(StoreMetricaRequest $request): JsonResponse
     {
@@ -76,7 +80,11 @@ class MetricaController extends Controller
     }
 
     /**
-     * Atualiza uma métrica do usuário autenticado.
+        * Update a metrica (must belong to the authenticated user).
+        *
+        * @param UpdateMetricaRequest $request
+        * @param Metrica $metrica
+        * @return JsonResponse
      */
     public function update(UpdateMetricaRequest $request, Metrica $metrica): JsonResponse
     {
@@ -91,7 +99,11 @@ class MetricaController extends Controller
     }
 
     /**
-     * Remove uma métrica do usuário autenticado.
+        * Delete a metrica (must belong to the authenticated user).
+        *
+        * @param Request $request
+        * @param Metrica $metrica
+        * @return JsonResponse
      */
     public function destroy(Request $request, Metrica $metrica): JsonResponse
     {
@@ -103,7 +115,11 @@ class MetricaController extends Controller
     }
 
     /**
-     * Garante que o registro pertence ao usuário autenticado via `assunto -> materia`.
+     * Ensure the record belongs to the authenticated user via `assunto -> materia`.
+     *
+     * @param Request $request
+     * @param Metrica $metrica
+     * @return void
      */
     private function ensureOwnership(Request $request, Metrica $metrica): void
     {
