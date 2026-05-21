@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 class AssuntoController extends Controller
 {
     /**
-     * List the authenticated user's assuntos (paginated).
+     * List the authenticated user's assuntos (paginated)
      *
      * @param Request $request
      * @return JsonResponse
