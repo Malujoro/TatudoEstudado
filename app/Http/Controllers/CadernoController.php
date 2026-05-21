@@ -16,9 +16,6 @@ class CadernoController extends Controller
 {
     /**
      * List the authenticated user's cadernos (paginated).
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -35,11 +32,7 @@ class CadernoController extends Controller
     }
 
     /**
-        * Show a single caderno (must belong to the authenticated user).
-        *
-        * @param Request $request
-        * @param Caderno $caderno
-        * @return JsonResponse
+     * Show a single caderno (must belong to the authenticated user).
      */
     public function show(Request $request, Caderno $caderno): JsonResponse
     {
@@ -51,10 +44,7 @@ class CadernoController extends Controller
     }
 
     /**
-        * Create a new caderno for one of the authenticated user's assuntos.
-        *
-        * @param StoreCadernoRequest $request
-        * @return JsonResponse
+     * Create a new caderno for one of the authenticated user's assuntos.
      */
     public function store(StoreCadernoRequest $request): JsonResponse
     {
@@ -79,11 +69,7 @@ class CadernoController extends Controller
     }
 
     /**
-        * Update a caderno (must belong to the authenticated user).
-        *
-        * @param UpdateCadernoRequest $request
-        * @param Caderno $caderno
-        * @return JsonResponse
+     * Update a caderno (must belong to the authenticated user).
      */
     public function update(UpdateCadernoRequest $request, Caderno $caderno): JsonResponse
     {
@@ -98,11 +84,7 @@ class CadernoController extends Controller
     }
 
     /**
-        * Delete a caderno (must belong to the authenticated user).
-        *
-        * @param Request $request
-        * @param Caderno $caderno
-        * @return JsonResponse
+     * Delete a caderno (must belong to the authenticated user).
      */
     public function destroy(Request $request, Caderno $caderno): JsonResponse
     {
@@ -115,10 +97,6 @@ class CadernoController extends Controller
 
     /**
      * Ensure the record belongs to the authenticated user via `assunto -> materia`.
-     *
-     * @param Request $request
-     * @param Caderno $caderno
-     * @return void
      */
     private function ensureOwnership(Request $request, Caderno $caderno): void
     {

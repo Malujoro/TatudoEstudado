@@ -19,9 +19,6 @@ class SessaoEstudoController extends Controller
 {
     /**
      * List the authenticated user's study sessions (paginated).
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -38,11 +35,7 @@ class SessaoEstudoController extends Controller
     }
 
     /**
-        * Show a single study session (must belong to the authenticated user).
-        *
-        * @param Request $request
-        * @param SessaoEstudo $sessaoEstudo
-        * @return JsonResponse
+     * Show a single study session (must belong to the authenticated user).
      */
     public function show(Request $request, SessaoEstudo $sessaoEstudo): JsonResponse
     {
@@ -54,10 +47,7 @@ class SessaoEstudoController extends Controller
     }
 
     /**
-        * Create a study session for one of the authenticated user's assuntos.
-        *
-        * @param StoreSessaoEstudoRequest $request
-        * @return JsonResponse
+     * Create a study session for one of the authenticated user's assuntos.
      */
     public function store(StoreSessaoEstudoRequest $request): JsonResponse
     {
@@ -85,11 +75,7 @@ class SessaoEstudoController extends Controller
     }
 
     /**
-        * Update a study session (must belong to the authenticated user).
-        *
-        * @param UpdateSessaoEstudoRequest $request
-        * @param SessaoEstudo $sessaoEstudo
-        * @return JsonResponse
+     * Update a study session (must belong to the authenticated user).
      */
     public function update(UpdateSessaoEstudoRequest $request, SessaoEstudo $sessaoEstudo): JsonResponse
     {
@@ -104,11 +90,7 @@ class SessaoEstudoController extends Controller
     }
 
     /**
-        * Delete a study session (must belong to the authenticated user).
-        *
-        * @param Request $request
-        * @param SessaoEstudo $sessaoEstudo
-        * @return JsonResponse
+     * Delete a study session (must belong to the authenticated user).
      */
     public function destroy(Request $request, SessaoEstudo $sessaoEstudo): JsonResponse
     {
@@ -120,11 +102,7 @@ class SessaoEstudoController extends Controller
     }
 
     /**
-        * Generate a study schedule for the next 15 days.
-        *
-        * @param Request $request
-        * @param CronogramaService $cronogramaService
-        * @return JsonResponse
+     * Generate a study schedule for the next 15 days.
      */
     public function gerarCronograma(Request $request, CronogramaService $cronogramaService): JsonResponse
     {
@@ -142,11 +120,7 @@ class SessaoEstudoController extends Controller
     }
 
     /**
-        * Mark a study session as finished and update related data (when applicable).
-        *
-        * @param Request $request
-        * @param SessaoEstudo $sessaoEstudo
-        * @return JsonResponse
+     * Mark a study session as finished and update related data (when applicable).
      */
     public function finalizar(Request $request, SessaoEstudo $sessaoEstudo): JsonResponse
     {
@@ -206,10 +180,6 @@ class SessaoEstudoController extends Controller
 
     /**
      * Ensure the record belongs to the authenticated user via `assunto -> materia`.
-     *
-     * @param Request $request
-     * @param SessaoEstudo $sessaoEstudo
-     * @return void
      */
     private function ensureOwnership(Request $request, SessaoEstudo $sessaoEstudo): void
     {

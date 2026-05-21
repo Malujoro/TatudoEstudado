@@ -16,9 +16,6 @@ class AssuntoController extends Controller
 {
     /**
      * List the authenticated user's assuntos (paginated).
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -35,11 +32,7 @@ class AssuntoController extends Controller
     }
 
     /**
-        * Show a single assunto (must belong to the authenticated user).
-        *
-        * @param Request $request
-        * @param Assunto $assunto
-        * @return JsonResponse
+     * Show a single assunto (must belong to the authenticated user).
      */
     public function show(Request $request, Assunto $assunto): JsonResponse
     {
@@ -51,10 +44,7 @@ class AssuntoController extends Controller
     }
 
     /**
-        * Create a new assunto for one of the authenticated user's materias.
-        *
-        * @param StoreAssuntoRequest $request
-        * @return JsonResponse
+     * Create a new assunto for one of the authenticated user's materias.
      */
     public function store(StoreAssuntoRequest $request): JsonResponse
     {
@@ -80,11 +70,7 @@ class AssuntoController extends Controller
     }
 
     /**
-        * Update an assunto (must belong to the authenticated user).
-        *
-        * @param UpdateAssuntoRequest $request
-        * @param Assunto $assunto
-        * @return JsonResponse
+     * Update an assunto (must belong to the authenticated user).
      */
     public function update(UpdateAssuntoRequest $request, Assunto $assunto): JsonResponse
     {
@@ -99,11 +85,7 @@ class AssuntoController extends Controller
     }
 
     /**
-        * Delete an assunto (must belong to the authenticated user).
-        *
-        * @param Request $request
-        * @param Assunto $assunto
-        * @return JsonResponse
+     * Delete an assunto (must belong to the authenticated user).
      */
     public function destroy(Request $request, Assunto $assunto): JsonResponse
     {
@@ -116,10 +98,6 @@ class AssuntoController extends Controller
 
     /**
      * Ensure the record belongs to the authenticated user via `materia`.
-     *
-     * @param Request $request
-     * @param Assunto $assunto
-     * @return void
      */
     private function ensureOwnership(Request $request, Assunto $assunto): void
     {

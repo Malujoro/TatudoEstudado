@@ -15,9 +15,6 @@ class MateriaController extends Controller
 {
     /**
      * List the authenticated user's materias (paginated).
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -34,11 +31,7 @@ class MateriaController extends Controller
     }
 
     /**
-        * Show a single materia (must belong to the authenticated user).
-        *
-        * @param Request $request
-        * @param Materia $materia
-        * @return JsonResponse
+     * Show a single materia (must belong to the authenticated user).
      */
     public function show(Request $request, Materia $materia): JsonResponse
     {
@@ -50,10 +43,7 @@ class MateriaController extends Controller
     }
 
     /**
-        * Create a new materia for the authenticated user.
-        *
-        * @param StoreMateriaRequest $request
-        * @return JsonResponse
+     * Create a new materia for the authenticated user.
      */
     public function store(StoreMateriaRequest $request): JsonResponse
     {
@@ -69,11 +59,7 @@ class MateriaController extends Controller
     }
 
     /**
-        * Update an existing materia (must belong to the authenticated user).
-        *
-        * @param UpdateMateriaRequest $request
-        * @param Materia $materia
-        * @return JsonResponse
+     * Update an existing materia (must belong to the authenticated user).
      */
     public function update(UpdateMateriaRequest $request, Materia $materia): JsonResponse
     {
@@ -88,11 +74,7 @@ class MateriaController extends Controller
     }
 
     /**
-        * Delete a materia (must belong to the authenticated user).
-        *
-        * @param Request $request
-        * @param Materia $materia
-        * @return JsonResponse
+     * Delete a materia (must belong to the authenticated user).
      */
     public function destroy(Request $request, Materia $materia): JsonResponse
     {
@@ -105,10 +87,6 @@ class MateriaController extends Controller
 
     /**
      * Ensure the record belongs to the authenticated user.
-     *
-     * @param Request $request
-     * @param Materia $materia
-     * @return void
      */
     private function ensureOwnership(Request $request, Materia $materia): void
     {

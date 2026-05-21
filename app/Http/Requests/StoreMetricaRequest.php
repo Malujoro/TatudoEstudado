@@ -13,8 +13,6 @@ class StoreMetricaRequest extends FormRequest
      * Authorize the request.
      *
      * Currently handled by route middleware (`auth`).
-     *
-     * @return bool
      */
     public function authorize(): bool
     {

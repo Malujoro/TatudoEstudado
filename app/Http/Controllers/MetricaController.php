@@ -16,9 +16,6 @@ class MetricaController extends Controller
 {
     /**
      * List the authenticated user's metricas (paginated).
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -35,11 +32,7 @@ class MetricaController extends Controller
     }
 
     /**
-        * Show a single metrica (must belong to the authenticated user).
-        *
-        * @param Request $request
-        * @param Metrica $metrica
-        * @return JsonResponse
+     * Show a single metrica (must belong to the authenticated user).
      */
     public function show(Request $request, Metrica $metrica): JsonResponse
     {
@@ -51,10 +44,7 @@ class MetricaController extends Controller
     }
 
     /**
-        * Create a new metrica for one of the authenticated user's assuntos.
-        *
-        * @param StoreMetricaRequest $request
-        * @return JsonResponse
+     * Create a new metrica for one of the authenticated user's assuntos.
      */
     public function store(StoreMetricaRequest $request): JsonResponse
     {
@@ -80,11 +70,7 @@ class MetricaController extends Controller
     }
 
     /**
-        * Update a metrica (must belong to the authenticated user).
-        *
-        * @param UpdateMetricaRequest $request
-        * @param Metrica $metrica
-        * @return JsonResponse
+     * Update a metrica (must belong to the authenticated user).
      */
     public function update(UpdateMetricaRequest $request, Metrica $metrica): JsonResponse
     {
@@ -99,11 +85,7 @@ class MetricaController extends Controller
     }
 
     /**
-        * Delete a metrica (must belong to the authenticated user).
-        *
-        * @param Request $request
-        * @param Metrica $metrica
-        * @return JsonResponse
+     * Delete a metrica (must belong to the authenticated user).
      */
     public function destroy(Request $request, Metrica $metrica): JsonResponse
     {
@@ -116,10 +98,6 @@ class MetricaController extends Controller
 
     /**
      * Ensure the record belongs to the authenticated user via `assunto -> materia`.
-     *
-     * @param Request $request
-     * @param Metrica $metrica
-     * @return void
      */
     private function ensureOwnership(Request $request, Metrica $metrica): void
     {

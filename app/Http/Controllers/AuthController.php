@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +18,7 @@ class AuthController extends Controller
     /**
      * Show the login page.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function showLogin()
     {
@@ -26,7 +28,7 @@ class AuthController extends Controller
     /**
      * Show the registration page.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function showRegister()
     {
@@ -36,8 +38,7 @@ class AuthController extends Controller
     /**
      * Attempt to authenticate the user.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function login(Request $request)
     {
@@ -60,8 +61,7 @@ class AuthController extends Controller
     /**
      * Register a new user and log them in.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function register(Request $request)
     {
@@ -96,8 +96,7 @@ class AuthController extends Controller
     /**
      * Log out the current user.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function logout(Request $request)
     {
@@ -112,8 +111,7 @@ class AuthController extends Controller
     /**
      * Send a password reset link to the given email.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function forgotPassword(Request $request)
     {
@@ -133,8 +131,7 @@ class AuthController extends Controller
     /**
      * Reset the user's password using the provided token.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function resetPassword(Request $request)
     {

@@ -15,9 +15,6 @@ class UserController extends Controller
 {
     /**
      * List users (paginated).
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -33,10 +30,7 @@ class UserController extends Controller
     }
 
     /**
-        * Show a single user.
-        *
-        * @param User $user
-        * @return JsonResponse
+     * Show a single user.
      */
     public function show(User $user): JsonResponse
     {
@@ -46,10 +40,7 @@ class UserController extends Controller
     }
 
     /**
-        * Create a new user.
-        *
-        * @param StoreUserRequest $request
-        * @return JsonResponse
+     * Create a new user.
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
@@ -74,11 +65,7 @@ class UserController extends Controller
     }
 
     /**
-        * Update an existing user.
-        *
-        * @param UpdateUserRequest $request
-        * @param User $user
-        * @return JsonResponse
+     * Update an existing user.
      */
     public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
@@ -98,9 +85,6 @@ class UserController extends Controller
 
     /**
      * Delete a user.
-     *
-     * @param User $user
-     * @return JsonResponse
      */
     public function destroy(User $user): JsonResponse
     {
