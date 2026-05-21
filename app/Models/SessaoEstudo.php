@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * Model representing an individual study session.
- * 
+ *
  * @property string $id Session UUID.
- * @property \Illuminate\Support\Carbon $data Session date.
+ * @property Carbon $data Session date.
  * @property string $tipo Study type (e.g., Theory, Revision).
  * @property float $horas Duration in hours.
  * @property bool $finalizado Completion status.
@@ -43,8 +44,6 @@ class SessaoEstudo extends Model
 
     /**
      * Defines the topic studied in this session.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function assunto(): BelongsTo
     {

@@ -35,8 +35,6 @@ class Materia extends Model
 
     /**
      * Defines the user who owns the subject.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user(): BelongsTo
     {
@@ -45,8 +43,6 @@ class Materia extends Model
 
     /**
      * Lists topics linked to this subject.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function assuntos(): HasMany
     {

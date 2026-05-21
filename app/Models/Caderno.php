@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Model representing the notebook content for a topic.
- * 
+ *
  * @property string $id Notebook UUID.
  * @property string $conteudo Annotation text.
  * @property string $assunto_id Related topic ID.
@@ -31,8 +31,6 @@ class Caderno extends Model
 
     /**
      * Defines the topic this notebook belongs to.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function assunto(): BelongsTo
     {

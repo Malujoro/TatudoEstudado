@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Model storing performance (correct/wrong) for a topic.
- * 
+ *
  * @property string $id Metric UUID.
  * @property int $acertos Number of correct answers.
  * @property int $erros Number of wrong answers.
@@ -33,8 +33,6 @@ class Metrica extends Model
 
     /**
      * Defines the topic this metric refers to.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function assunto(): BelongsTo
     {

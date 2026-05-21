@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Model representing a study topic within a subject.
- * 
+ *
  * @property string $id Topic UUID.
  * @property string $nome Topic name.
  * @property string $materia_id Parent subject ID.
@@ -39,8 +39,6 @@ class Assunto extends Model
 
     /**
      * Defines the subject this topic belongs to.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function materia(): BelongsTo
     {
@@ -49,8 +47,6 @@ class Assunto extends Model
 
     /**
      * Lists all study sessions performed for this topic.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function sessoesEstudo(): HasMany
     {
@@ -59,8 +55,6 @@ class Assunto extends Model
 
     /**
      * Gets the notebook linked to this topic.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function caderno(): HasOne
     {
@@ -69,8 +63,6 @@ class Assunto extends Model
 
     /**
      * Gets the performance metrics linked to this topic.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function metrica(): HasOne
     {

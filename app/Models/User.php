@@ -75,8 +75,6 @@ class User extends Authenticatable
 
     /**
      * Lists subjects created by this user.
-     * 
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function materias(): HasMany
     {

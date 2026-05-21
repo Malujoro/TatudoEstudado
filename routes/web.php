@@ -10,24 +10,26 @@ use App\Http\Controllers\UserController;
 use App\Models\Assunto;
 use App\Models\Materia;
 use App\Models\SessaoEstudo;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\View;
 
 /**
  * Application Web and API Routes.
- * 
- * This file defines all the HTTP routes for the application, including 
+ *
+ * This file defines all the HTTP routes for the application, including
  * dashboard views, authentication, and the JSON API endpoints.
  */
 
 /**
  * Home Dashboard.
- * 
+ *
  * Displays the study calendar for a specific week.
- * 
- * @param \Illuminate\Http\Request $request Includes 'week' (int) as a query parameter.
- * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+ *
+ * @param  Request  $request  Includes 'week' (int) as a query parameter.
+ * @return View|RedirectResponse
  */
 Route::get('/', function (Request $request) {
     if (auth()->check()) {
@@ -85,11 +87,11 @@ Route::get('/', function (Request $request) {
 
 /**
  * Daily Goals.
- * 
+ *
  * Lists all unfinished study sessions due by or before today.
- * 
- * @param \Illuminate\Http\Request $request
- * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+ *
+ * @param  Request  $request
+ * @return View|RedirectResponse
  */
 Route::get('/metas-diarias', function (Request $request) {
     if (auth()->check()) {
@@ -171,14 +173,14 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 /**
  * Protected Web Interface Routes.
- * 
+ *
  * Requires user authentication.
  */
 Route::middleware('auth')->group(function () {
     /**
      * List all Subjects (Matérias).
-     * 
-     * @return \Illuminate\View\View
+     *
+     * @return View
      */
     Route::get('/materias', function (Request $request) {
         $materias = Materia::where('user_id', $request->user()->id)->withCount('assuntos')->orderBy('nome')->get();
@@ -188,8 +190,8 @@ Route::middleware('auth')->group(function () {
 
     /**
      * List all Topics (Assuntos).
-     * 
-     * @return \Illuminate\View\View
+     *
+     * @return View
      */
     Route::get('/assuntos', function (Request $request) {
         $materias = Materia::where('user_id', $request->user()->id)->orderBy('nome')->get();
@@ -200,8 +202,8 @@ Route::middleware('auth')->group(function () {
 
     /**
      * User Profile and Availability View.
-     * 
-     * @return \Illuminate\View\View
+     *
+     * @return View
      */
     Route::get('/perfil', function (Request $request) {
         $user = $request->user();
@@ -212,9 +214,9 @@ Route::middleware('auth')->group(function () {
 
     /**
      * Update User Weekly Availability.
-     * 
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     *
+     * @param  Request  $request
+     * @return RedirectResponse
      */
     Route::post('/perfil', function (Request $request) {
         $data = $request->validate([
@@ -236,7 +238,7 @@ Route::middleware('auth')->group(function () {
 
 /**
  * JSON API Routes.
- * 
+ *
  * Provides RESTful endpoints for CRUD operations and schedule generation.
  */
 Route::middleware('auth')

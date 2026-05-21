@@ -34,11 +34,10 @@ class CronogramaService
     /**
      * Generates a study schedule for the upcoming days.
      *
-     * @param \App\Models\User $user The user for whom the schedule is generated.
-     * @param \Illuminate\Support\Carbon|null $inicio The start date for the schedule. Defaults to today.
-     * @param int $dias The number of days to generate the schedule for. Defaults to 15.
-     * @param bool $limpar Whether to clear existing unfinished sessions within the period. Defaults to true.
-     *
+     * @param  User  $user  The user for whom the schedule is generated.
+     * @param  Carbon|null  $inicio  The start date for the schedule. Defaults to today.
+     * @param  int  $dias  The number of days to generate the schedule for. Defaults to 15.
+     * @param  bool  $limpar  Whether to clear existing unfinished sessions within the period. Defaults to true.
      * @return array<string, mixed> An array containing the schedule details, including start/end dates and sessions.
      * @return array<string, mixed>
      */
@@ -215,8 +214,8 @@ class CronogramaService
      *
      * @param  array<string, mixed>  $states
      * @param  array<int, string>  $candidatos
-     * @param  \Illuminate\Support\Carbon  $dia The current day being scheduled.
-     * @param  array<int, string>  $ultimasMaterias A list of recently scheduled subject IDs to avoid repetition.
+     * @param  Carbon  $dia  The current day being scheduled.
+     * @param  array<int, string>  $ultimasMaterias  A list of recently scheduled subject IDs to avoid repetition.
      * @return string|null The ID of the chosen topic, or null if no suitable topic is found.
      */
     private function escolherAssunto(array $states, array $candidatos, Carbon $dia, array $ultimasMaterias): ?string
@@ -256,8 +255,9 @@ class CronogramaService
      * Calculates a score for a topic to determine its priority in the schedule.
      *
      * @param  array<string, mixed>  $state
-     * @param  \Illuminate\Support\Carbon  $dia The current day for which the score is being calculated.
+     * @param  Carbon  $dia  The current day for which the score is being calculated.
      * @return float The calculated score for the topic.
+     *
      * @internal This method is for internal use within the service.
      */
     private function calcularScore(array $state, Carbon $dia): float
@@ -278,9 +278,10 @@ class CronogramaService
      * Prioritizes based on completion status, remaining time, and recent session types.
      *
      * @param  array<string, mixed>  $state
-     * @param  int  $minutosRestantes Remaining minutes in the current day's schedule.
-     * @param  array<int, string>  $ultimosTipos A list of recently scheduled session types to avoid repetition.
+     * @param  int  $minutosRestantes  Remaining minutes in the current day's schedule.
+     * @param  array<int, string>  $ultimosTipos  A list of recently scheduled session types to avoid repetition.
      * @return string|null The chosen session type, or null if no suitable type is found.
+     *
      * @internal This method is for internal use within the service.
      */
     private function escolherTipo(array $state, int $minutosRestantes, array $ultimosTipos): ?string
