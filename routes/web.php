@@ -14,6 +14,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 
+/**
+ * Application Web and API Routes.
+ * 
+ * This file defines all the HTTP routes for the application, including 
+ * dashboard views, authentication, and the JSON API endpoints.
+ */
+
+/**
+ * Home Dashboard.
+ * 
+ * Displays the study calendar for a specific week.
+ * 
+ * @param \Illuminate\Http\Request $request Includes 'week' (int) as a query parameter.
+ * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+ */
 Route::get('/', function (Request $request) {
     if (auth()->check()) {
         $user = $request->user();
@@ -68,6 +83,14 @@ Route::get('/', function (Request $request) {
     return redirect()->route('login');
 })->name('home');
 
+/**
+ * Daily Goals.
+ * 
+ * Lists all unfinished study sessions due by or before today.
+ * 
+ * @param \Illuminate\Http\Request $request
+ * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+ */
 Route::get('/metas-diarias', function (Request $request) {
     if (auth()->check()) {
         $user = $request->user();
@@ -117,6 +140,9 @@ Route::get('/metas-diarias', function (Request $request) {
     return redirect()->route('login');
 })->name('metas.diarias');
 
+/**
+ * Authentication Routes (Login, Register, Logout).
+ */
 Route::get('/login', [AuthController::class, 'showLogin'])
     ->name('login')
     ->middleware('guest');
@@ -137,40 +163,59 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
 
-// Recuperação de senha:
+// Password Recovery Routes
 Route::view('/forgot-password', 'auth.forgot-password')->name('password.request');
-
 Route::view('/reset-password', 'auth.reset-password')->name('password.reset');
-
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-// ###
 
+/**
+ * Protected Web Interface Routes.
+ * 
+ * Requires user authentication.
+ */
 Route::middleware('auth')->group(function () {
+    /**
+     * List all Subjects (Matérias).
+     * 
+     * @return \Illuminate\View\View
+     */
     Route::get('/materias', function (Request $request) {
-        // Carrega todas as matérias do usuário
         $materias = Materia::where('user_id', $request->user()->id)->withCount('assuntos')->orderBy('nome')->get();
 
         return view('materias.index', compact('materias'));
     })->name('materias.index');
 
+    /**
+     * List all Topics (Assuntos).
+     * 
+     * @return \Illuminate\View\View
+     */
     Route::get('/assuntos', function (Request $request) {
-        // Carrega as matérias e seus respectivos assuntos
         $materias = Materia::where('user_id', $request->user()->id)->orderBy('nome')->get();
         $assuntos = Assunto::whereIn('materia_id', $materias->pluck('id'))->with('materia')->orderBy('nome')->get();
 
         return view('assuntos.index', compact('materias', 'assuntos'));
     })->name('assuntos.index');
 
+    /**
+     * User Profile and Availability View.
+     * 
+     * @return \Illuminate\View\View
+     */
     Route::get('/perfil', function (Request $request) {
         $user = $request->user();
-        // Carrega as matérias com a contagem de assuntos
         $materias = Materia::where('user_id', $user->id)->withCount('assuntos')->orderBy('nome')->get();
 
         return view('profile', compact('user', 'materias'));
     })->name('profile');
 
+    /**
+     * Update User Weekly Availability.
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     Route::post('/perfil', function (Request $request) {
         $data = $request->validate([
             'horario_semanal' => ['required', 'array'],
@@ -188,17 +233,12 @@ Route::middleware('auth')->group(function () {
         return back()->with('status', 'Disponibilidade atualizada!');
     })->name('profile.update');
 });
-/*
-|--------------------------------------------------------------------------
-| API (JSON) - Exemplo de CRUD
-|--------------------------------------------------------------------------
-|
-| Estas rotas retornam JSON e servem como base para os demais CRUDs.
-| Estão protegidas por `auth` (sessão). Para uso via front, basta consumir
-| os endpoints e enviar o cookie de sessão (ou adaptar para token depois).
-|
-*/
 
+/**
+ * JSON API Routes.
+ * 
+ * Provides RESTful endpoints for CRUD operations and schedule generation.
+ */
 Route::middleware('auth')
     ->prefix('api')
     ->name('api.')

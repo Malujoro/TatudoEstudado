@@ -7,6 +7,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Model storing performance (correct/wrong) for a topic.
+ * 
+ * @property string $id Metric UUID.
+ * @property int $acertos Number of correct answers.
+ * @property int $erros Number of wrong answers.
+ * @property string $assunto_id Related topic ID.
+ */
 class Metrica extends Model
 {
     use HasFactory, HasUuids;
@@ -23,6 +31,11 @@ class Metrica extends Model
         'assunto_id',
     ];
 
+    /**
+     * Defines the topic this metric refers to.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function assunto(): BelongsTo
     {
         return $this->belongsTo(Assunto::class);
