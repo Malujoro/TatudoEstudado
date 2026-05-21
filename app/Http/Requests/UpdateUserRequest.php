@@ -7,14 +7,14 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**
- * Validação para atualização de usuário.
+ * Validation rules for updating a user.
  */
 class UpdateUserRequest extends FormRequest
 {
     /**
-     * Autoriza a execução do request.
+     * Authorize the request.
      *
-     * No momento, a autorização é controlada por middleware de rota (`auth`).
+     * Currently handled by route middleware (`auth`).
      */
     public function authorize(): bool
     {
@@ -22,9 +22,9 @@ class UpdateUserRequest extends FormRequest
     }
 
     /**
-     * Regras de validação.
+     * Get the validation rules.
      *
-     * `password` é opcional na atualização.
+     * Note: `password` is optional on updates.
      *
      * @return array<string, mixed>
      */

@@ -9,6 +9,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * Model representing a study topic within a subject.
+ *
+ * @property string $id Topic UUID.
+ * @property string $nome Topic name.
+ * @property string $materia_id Parent subject ID.
+ * @property bool $teoria_finalizada Indicates if the theory part was completed.
+ */
 class Assunto extends Model
 {
     use HasFactory, HasUuids;
@@ -29,21 +37,33 @@ class Assunto extends Model
         'teoria_finalizada' => 'boolean',
     ];
 
+    /**
+     * Defines the subject this topic belongs to.
+     */
     public function materia(): BelongsTo
     {
         return $this->belongsTo(Materia::class);
     }
 
+    /**
+     * Lists all study sessions performed for this topic.
+     */
     public function sessoesEstudo(): HasMany
     {
         return $this->hasMany(SessaoEstudo::class);
     }
 
+    /**
+     * Gets the notebook linked to this topic.
+     */
     public function caderno(): HasOne
     {
         return $this->hasOne(Caderno::class);
     }
 
+    /**
+     * Gets the performance metrics linked to this topic.
+     */
     public function metrica(): HasOne
     {
         return $this->hasOne(Metrica::class);

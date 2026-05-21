@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 
 /**
- * Model de usuário.
+ * User model.
  *
  * @property int $id
  * @property string $name
@@ -74,7 +74,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Matérias cadastradas pelo usuário.
+     * Lists subjects created by this user.
      */
     public function materias(): HasMany
     {

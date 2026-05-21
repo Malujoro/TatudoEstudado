@@ -13,17 +13,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 /**
- * CRUD de sessões de estudo.
- *
- * Regras importantes:
- * - Sempre escopa por usuário autenticado via `assunto -> materia`.
- * - Para criar, o `assunto_id` deve pertencer ao usuário.
- * - Retorna JSON para consumo pelo front.
+ * CRUD controller for Sessoes de Estudo, scoped to the authenticated user.
  */
 class SessaoEstudoController extends Controller
 {
     /**
-     * Lista sessões de estudo do usuário autenticado com paginação.
+     * List the authenticated user's study sessions (paginated).
      */
     public function index(Request $request): JsonResponse
     {
@@ -40,7 +35,7 @@ class SessaoEstudoController extends Controller
     }
 
     /**
-     * Exibe uma sessão de estudo do usuário autenticado.
+     * Show a single study session (must belong to the authenticated user).
      */
     public function show(Request $request, SessaoEstudo $sessaoEstudo): JsonResponse
     {
@@ -52,7 +47,7 @@ class SessaoEstudoController extends Controller
     }
 
     /**
-     * Cria uma sessão de estudo para um assunto do usuário autenticado.
+     * Create a study session for one of the authenticated user's assuntos.
      */
     public function store(StoreSessaoEstudoRequest $request): JsonResponse
     {
@@ -80,7 +75,7 @@ class SessaoEstudoController extends Controller
     }
 
     /**
-     * Atualiza uma sessão de estudo do usuário autenticado.
+     * Update a study session (must belong to the authenticated user).
      */
     public function update(UpdateSessaoEstudoRequest $request, SessaoEstudo $sessaoEstudo): JsonResponse
     {
@@ -95,7 +90,7 @@ class SessaoEstudoController extends Controller
     }
 
     /**
-     * Remove uma sessão de estudo do usuário autenticado.
+     * Delete a study session (must belong to the authenticated user).
      */
     public function destroy(Request $request, SessaoEstudo $sessaoEstudo): JsonResponse
     {
@@ -107,7 +102,7 @@ class SessaoEstudoController extends Controller
     }
 
     /**
-     * Gera o cronograma de estudo para os próximos 15 dias.
+     * Generate a study schedule for the next 15 days.
      */
     public function gerarCronograma(Request $request, CronogramaService $cronogramaService): JsonResponse
     {
@@ -125,7 +120,7 @@ class SessaoEstudoController extends Controller
     }
 
     /**
-     * Finaliza uma sessão de estudo e atualiza métricas (quando aplicável).
+     * Mark a study session as finished and update related data (when applicable).
      */
     public function finalizar(Request $request, SessaoEstudo $sessaoEstudo): JsonResponse
     {
@@ -184,7 +179,7 @@ class SessaoEstudoController extends Controller
     }
 
     /**
-     * Garante que o registro pertence ao usuário autenticado via `assunto -> materia`.
+     * Ensure the record belongs to the authenticated user via `assunto -> materia`.
      */
     private function ensureOwnership(Request $request, SessaoEstudo $sessaoEstudo): void
     {

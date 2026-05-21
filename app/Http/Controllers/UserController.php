@@ -9,18 +9,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * CRUD de usuários.
- *
- * Este controller é pensado para consumo via front (posteriormente) e retorna JSON.
- * Rotas registradas como `apiResource` sob prefixo `/api` e middleware `auth`.
+ * CRUD controller for users.
  */
 class UserController extends Controller
 {
     /**
-     * Lista usuários com paginação.
-     *
-     * Query params suportados:
-     * - `per_page` (int): quantidade por página (default: 15)
+     * List users (paginated).
      */
     public function index(Request $request): JsonResponse
     {
@@ -36,7 +30,7 @@ class UserController extends Controller
     }
 
     /**
-     * Exibe um usuário específico.
+     * Show a single user.
      */
     public function show(User $user): JsonResponse
     {
@@ -46,7 +40,7 @@ class UserController extends Controller
     }
 
     /**
-     * Cria um novo usuário.
+     * Create a new user.
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
@@ -71,7 +65,7 @@ class UserController extends Controller
     }
 
     /**
-     * Atualiza um usuário existente.
+     * Update an existing user.
      */
     public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
@@ -90,7 +84,7 @@ class UserController extends Controller
     }
 
     /**
-     * Remove um usuário.
+     * Delete a user.
      */
     public function destroy(User $user): JsonResponse
     {

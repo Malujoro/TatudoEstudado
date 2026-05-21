@@ -5,14 +5,14 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Validação para criação de usuário.
+ * Validation rules for creating a user.
  */
 class StoreUserRequest extends FormRequest
 {
     /**
-     * Autoriza a execução do request.
+     * Authorize the request.
      *
-     * No momento, a autorização é controlada por middleware de rota (`auth`).
+     * Currently handled by route middleware (`auth`).
      */
     public function authorize(): bool
     {
@@ -20,7 +20,7 @@ class StoreUserRequest extends FormRequest
     }
 
     /**
-     * Regras de validação.
+     * Get the validation rules.
      *
      * @return array<string, mixed>
      */

@@ -9,20 +9,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * CRUD de matérias.
- *
- * Regras importantes:
- * - Sempre escopa por `user_id` (usuário autenticado).
- * - `user_id` não é aceito do cliente; é definido pelo backend.
- * - Retorna JSON para consumo pelo front.
+ * CRUD controller for Materias, scoped to the authenticated user.
  */
 class MateriaController extends Controller
 {
     /**
-     * Lista matérias do usuário autenticado com paginação.
-     *
-     * Query params suportados:
-     * - `per_page` (int): quantidade por página (default: 15)
+     * List the authenticated user's materias (paginated).
      */
     public function index(Request $request): JsonResponse
     {
@@ -39,7 +31,7 @@ class MateriaController extends Controller
     }
 
     /**
-     * Exibe uma matéria do usuário autenticado.
+     * Show a single materia (must belong to the authenticated user).
      */
     public function show(Request $request, Materia $materia): JsonResponse
     {
@@ -51,7 +43,7 @@ class MateriaController extends Controller
     }
 
     /**
-     * Cria uma matéria para o usuário autenticado.
+     * Create a new materia for the authenticated user.
      */
     public function store(StoreMateriaRequest $request): JsonResponse
     {
@@ -67,7 +59,7 @@ class MateriaController extends Controller
     }
 
     /**
-     * Atualiza uma matéria do usuário autenticado.
+     * Update an existing materia (must belong to the authenticated user).
      */
     public function update(UpdateMateriaRequest $request, Materia $materia): JsonResponse
     {
@@ -82,7 +74,7 @@ class MateriaController extends Controller
     }
 
     /**
-     * Remove uma matéria do usuário autenticado.
+     * Delete a materia (must belong to the authenticated user).
      */
     public function destroy(Request $request, Materia $materia): JsonResponse
     {
@@ -94,9 +86,7 @@ class MateriaController extends Controller
     }
 
     /**
-     * Garante que o registro pertence ao usuário autenticado.
-     *
-     * Retorna 404 para evitar enumeração de IDs por terceiros.
+     * Ensure the record belongs to the authenticated user.
      */
     private function ensureOwnership(Request $request, Materia $materia): void
     {

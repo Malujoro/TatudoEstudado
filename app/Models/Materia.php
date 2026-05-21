@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
- * Model de matéria.
+ * Subject model.
  *
  * @property string $id
  * @property string $nome
@@ -33,11 +33,17 @@ class Materia extends Model
         'user_id',
     ];
 
+    /**
+     * Defines the user who owns the subject.
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Lists topics linked to this subject.
+     */
     public function assuntos(): HasMany
     {
         return $this->hasMany(Assunto::class);
