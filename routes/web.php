@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Models\Assunto;
 use App\Models\Materia;
 use App\Models\SessaoEstudo;
+use App\Services\CronogramaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -50,6 +51,26 @@ Route::get('/', function (Request $request) {
             ->orderBy('data')
             ->orderBy('created_at')
             ->get();
+
+        if ($sessoesSemana->isEmpty() && $weekOffset === 0) {
+            $assuntosCount = Assunto::whereHas('materia', fn ($q) => $q->where('user_id', $user->id))->count();
+            if ($assuntosCount > 0) {
+                app(CronogramaService::class)->gerar($user, Carbon::today(), 15, true);
+
+                $sessoesSemana = SessaoEstudo::query()
+                    ->whereHas('assunto.materia', fn ($q) => $q->where('user_id', $user->id))
+                    ->whereBetween('data', [$inicioSemana->toDateString(), $fimSemana->toDateString()])
+                    ->with([
+                        'assunto:id,nome,materia_id',
+                        'assunto.materia:id,nome',
+                        'assunto.metrica:id,assunto_id,acertos,erros',
+                        'assunto.caderno:id,assunto_id,conteudo',
+                    ])
+                    ->orderBy('data')
+                    ->orderBy('created_at')
+                    ->get();
+            }
+        }
 
         $sessoesPorDia = $sessoesSemana->groupBy(fn ($sessao) => $sessao->data->toDateString());
 
@@ -195,7 +216,7 @@ Route::middleware('auth')->group(function () {
      */
     Route::get('/assuntos', function (Request $request) {
         $materias = Materia::where('user_id', $request->user()->id)->orderBy('nome')->get();
-        $assuntos = Assunto::whereIn('materia_id', $materias->pluck('id'))->with('materia')->orderBy('nome')->get();
+        $assuntos = Assunto::whereIn('materia_id', $materias->pluck('id'))->with(['materia', 'caderno'])->orderBy('nome')->get();
 
         return view('assuntos.index', compact('materias', 'assuntos'));
     })->name('assuntos.index');
@@ -232,7 +253,7 @@ Route::middleware('auth')->group(function () {
 
         $request->user()->update($data);
 
-        return back()->with('status', 'Disponibilidade atualizada!');
+        return back()->with('status', 'Disponibilidade atualizada!')->with('prompt_cronograma', true);
     })->name('profile.update');
 });
 

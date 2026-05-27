@@ -10,8 +10,15 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
     <script type="module" src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.4/dist/turbo.es2017-umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        .swal2-container.swal2-backdrop-show {
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+    </style>
 </head>
 
 <body class="min-h-screen bg-main-light text-main-dark">
@@ -83,6 +90,34 @@
             @yield('content')
         </main>
     </div>
+
+    @if (session('prompt_cronograma'))
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                Swal.fire({
+                    title: 'Disponibilidade alterada!',
+                    text: 'Deseja gerar um novo cronograma para aplicar as mudanças?',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: 'var(--color-swal-confirm)',
+                    cancelButtonColor: 'var(--color-swal-cancel)',
+                    confirmButtonText: 'Sim, gerar novo',
+                    cancelButtonText: 'Não, manter atual'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('/api/cronograma/gerar', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .getAttribute('content'),
+                                'Accept': 'application/json'
+                            }
+                        }).then(() => window.location.reload());
+                    }
+                });
+            });
+        </script>
+    @endif
 </body>
 
 </html>

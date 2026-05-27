@@ -186,6 +186,10 @@ class CronogramaService
                 $states[$assuntoId]['type_counts'][$tipo]++;
                 $states[$assuntoId]['last_date'] = $dia->toDateString();
 
+                if ($tipo === 'teoria') {
+                    $states[$assuntoId]['teoria_finalizada'] = true;
+                }
+
                 $ultimosTipos[] = $tipo;
                 if (count($ultimosTipos) > 2) {
                     array_shift($ultimosTipos);
@@ -315,6 +319,14 @@ class CronogramaService
                 $tiposRestritos,
                 fn ($tipo) => is_string($tipo) && array_key_exists($tipo, self::SESSION_MINUTES)
             ));
+
+            if (in_array('teoria', $permitidos)) {
+                if ($state['teoria_finalizada']) {
+                    $permitidos = array_values(array_filter($permitidos, fn ($t) => $t !== 'teoria'));
+                } else {
+                    $permitidos = array_values(array_filter($permitidos, fn ($t) => $t !== 'exercicio'));
+                }
+            }
         } else {
             $permitidos = $state['teoria_finalizada']
                 ? ['exercicio', 'revisao']

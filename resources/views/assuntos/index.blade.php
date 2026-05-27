@@ -40,10 +40,34 @@
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             @foreach ($assuntos as $assunto)
                 <div class="assunto-card-wrapper" data-nome="{{ strtolower($assunto->nome) }}"
-                    data-materia-id="{{ $assunto->materia_id }}" data-id="{{ $assunto->id }}" data-tipo='@json($assunto->tipo)'>
+                    data-nome-real="{{ $assunto->nome }}" data-materia-id="{{ $assunto->materia_id }}"
+                    data-id="{{ $assunto->id }}" data-tipo='@json($assunto->tipo)'
+                    data-caderno-id="{{ $assunto->caderno->id ?? '' }}"
+                    data-caderno-conteudo="{{ $assunto->caderno->conteudo ?? '' }}">
                     <x-assunto-card :nome="$assunto->nome" :id="$assunto->id" :tipo="$assunto->tipo" />
                 </div>
             @endforeach
+        </div>
+    </div>
+
+    <!-- Modal Caderno de Erros -->
+    <div class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-3" data-modal-caderno>
+        <div class="flex h-[94vh] w-full max-w-6xl flex-col rounded-3xl bg-white p-6">
+            <div class="flex items-center justify-between">
+                <h3 class="font-rem text-lg font-semibold text-purple-night">Caderno de erros</h3>
+                <button type="button" class="text-purple-night" data-close-modal-caderno>✕</button>
+            </div>
+            <textarea
+                class="mt-4 min-h-0 flex-1 w-full rounded-2xl border border-purple-dim/50 bg-white px-4 py-3 text-sm text-purple-night"
+                data-caderno-texto></textarea>
+            <div class="mt-4 flex justify-end gap-2">
+                <button type="button"
+                    class="rounded-full border border-purple-dim px-4 py-2 text-xs font-semibold text-purple-dim hover:bg-purple-dim hover:text-white transition"
+                    data-close-modal-caderno>Cancelar</button>
+                <button type="button"
+                    class="rounded-full bg-purple-light px-4 py-2 text-xs font-semibold text-purple-night hover:opacity-80 transition"
+                    data-save-caderno>Salvar</button>
+            </div>
         </div>
     </div>
 
@@ -63,6 +87,7 @@
             const btnCancelar = document.getElementById('btnCancelarAssunto');
             const modalTitle = modal.querySelector('h2');
             const tipoCheckboxes = Array.from(modal.querySelectorAll('[data-assunto-tipo]'));
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
             let currentAssuntoId = null;
 
@@ -105,6 +130,82 @@
                 if (e.target === modal) closeModal();
             });
 
+            // --- Funções Auxiliares de API e UI ---
+            function atualizarTela() {
+                typeof Turbo !== 'undefined' ? Turbo.visit(window.location.href, {
+                    action: "replace"
+                }) : window.location.reload();
+            }
+
+            async function checarEGerarCronograma(titulo) {
+                const result = await Swal.fire({
+                    title: titulo,
+                    text: 'Deseja gerar um novo cronograma para aplicar as mudanças?',
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonColor: 'var(--color-swal-confirm)',
+                    cancelButtonColor: 'var(--color-swal-cancel)',
+                    confirmButtonText: 'Gerar cronograma',
+                    cancelButtonText: 'Manter atual'
+                });
+
+                if (!result.isConfirmed) return;
+
+                try {
+                    await fetch('/api/cronograma/gerar', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json'
+                        }
+                    });
+                } catch (error) {
+                    console.error("Erro ao gerar cronograma:", error);
+                }
+            }
+
+            async function salvarAssunto(url, method, payload) {
+                try {
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) {
+                        closeModal();
+                        
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        
+                        await checarEGerarCronograma('Assunto salvo com sucesso!');
+                        atualizarTela();
+                    }
+                } catch (error) {
+                    console.error("Erro ao salvar:", error);
+                }
+            }
+
+            async function excluirAssunto(id) {
+                try {
+                    const response = await fetch(`/api/assuntos/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    if (response.ok) {
+                        await checarEGerarCronograma('Assunto excluído!');
+                        atualizarTela();
+                    }
+                } catch (error) {
+                    console.error("Erro ao excluir:", error);
+                }
+            }
+
             // 1. Filtro Local Integrado (Pesquisa + Dropdown de Matéria)
             function filterAssuntos() {
                 const term = searchInput ? searchInput.value.toLowerCase() : '';
@@ -132,7 +233,12 @@
 
                     const tipos = getTiposSelecionados();
                     if (tipos.length < 1) {
-                        alert('Selecione pelo menos 1 tipo (Teoria, Exercício ou Revisão).');
+                        Swal.fire({
+                            title: 'Atenção!',
+                            text: 'Selecione pelo menos 1 tipo (Teoria, Exercício ou Revisão).',
+                            icon: 'warning',
+                            confirmButtonColor: '#9333EA'
+                        });
                         return;
                     }
 
@@ -142,26 +248,7 @@
                         tipo: tipos,
                     };
 
-                    try {
-                        const response = await fetch(url, {
-                            method: method,
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector(
-                                    'meta[name="csrf-token"]')?.getAttribute('content')
-                            },
-                            body: JSON.stringify(payload)
-                        });
-                        if (response.ok) {
-                            closeModal();
-                            typeof Turbo !== 'undefined' ? Turbo.visit(window.location.href, {
-                                action: "replace"
-                            }) : window.location.reload();
-                        }
-                    } catch (error) {
-                        console.error("Erro ao salvar:", error);
-                    }
+                    await salvarAssunto(url, method, payload);
                 });
             }
 
@@ -178,33 +265,104 @@
                     } catch {
                         tipo = rawTipo || null;
                     }
-                    const currentName = wrapper.querySelector('h2').innerText;
+                    const currentName = wrapper.dataset.nomeReal;
                     openModal(id, currentName, materiaId, tipo);
+                });
+            });
+
+            // Clicar no card executa a edição por padrão (exceto nos botões)
+            document.querySelectorAll('.assunto-card-wrapper').forEach(wrapper => {
+                wrapper.style.cursor = 'pointer';
+                wrapper.addEventListener('click', (e) => {
+                    if (e.target.closest('.action-buttons')) return;
+                    wrapper.querySelector('.btn-edit-assunto')?.click();
                 });
             });
 
             // 4. Deletar Assunto
             document.querySelectorAll('.btn-delete-assunto').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
-                    if (!confirm("Tem certeza que deseja excluir este assunto?")) return;
-                    const id = e.target.closest('.assunto-card-wrapper').dataset.id;
-                    try {
-                        const response = await fetch(`/api/assuntos/${id}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector(
-                                    'meta[name="csrf-token"]')?.getAttribute(
-                                    'content')
-                            }
-                        });
-                        if (response.ok) typeof Turbo !== 'undefined' ? Turbo.visit(window
-                            .location.href, {
-                                action: "replace"
-                            }) : window.location.reload();
-                    } catch (error) {
-                        console.error("Erro ao excluir:", error);
+                    e.stopPropagation();
+                    const result = await Swal.fire({
+                        title: 'Atenção!',
+                        text: 'Tem certeza que deseja excluir este assunto?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: 'var(--color-swal-delete)',
+                        cancelButtonColor: 'var(--color-swal-cancel)',
+                        confirmButtonText: 'Sim, excluir',
+                        cancelButtonText: 'Cancelar'
+                    });
+
+                    if (result.isConfirmed) {
+                        const id = e.target.closest('.assunto-card-wrapper').dataset.id;
+                        await excluirAssunto(id);
                     }
                 });
+            });
+
+            // 5. Caderno de erros
+            const modalCaderno = document.querySelector('[data-modal-caderno]');
+            const textoCaderno = document.querySelector('[data-caderno-texto]');
+            const saveCaderno = document.querySelector('[data-save-caderno]');
+            const closeCaderno = document.querySelectorAll('[data-close-modal-caderno]');
+            let cadernoState = {
+                assuntoId: null,
+                cadernoId: null
+            };
+
+            document.querySelectorAll('.btn-caderno-assunto').forEach((button) => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const wrapper = e.target.closest('.assunto-card-wrapper');
+                    cadernoState = {
+                        assuntoId: wrapper.dataset.id,
+                        cadernoId: wrapper.dataset.cadernoId || null,
+                    };
+                    if (textoCaderno) textoCaderno.value = wrapper.dataset.cadernoConteudo || '';
+                    if (modalCaderno) {
+                        modalCaderno.classList.remove('hidden');
+                        modalCaderno.classList.add('flex');
+                    }
+                });
+            });
+
+            closeCaderno.forEach((button) => {
+                button.addEventListener('click', () => {
+                    modalCaderno?.classList.add('hidden');
+                    modalCaderno?.classList.remove('flex');
+                });
+            });
+
+            saveCaderno?.addEventListener('click', async () => {
+                if (!cadernoState.assuntoId) return;
+                const conteudo = textoCaderno?.value || '';
+                const isUpdate = Boolean(cadernoState.cadernoId);
+                const url = isUpdate ? `/api/cadernos/${cadernoState.cadernoId}` : '/api/cadernos';
+
+                try {
+                    const response = await fetch(url, {
+                        method: isUpdate ? 'PUT' : 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify(isUpdate ? {
+                            conteudo
+                        } : {
+                            conteudo,
+                            assunto_id: cadernoState.assuntoId
+                        }),
+                    });
+                    if (response.ok) {
+                        modalCaderno?.classList.add('hidden');
+                        modalCaderno?.classList.remove('flex');
+                        atualizarTela();
+                    }
+                } catch (error) {
+                    console.error("Erro ao salvar caderno:", error);
+                }
             });
         })();
     </script>
