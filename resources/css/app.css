@@ -32,6 +32,11 @@
     --color-secondary-green: #9FA089;
     --color-secondary-blue: #6BC5D2;
     --color-secondary-red: #D77979;
+
+    /* Cores Pop-ups (SweetAlert) */
+    --color-swal-confirm: var(--color-purple);
+    --color-swal-cancel: var(--color-purple-muted);
+    --color-swal-delete: var(--color-secondary-red);
 }
 
 @layer utilities {

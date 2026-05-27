@@ -42,6 +42,7 @@
             const searchInput = document.querySelector('.mb-8 input') || document.querySelector(
                 'input[type="search"]');
             const modalTitle = modal.querySelector('h2');
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
             let currentMateriaId = null;
 
@@ -61,6 +62,36 @@
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) closeModal();
             });
+
+            // --- Funções Auxiliares de API e UI ---
+            function atualizarTela() {
+                typeof Turbo !== 'undefined' ? Turbo.visit(window.location.href, {
+                    action: "replace"
+                }) : window.location.reload();
+            }
+
+            async function excluirMateria(id) {
+                try {
+                    const response = await fetch(`/api/materias/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    if (response.ok) {
+                        await Swal.fire({
+                            title: 'Sucesso!',
+                            text: 'Matéria excluída com sucesso.',
+                            icon: 'success',
+                            confirmButtonColor: 'var(--color-swal-confirm)'
+                        });
+                        atualizarTela();
+                    }
+                } catch (error) {
+                    console.error("Erro ao excluir:", error);
+                }
+            }
 
             // 1. Pesquisa Local
             if (searchInput) {
@@ -87,22 +118,30 @@
                         headers: {
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                ?.getAttribute('content')
+                            'X-CSRF-TOKEN': token
                         },
                         body: JSON.stringify(Object.fromEntries(formData))
                     });
                     if (response.ok) {
                         closeModal();
-                        typeof Turbo !== 'undefined' ?
-                            Turbo.visit(window.location.href, {
-                                action: "replace"
-                            }) :
-                            window.location.reload();
+                        
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        
+                        await Swal.fire({
+                            title: 'Sucesso!',
+                            text: 'Matéria salva com sucesso.',
+                            icon: 'success',
+                            confirmButtonColor: 'var(--color-swal-confirm)'
+                        });
+                        atualizarTela();
                     } else {
                         const errorData = await response.json();
-                        console.error("Erro retornado pela API:", errorData);
-                        alert("Erro ao adicionar a matéria. Verifique o console do navegador.");
+                        Swal.fire({
+                            title: 'Erro!',
+                            text: 'Erro ao adicionar a matéria. Verifique o console do navegador.',
+                            icon: 'error',
+                            confirmButtonColor: 'var(--color-swal-confirm)'
+                        });
                     }
                 } catch (error) {
                     console.error("Erro ao adicionar:", error);
@@ -122,25 +161,21 @@
             // 4. Deletar Matéria
             document.querySelectorAll('.btn-delete-materia').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
-                    if (!confirm(
-                            "Tem certeza que deseja excluir esta matéria? Todos os assuntos vinculados a ela serão excluídos."
-                        )) return;
-                    const id = e.target.closest('.materia-card-wrapper').dataset.id;
-                    try {
-                        const response = await fetch(`/api/materias/${id}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector(
-                                    'meta[name="csrf-token"]')?.getAttribute(
-                                    'content')
-                            }
-                        });
-                        if (response.ok) typeof Turbo !== 'undefined' ? Turbo.visit(window
-                            .location.href, {
-                                action: "replace"
-                            }) : window.location.reload();
-                    } catch (error) {
-                        console.error("Erro ao excluir:", error);
+                    e.stopPropagation();
+                    const result = await Swal.fire({
+                        title: 'Atenção!',
+                        text: 'Tem certeza que deseja excluir esta matéria? Todos os assuntos vinculados a ela serão excluídos.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: 'var(--color-swal-delete)',
+                        cancelButtonColor: 'var(--color-swal-cancel)',
+                        confirmButtonText: 'Sim, excluir',
+                        cancelButtonText: 'Cancelar'
+                    });
+
+                    if (result.isConfirmed) {
+                        const id = e.target.closest('.materia-card-wrapper').dataset.id;
+                        await excluirMateria(id);
                     }
                 });
             });

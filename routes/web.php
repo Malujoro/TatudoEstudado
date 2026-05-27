@@ -216,7 +216,7 @@ Route::middleware('auth')->group(function () {
      */
     Route::get('/assuntos', function (Request $request) {
         $materias = Materia::where('user_id', $request->user()->id)->orderBy('nome')->get();
-        $assuntos = Assunto::whereIn('materia_id', $materias->pluck('id'))->with('materia')->orderBy('nome')->get();
+        $assuntos = Assunto::whereIn('materia_id', $materias->pluck('id'))->with(['materia', 'caderno'])->orderBy('nome')->get();
 
         return view('assuntos.index', compact('materias', 'assuntos'));
     })->name('assuntos.index');
