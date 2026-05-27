@@ -7,6 +7,27 @@
             <input type="text" name="nome" placeholder="Nome do Assunto" required
                 class="w-full rounded-full border-none bg-white px-6 py-4 font-semibold text-purple placeholder-purple/70 outline-none focus:ring-2 focus:ring-main-dark text-lg shadow-inner" />
 
+            <div class="flex flex-col gap-3">
+                <p class="text-sm font-semibold text-main-dark">Selecione um ou mais tipos:</p>
+                <div class="flex flex-col gap-2">
+                    <label class="flex items-center gap-3">
+                        <input type="checkbox" name="tipo[]" value="teoria" data-assunto-tipo
+                            class="h-5 w-5 rounded border-purple-dim/50 text-purple focus:ring-purple" />
+                        <span class="text-sm font-semibold text-main-dark">Teoria</span>
+                    </label>
+                    <label class="flex items-center gap-3">
+                        <input type="checkbox" name="tipo[]" value="exercicio" data-assunto-tipo
+                            class="h-5 w-5 rounded border-purple-dim/50 text-purple focus:ring-purple" />
+                        <span class="text-sm font-semibold text-main-dark">Exercício</span>
+                    </label>
+                    <label class="flex items-center gap-3">
+                        <input type="checkbox" name="tipo[]" value="revisao" data-assunto-tipo
+                            class="h-5 w-5 rounded border-purple-dim/50 text-purple focus:ring-purple" />
+                        <span class="text-sm font-semibold text-main-dark">Revisão</span>
+                    </label>
+                </div>
+            </div>
+
             <!-- Matéria Vinculada de forma Oculta (preenchido automaticamente via JS) -->
             <input type="hidden" name="materia_id" id="hiddenMateriaId" />
 

@@ -40,8 +40,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             @foreach ($assuntos as $assunto)
                 <div class="assunto-card-wrapper" data-nome="{{ strtolower($assunto->nome) }}"
-                    data-materia-id="{{ $assunto->materia_id }}" data-id="{{ $assunto->id }}">
-                    <x-assunto-card :nome="$assunto->nome" :id="$assunto->id" />
+                    data-materia-id="{{ $assunto->materia_id }}" data-id="{{ $assunto->id }}" data-tipo='@json($assunto->tipo)'>
+                    <x-assunto-card :nome="$assunto->nome" :id="$assunto->id" :tipo="$assunto->tipo" />
                 </div>
             @endforeach
         </div>
@@ -62,21 +62,36 @@
             const btnAdicionar = document.getElementById('btnOpenAddAssuntoModal');
             const btnCancelar = document.getElementById('btnCancelarAssunto');
             const modalTitle = modal.querySelector('h2');
+            const tipoCheckboxes = Array.from(modal.querySelectorAll('[data-assunto-tipo]'));
 
             let currentAssuntoId = null;
 
-            const openModal = (id = null, nome = '', materiaId = null) => {
+            const setTipos = (tipos) => {
+                const normalized = Array.isArray(tipos) ? tipos : [];
+
+                tipoCheckboxes.forEach(cb => {
+                    cb.checked = normalized.includes(cb.value);
+                });
+            };
+
+            const getTiposSelecionados = () => {
+                return tipoCheckboxes.filter(cb => cb.checked).map(cb => cb.value);
+            };
+
+            const openModal = (id = null, nome = '', materiaId = null, tipo = null) => {
                 currentAssuntoId = id;
                 if (id) {
                     modalTitle.innerText = 'Editar Assunto';
                     form.elements['nome'].value = nome;
                     document.getElementById('hiddenMateriaId').value = materiaId;
+                    setTipos(tipo);
                 } else {
                     modalTitle.innerText = 'Adicionar Assunto';
                     form.elements['nome'].value = '';
                     if (materiaSelect) {
                         document.getElementById('hiddenMateriaId').value = materiaSelect.value;
                     }
+                    setTipos([]);
                 }
                 modal.classList.remove('hidden');
             };
@@ -111,10 +126,21 @@
             if (form) {
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    const formData = new FormData(form);
                     const isEditing = !!currentAssuntoId;
                     const url = isEditing ? `/api/assuntos/${currentAssuntoId}` : '/api/assuntos';
                     const method = isEditing ? 'PUT' : 'POST';
+
+                    const tipos = getTiposSelecionados();
+                    if (tipos.length < 1) {
+                        alert('Selecione pelo menos 1 tipo (Teoria, Exercício ou Revisão).');
+                        return;
+                    }
+
+                    const payload = {
+                        nome: form.elements['nome']?.value,
+                        materia_id: document.getElementById('hiddenMateriaId')?.value,
+                        tipo: tipos,
+                    };
 
                     try {
                         const response = await fetch(url, {
@@ -125,7 +151,7 @@
                                 'X-CSRF-TOKEN': document.querySelector(
                                     'meta[name="csrf-token"]')?.getAttribute('content')
                             },
-                            body: JSON.stringify(Object.fromEntries(formData))
+                            body: JSON.stringify(payload)
                         });
                         if (response.ok) {
                             closeModal();
@@ -145,8 +171,15 @@
                     const wrapper = e.target.closest('.assunto-card-wrapper');
                     const id = wrapper.dataset.id;
                     const materiaId = wrapper.dataset.materiaId;
+                    const rawTipo = wrapper.dataset.tipo;
+                    let tipo = null;
+                    try {
+                        tipo = rawTipo ? JSON.parse(rawTipo) : null;
+                    } catch {
+                        tipo = rawTipo || null;
+                    }
                     const currentName = wrapper.querySelector('h2').innerText;
-                    openModal(id, currentName, materiaId);
+                    openModal(id, currentName, materiaId, tipo);
                 });
             });
 

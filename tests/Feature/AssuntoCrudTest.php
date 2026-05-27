@@ -46,6 +46,7 @@ class AssuntoCrudTest extends TestCase
         $createResponse = $this->postJson('/api/assuntos', [
             'nome' => 'Álgebra',
             'materia_id' => $materiaA->id,
+            'tipo' => 'teoria',
         ]);
 
         $createResponse->assertCreated();
@@ -55,6 +56,7 @@ class AssuntoCrudTest extends TestCase
             'id' => $createdId,
             'nome' => 'Álgebra',
             'materia_id' => $materiaA->id,
+            'tipo' => 'teoria',
         ]);
 
         // Index retorna apenas assuntos do userA (via matéria do userA)
@@ -77,16 +79,19 @@ class AssuntoCrudTest extends TestCase
         // Update próprio
         $this->putJson("/api/assuntos/{$createdId}", [
             'nome' => 'Álgebra II',
+            'tipo' => 'revisao',
         ])->assertOk()->assertJson([
             'id' => $createdId,
             'nome' => 'Álgebra II',
             'materia_id' => $materiaA->id,
+            'tipo' => 'revisao',
         ]);
 
         $this->assertDatabaseHas('assuntos', [
             'id' => $createdId,
             'nome' => 'Álgebra II',
             'materia_id' => $materiaA->id,
+            'tipo' => 'revisao',
         ]);
 
         // Delete próprio

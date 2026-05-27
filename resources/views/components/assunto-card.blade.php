@@ -1,4 +1,4 @@
-@props(['nome', 'id' => null])
+@props(['nome', 'id' => null, 'tipo' => null])
 
 
 <div
@@ -9,9 +9,24 @@
 
     <div class="flex items-end justify-between gap-2 mt-6">
         <div class="flex flex-wrap items-center gap-2">
-            <x-tag tipo="teoria" />
-            <x-tag tipo="exercicio" />
-            <x-tag tipo="revisao" />
+            @php
+                $tipos = [];
+                if (is_array($tipo)) {
+                    $tipos = array_values(array_filter($tipo, fn ($t) => is_string($t) && $t !== ''));
+                } elseif (is_string($tipo) && $tipo !== '') {
+                    $tipos = [$tipo];
+                }
+            @endphp
+
+            @if (!empty($tipos))
+                @foreach ($tipos as $t)
+                    <x-tag :tipo="$t" />
+                @endforeach
+            @else
+                <x-tag tipo="teoria" />
+                <x-tag tipo="exercicio" />
+                <x-tag tipo="revisao" />
+            @endif
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
             <!-- Ícone de Documento/Anotação -->

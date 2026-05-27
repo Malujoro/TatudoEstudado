@@ -34,12 +34,11 @@ class CronogramaService
     /**
      * Generates a study schedule for the upcoming days.
      *
-     * @param  User  $user  The user for whom the schedule is generated.
-     * @param  Carbon|null  $inicio  The start date for the schedule. Defaults to today.
-     * @param  int  $dias  The number of days to generate the schedule for. Defaults to 15.
-     * @param  bool  $limpar  Whether to clear existing unfinished sessions within the period. Defaults to true.
-     * @return array<string, mixed> An array containing the schedule details, including start/end dates and sessions.
-     * @return array<string, mixed>
+     * @param  User  $user  Target user (availability is read from horario_semanal).
+     * @param  Carbon|null  $inicio  Start date (defaults to today).
+     * @param  int  $dias  Number of days to generate (defaults to 15).
+     * @param  bool  $limpar  When true, removes unfinished sessions in the generated range.
+     * @return array<string, mixed> Schedule payload: inicio, fim, total, sessoes.
      */
     public function gerar(User $user, ?Carbon $inicio = null, int $dias = 15, bool $limpar = true): array
     {
@@ -50,7 +49,7 @@ class CronogramaService
         $assuntos = Assunto::query()
             ->whereHas('materia', fn ($q) => $q->where('user_id', $user->id))
             ->with('metrica:id,assunto_id,acertos,erros')
-            ->get(['id', 'nome', 'materia_id', 'teoria_finalizada']);
+            ->get(['id', 'nome', 'materia_id', 'teoria_finalizada', 'tipo']);
 
         if ($assuntos->isEmpty()) {
             return [
@@ -143,13 +142,29 @@ class CronogramaService
 
             while ($minutosRestantes >= self::SESSION_MINUTES['revisao']) {
                 $candidatos = ! empty($remainingAssuntos) ? $remainingAssuntos : array_keys($states);
-                $assuntoId = $this->escolherAssunto($states, $candidatos, $dia, $ultimasMaterias);
-                if ($assuntoId === null) {
-                    break;
+                $candidatosTentativa = $candidatos;
+
+                $assuntoId = null;
+                $tipo = null;
+
+                while (! empty($candidatosTentativa)) {
+                    $assuntoId = $this->escolherAssunto($states, $candidatosTentativa, $dia, $ultimasMaterias);
+                    if ($assuntoId === null) {
+                        break;
+                    }
+
+                    $tipo = $this->escolherTipo($states[$assuntoId], $minutosRestantes, $ultimosTipos);
+                    if ($tipo !== null) {
+                        break;
+                    }
+
+                    // Este assunto não consegue gerar sessão agora. Tenta outro.
+                    $candidatosTentativa = array_values(array_diff($candidatosTentativa, [$assuntoId]));
+                    $remainingAssuntos = array_values(array_diff($remainingAssuntos, [$assuntoId]));
+                    $assuntoId = null;
                 }
 
-                $tipo = $this->escolherTipo($states[$assuntoId], $minutosRestantes, $ultimosTipos);
-                if ($tipo === null) {
+                if ($assuntoId === null || $tipo === null) {
                     break;
                 }
 
@@ -212,11 +227,11 @@ class CronogramaService
     /**
      * Chooses the next topic to schedule based on error rate, last study date, and recent subjects.
      *
-     * @param  array<string, mixed>  $states
-     * @param  array<int, string>  $candidatos
-     * @param  Carbon  $dia  The current day being scheduled.
-     * @param  array<int, string>  $ultimasMaterias  A list of recently scheduled subject IDs to avoid repetition.
-     * @return string|null The ID of the chosen topic, or null if no suitable topic is found.
+     * @param  array<string, mixed>  $states  In-memory scheduling state indexed by assunto id.
+     * @param  array<int, string>  $candidatos  Candidate assunto ids.
+     * @param  Carbon  $dia  Day being scheduled.
+     * @param  array<int, string>  $ultimasMaterias  Recently scheduled materia ids (used to avoid repetition).
+     * @return string|null The chosen assunto id or null.
      */
     private function escolherAssunto(array $states, array $candidatos, Carbon $dia, array $ultimasMaterias): ?string
     {
@@ -254,9 +269,9 @@ class CronogramaService
     /**
      * Calculates a score for a topic to determine its priority in the schedule.
      *
-     * @param  array<string, mixed>  $state
-     * @param  Carbon  $dia  The current day for which the score is being calculated.
-     * @return float The calculated score for the topic.
+     * @param  array<string, mixed>  $state  Current assunto scheduling state.
+     * @param  Carbon  $dia  Day being scheduled.
+     * @return float Priority score (higher means more likely to be scheduled).
      *
      * @internal This method is for internal use within the service.
      */
@@ -277,18 +292,34 @@ class CronogramaService
      * Chooses the type of study session (theory, exercise, or revision) for a given topic.
      * Prioritizes based on completion status, remaining time, and recent session types.
      *
-     * @param  array<string, mixed>  $state
-     * @param  int  $minutosRestantes  Remaining minutes in the current day's schedule.
-     * @param  array<int, string>  $ultimosTipos  A list of recently scheduled session types to avoid repetition.
-     * @return string|null The chosen session type, or null if no suitable type is found.
+     * If the assunto has explicit allowed types (Assunto::tipo), this list is treated as the source of truth.
+     *
+     * @param  array<string, mixed>  $state  Current assunto scheduling state.
+     * @param  int  $minutosRestantes  Remaining minutes in the current day.
+     * @param  array<int, string>  $ultimosTipos  Recent scheduled types (used to reduce repetition).
+     * @return string|null Chosen type key (teoria|exercicio|revisao) or null.
      *
      * @internal This method is for internal use within the service.
      */
     private function escolherTipo(array $state, int $minutosRestantes, array $ultimosTipos): ?string
     {
-        $permitidos = $state['teoria_finalizada']
-            ? ['exercicio', 'revisao']
-            : ['teoria', 'revisao'];
+        $tiposRestritos = $state['assunto']?->tipo;
+        if (is_string($tiposRestritos) && $tiposRestritos !== '') {
+            $tiposRestritos = [$tiposRestritos];
+        }
+
+        // Se o assunto tem restrição explícita de tipos, ela deve ser a fonte de verdade.
+        // (Compatível com o comportamento antigo de "tipo" único.)
+        if (is_array($tiposRestritos) && ! empty($tiposRestritos)) {
+            $permitidos = array_values(array_filter(
+                $tiposRestritos,
+                fn ($tipo) => is_string($tipo) && array_key_exists($tipo, self::SESSION_MINUTES)
+            ));
+        } else {
+            $permitidos = $state['teoria_finalizada']
+                ? ['exercicio', 'revisao']
+                : ['teoria', 'revisao'];
+        }
 
         $permitidos = array_values(array_filter(
             $permitidos,

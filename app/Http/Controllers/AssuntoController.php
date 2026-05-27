@@ -16,6 +16,9 @@ class AssuntoController extends Controller
 {
     /**
      * List the authenticated user's assuntos (paginated).
+     *
+     * @param  Request  $request  HTTP request containing optional pagination params.
+     * @return JsonResponse Paginated assuntos owned by the authenticated user.
      */
     public function index(Request $request): JsonResponse
     {
@@ -24,7 +27,7 @@ class AssuntoController extends Controller
 
         $assuntos = Assunto::query()
             ->whereHas('materia', fn ($q) => $q->where('user_id', $request->user()->id))
-            ->select(['id', 'nome', 'teoria_finalizada', 'materia_id', 'created_at', 'updated_at'])
+            ->select(['id', 'nome', 'teoria_finalizada', 'tipo', 'materia_id', 'created_at', 'updated_at'])
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
@@ -33,18 +36,25 @@ class AssuntoController extends Controller
 
     /**
      * Show a single assunto (must belong to the authenticated user).
+     *
+     * @param  Request  $request  Current HTTP request.
+     * @param  Assunto  $assunto  Route-bound assunto model.
+     * @return JsonResponse The assunto payload (limited fields).
      */
     public function show(Request $request, Assunto $assunto): JsonResponse
     {
         $this->ensureOwnership($request, $assunto);
 
         return response()->json(
-            $assunto->only(['id', 'nome', 'teoria_finalizada', 'materia_id', 'created_at', 'updated_at'])
+            $assunto->only(['id', 'nome', 'teoria_finalizada', 'tipo', 'materia_id', 'created_at', 'updated_at'])
         );
     }
 
     /**
      * Create a new assunto for one of the authenticated user's materias.
+     *
+     * @param  StoreAssuntoRequest  $request  Validated payload for assunto creation.
+     * @return JsonResponse The created assunto payload.
      */
     public function store(StoreAssuntoRequest $request): JsonResponse
     {
@@ -61,16 +71,21 @@ class AssuntoController extends Controller
             'nome' => $data['nome'],
             'materia_id' => $materia->id,
             'teoria_finalizada' => $data['teoria_finalizada'] ?? false,
+            'tipo' => $data['tipo'],
         ]);
 
         return response()->json(
-            $assunto->only(['id', 'nome', 'teoria_finalizada', 'materia_id', 'created_at', 'updated_at']),
+            $assunto->only(['id', 'nome', 'teoria_finalizada', 'tipo', 'materia_id', 'created_at', 'updated_at']),
             201
         );
     }
 
     /**
      * Update an assunto (must belong to the authenticated user).
+     *
+     * @param  UpdateAssuntoRequest  $request  Validated payload for updating an assunto.
+     * @param  Assunto  $assunto  Route-bound assunto model.
+     * @return JsonResponse The updated assunto payload.
      */
     public function update(UpdateAssuntoRequest $request, Assunto $assunto): JsonResponse
     {
@@ -80,12 +95,16 @@ class AssuntoController extends Controller
         $assunto->save();
 
         return response()->json(
-            $assunto->only(['id', 'nome', 'teoria_finalizada', 'materia_id', 'created_at', 'updated_at'])
+            $assunto->only(['id', 'nome', 'teoria_finalizada', 'tipo', 'materia_id', 'created_at', 'updated_at'])
         );
     }
 
     /**
      * Delete an assunto (must belong to the authenticated user).
+     *
+     * @param  Request  $request  Current HTTP request.
+     * @param  Assunto  $assunto  Route-bound assunto model.
+     * @return JsonResponse Empty response with 204 status.
      */
     public function destroy(Request $request, Assunto $assunto): JsonResponse
     {
@@ -98,6 +117,9 @@ class AssuntoController extends Controller
 
     /**
      * Ensure the record belongs to the authenticated user via `materia`.
+     *
+     * @param  Request  $request  Current HTTP request.
+     * @param  Assunto  $assunto  Target assunto.
      */
     private function ensureOwnership(Request $request, Assunto $assunto): void
     {
