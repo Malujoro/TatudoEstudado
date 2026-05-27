@@ -13,6 +13,8 @@ class StoreAssuntoRequest extends FormRequest
      * Authorize the request.
      *
      * Currently handled by route middleware (`auth`).
+     *
+     * @return bool True when the request is allowed to proceed.
      */
     public function authorize(): bool
     {
@@ -21,6 +23,12 @@ class StoreAssuntoRequest extends FormRequest
 
     /**
      * Get the validation rules.
+     *
+     * Expected payload:
+     * - nome: string
+     * - materia_id: uuid
+     * - teoria_finalizada: bool (optional)
+     * - tipo: array<string> (min 1, max 3)
      *
      * @return array<string, mixed>
      */

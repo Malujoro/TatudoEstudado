@@ -35,6 +35,14 @@ class Assunto extends Model
         'tipo',
     ];
 
+    /**
+     * Attribute casting.
+     *
+     * - teoria_finalizada: bool
+     * - tipo: array<string>|null (stored as JSON/JSONB)
+     *
+     * @var array<string, string>
+     */
     protected $casts = [
         'teoria_finalizada' => 'boolean',
         'tipo' => 'array',
@@ -42,6 +50,8 @@ class Assunto extends Model
 
     /**
      * Defines the subject this topic belongs to.
+     *
+     * @return BelongsTo<Materia, Assunto>
      */
     public function materia(): BelongsTo
     {
@@ -50,6 +60,8 @@ class Assunto extends Model
 
     /**
      * Lists all study sessions performed for this topic.
+     *
+     * @return HasMany<SessaoEstudo, Assunto>
      */
     public function sessoesEstudo(): HasMany
     {
@@ -58,6 +70,8 @@ class Assunto extends Model
 
     /**
      * Gets the notebook linked to this topic.
+     *
+     * @return HasOne<Caderno, Assunto>
      */
     public function caderno(): HasOne
     {
@@ -66,6 +80,8 @@ class Assunto extends Model
 
     /**
      * Gets the performance metrics linked to this topic.
+     *
+     * @return HasOne<Metrica, Assunto>
      */
     public function metrica(): HasOne
     {

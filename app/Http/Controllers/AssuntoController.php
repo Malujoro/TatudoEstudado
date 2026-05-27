@@ -16,6 +16,9 @@ class AssuntoController extends Controller
 {
     /**
      * List the authenticated user's assuntos (paginated).
+     *
+     * @param  Request  $request  HTTP request containing optional pagination params.
+     * @return JsonResponse Paginated assuntos owned by the authenticated user.
      */
     public function index(Request $request): JsonResponse
     {
@@ -33,6 +36,10 @@ class AssuntoController extends Controller
 
     /**
      * Show a single assunto (must belong to the authenticated user).
+     *
+     * @param  Request  $request  Current HTTP request.
+     * @param  Assunto  $assunto  Route-bound assunto model.
+     * @return JsonResponse The assunto payload (limited fields).
      */
     public function show(Request $request, Assunto $assunto): JsonResponse
     {
@@ -45,6 +52,9 @@ class AssuntoController extends Controller
 
     /**
      * Create a new assunto for one of the authenticated user's materias.
+     *
+     * @param  StoreAssuntoRequest  $request  Validated payload for assunto creation.
+     * @return JsonResponse The created assunto payload.
      */
     public function store(StoreAssuntoRequest $request): JsonResponse
     {
@@ -72,6 +82,10 @@ class AssuntoController extends Controller
 
     /**
      * Update an assunto (must belong to the authenticated user).
+     *
+     * @param  UpdateAssuntoRequest  $request  Validated payload for updating an assunto.
+     * @param  Assunto  $assunto  Route-bound assunto model.
+     * @return JsonResponse The updated assunto payload.
      */
     public function update(UpdateAssuntoRequest $request, Assunto $assunto): JsonResponse
     {
@@ -87,6 +101,10 @@ class AssuntoController extends Controller
 
     /**
      * Delete an assunto (must belong to the authenticated user).
+     *
+     * @param  Request  $request  Current HTTP request.
+     * @param  Assunto  $assunto  Route-bound assunto model.
+     * @return JsonResponse Empty response with 204 status.
      */
     public function destroy(Request $request, Assunto $assunto): JsonResponse
     {
@@ -99,6 +117,9 @@ class AssuntoController extends Controller
 
     /**
      * Ensure the record belongs to the authenticated user via `materia`.
+     *
+     * @param  Request  $request  Current HTTP request.
+     * @param  Assunto  $assunto  Target assunto.
      */
     private function ensureOwnership(Request $request, Assunto $assunto): void
     {
