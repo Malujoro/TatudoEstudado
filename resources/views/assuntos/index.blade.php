@@ -155,6 +155,15 @@
                         });
                         if (response.ok) {
                             closeModal();
+                            if (confirm("Assunto salvo com sucesso! Deseja gerar um novo cronograma para aplicar as mudanças?")) {
+                                await fetch('/api/cronograma/gerar', {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                                        'Accept': 'application/json'
+                                    }
+                                });
+                            }
                             typeof Turbo !== 'undefined' ? Turbo.visit(window.location.href, {
                                 action: "replace"
                             }) : window.location.reload();
@@ -197,10 +206,20 @@
                                     'content')
                             }
                         });
-                        if (response.ok) typeof Turbo !== 'undefined' ? Turbo.visit(window
-                            .location.href, {
+                        if (response.ok) {
+                            if (confirm("Assunto excluído! Deseja gerar um novo cronograma para aplicar as mudanças?")) {
+                                await fetch('/api/cronograma/gerar', {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                                        'Accept': 'application/json'
+                                    }
+                                });
+                            }
+                            typeof Turbo !== 'undefined' ? Turbo.visit(window.location.href, {
                                 action: "replace"
                             }) : window.location.reload();
+                        }
                     } catch (error) {
                         console.error("Erro ao excluir:", error);
                     }

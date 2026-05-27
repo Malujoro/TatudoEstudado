@@ -83,6 +83,24 @@
             @yield('content')
         </main>
     </div>
+
+    @if (session('prompt_cronograma'))
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                if (confirm("Sua disponibilidade foi alterada! Deseja gerar um novo cronograma para aplicar as mudanças?")) {
+                    fetch('/api/cronograma/gerar', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json'
+                        }
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            });
+        </script>
+    @endif
 </body>
 
 </html>
