@@ -29,7 +29,8 @@ class UpdateAssuntoRequest extends FormRequest
         return [
             'nome' => ['sometimes', 'string', 'max:255'],
             'teoria_finalizada' => ['sometimes', 'boolean'],
-            'tipo' => ['sometimes', 'nullable', 'in:teoria,exercicio,revisao'],
+            'tipo' => ['sometimes', 'required', 'array', 'min:1', 'max:3'],
+            'tipo.*' => ['required', 'string', 'in:teoria,exercicio,revisao', 'distinct'],
         ];
     }
 }

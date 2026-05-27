@@ -9,8 +9,19 @@
 
     <div class="flex items-end justify-between gap-2 mt-6">
         <div class="flex flex-wrap items-center gap-2">
-            @if (!empty($tipo))
-                <x-tag :tipo="$tipo" />
+            @php
+                $tipos = [];
+                if (is_array($tipo)) {
+                    $tipos = array_values(array_filter($tipo, fn ($t) => is_string($t) && $t !== ''));
+                } elseif (is_string($tipo) && $tipo !== '') {
+                    $tipos = [$tipo];
+                }
+            @endphp
+
+            @if (!empty($tipos))
+                @foreach ($tipos as $t)
+                    <x-tag :tipo="$t" />
+                @endforeach
             @else
                 <x-tag tipo="teoria" />
                 <x-tag tipo="exercicio" />

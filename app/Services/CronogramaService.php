@@ -143,13 +143,29 @@ class CronogramaService
 
             while ($minutosRestantes >= self::SESSION_MINUTES['revisao']) {
                 $candidatos = ! empty($remainingAssuntos) ? $remainingAssuntos : array_keys($states);
-                $assuntoId = $this->escolherAssunto($states, $candidatos, $dia, $ultimasMaterias);
-                if ($assuntoId === null) {
-                    break;
+                $candidatosTentativa = $candidatos;
+
+                $assuntoId = null;
+                $tipo = null;
+
+                while (! empty($candidatosTentativa)) {
+                    $assuntoId = $this->escolherAssunto($states, $candidatosTentativa, $dia, $ultimasMaterias);
+                    if ($assuntoId === null) {
+                        break;
+                    }
+
+                    $tipo = $this->escolherTipo($states[$assuntoId], $minutosRestantes, $ultimosTipos);
+                    if ($tipo !== null) {
+                        break;
+                    }
+
+                    // Este assunto não consegue gerar sessão agora. Tenta outro.
+                    $candidatosTentativa = array_values(array_diff($candidatosTentativa, [$assuntoId]));
+                    $remainingAssuntos = array_values(array_diff($remainingAssuntos, [$assuntoId]));
+                    $assuntoId = null;
                 }
 
-                $tipo = $this->escolherTipo($states[$assuntoId], $minutosRestantes, $ultimosTipos);
-                if ($tipo === null) {
+                if ($assuntoId === null || $tipo === null) {
                     break;
                 }
 
@@ -286,16 +302,23 @@ class CronogramaService
      */
     private function escolherTipo(array $state, int $minutosRestantes, array $ultimosTipos): ?string
     {
-        $tipoForcado = $state['assunto']?->tipo;
-        if (! empty($tipoForcado)) {
-            return (self::SESSION_MINUTES[$tipoForcado] ?? PHP_INT_MAX) <= $minutosRestantes
-                ? $tipoForcado
-                : null;
+        $tiposRestritos = $state['assunto']?->tipo;
+        if (is_string($tiposRestritos) && $tiposRestritos !== '') {
+            $tiposRestritos = [$tiposRestritos];
         }
 
-        $permitidos = $state['teoria_finalizada']
-            ? ['exercicio', 'revisao']
-            : ['teoria', 'revisao'];
+        // Se o assunto tem restrição explícita de tipos, ela deve ser a fonte de verdade.
+        // (Compatível com o comportamento antigo de "tipo" único.)
+        if (is_array($tiposRestritos) && ! empty($tiposRestritos)) {
+            $permitidos = array_values(array_filter(
+                $tiposRestritos,
+                fn ($tipo) => is_string($tipo) && array_key_exists($tipo, self::SESSION_MINUTES)
+            ));
+        } else {
+            $permitidos = $state['teoria_finalizada']
+                ? ['exercicio', 'revisao']
+                : ['teoria', 'revisao'];
+        }
 
         $permitidos = array_values(array_filter(
             $permitidos,

@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $nome Topic name.
  * @property string $materia_id Parent subject ID.
  * @property bool $teoria_finalizada Indicates if the theory part was completed.
- * @property string|null $tipo Indicates if the topic is only teoria/exercicio/revisao.
+ * @property array<int, string>|null $tipo Indicates which types are allowed (teoria/exercicio/revisao).
  */
 class Assunto extends Model
 {
@@ -37,6 +37,7 @@ class Assunto extends Model
 
     protected $casts = [
         'teoria_finalizada' => 'boolean',
+        'tipo' => 'array',
     ];
 
     /**

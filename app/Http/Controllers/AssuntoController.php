@@ -61,7 +61,7 @@ class AssuntoController extends Controller
             'nome' => $data['nome'],
             'materia_id' => $materia->id,
             'teoria_finalizada' => $data['teoria_finalizada'] ?? false,
-            'tipo' => $data['tipo'] ?? null,
+            'tipo' => $data['tipo'],
         ]);
 
         return response()->json(
