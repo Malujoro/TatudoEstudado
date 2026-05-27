@@ -20,14 +20,14 @@
         @else
             <div class="flex flex-col gap-6">
                 @foreach ($diasPendentes as $dia)
-                    <div class="rounded-[26px] border border-purple-dim/50 bg-main-dark/90 px-6 py-4">
+                    <div class="rounded-[26px] border-2 border-purple bg-purple-lightest px-6 py-4 shadow-sm">
                         <div class="flex flex-wrap items-center justify-between gap-4">
                             <div class="flex items-center gap-3">
                                 <span
                                     class="inline-flex items-center justify-center rounded-2xl bg-purple-light px-4 py-2 font-rem text-sm font-bold text-purple-night">
                                     {{ $dia['label'] }}
                                 </span>
-                                <span class="text-sm font-semibold text-purple-light">
+                                <span class="text-sm font-semibold text-purple-night">
                                     {{ \Illuminate\Support\Carbon::parse($dia['data'])->format('d/m') }}
                                 </span>
                             </div>
@@ -66,12 +66,13 @@
                                                 <p class="text-xs text-purple-night/70">
                                                     Média de acerto: <span class="font-semibold">{{ $media }}%</span>
                                                 </p>
+                                            <div class="mt-2 flex">
+                                                <span
+                                                    class="rounded-full px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider tema-{{ $tipo ?: 'default' }}">
+                                                    {{ $tipo }}
+                                                </span>
                                             </div>
-
-                                            <span
-                                                class="rounded-full px-3 py-1 text-xs font-semibold tema-{{ $tipo ?: 'default' }}">
-                                                {{ $tipo }}
-                                            </span>
+                                            </div>
                                         </div>
 
                                         <div class="flex flex-wrap items-center gap-2" data-session-actions>

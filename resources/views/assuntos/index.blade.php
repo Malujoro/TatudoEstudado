@@ -3,41 +3,44 @@
 @section('content')
     <div class="flex flex-col h-full w-full">
 
-        <!-- Header: Botão Adicionar, Pesquisa e Select Matéria -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5 mb-8">
-
-            <!-- Botão: Adicionar Assunto -->
-            <x-button id="btnOpenAddAssuntoModal">
-                Adicionar Assunto
-                <div class="bg-purple-lightest rounded-full p-1 flex items-center justify-center">
-                    <x-icons.plus class="text-purple-light" />
+        <!-- Header: Select Matéria e Barra de Pesquisa -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+            <div class="md:col-start-1 xl:col-start-2">
+                <!-- Select da Matéria Atual -->
+                <div class="relative w-full">
+                    @php
+                        $selectedMateriaId = request('materia_id');
+                    @endphp
+                    <select id="materiaSelect"
+                        class="w-full appearance-none bg-purple-light text-main-dark px-5 py-2.5 rounded-full outline-none focus:ring-2 focus:ring-purple font-semibold text-[18px] pr-12 cursor-pointer">
+                        @foreach ($materias as $materia)
+                            <option value="{{ $materia->id }}" @selected($materia->id == $selectedMateriaId)>{{ $materia->nome }}</option>
+                        @endforeach
+                    </select>
+                    <div
+                        class="absolute right-3 top-1/2 -translate-y-1/2 bg-purple-lightest rounded-full p-1 flex items-center justify-center pointer-events-none">
+                        <x-icons.chevron-down class="text-purple-light" />
+                    </div>
                 </div>
-            </x-button>
-
-            <!-- Input de Pesquisa -->
-            <x-search-input />
-
-            <!-- Select da Matéria Atual -->
-            <div class="relative w-full sm:w-auto min-w-50">
-                @php
-                    $selectedMateriaId = request('materia_id');
-                @endphp
-                <select id="materiaSelect"
-                    class="w-full appearance-none bg-purple-light text-main-dark px-5 py-2.5 rounded-full outline-none focus:ring-2 focus:ring-purple font-semibold text-[18px] pr-12 cursor-pointer">
-                    @foreach ($materias as $materia)
-                        <option value="{{ $materia->id }}" @selected($materia->id == $selectedMateriaId)>{{ $materia->nome }}</option>
-                    @endforeach
-                </select>
-                <div
-                    class="absolute right-3 top-1/2 -translate-y-1/2 bg-purple-lightest rounded-full p-1 flex items-center justify-center pointer-events-none">
-
-                    <x-icons.chevron-down class="text-purple-light" />
-                </div>
+            </div>
+            <div class="md:col-start-2 xl:col-start-3">
+                <!-- Input de Pesquisa -->
+                <x-search-input class="py-3" container-class="w-full" />
             </div>
         </div>
 
         <!-- Grid de Cards dos Assuntos -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+            <!-- Card: Adicionar Assunto -->
+            <button id="btnOpenAddAssuntoModal"
+                class="bg-secondary-green rounded-[20px] p-6 flex flex-col items-center justify-center min-h-42.5 text-main-dark hover:bg-secondary-green/90 transition-colors shadow-sm border-2 border-dashed border-main-dark/10">
+                <div class="bg-purple-lightest rounded-full p-3 mb-3 flex items-center justify-center">
+                    <x-icons.plus class="w-10 h-10 text-purple-light" />
+                </div>
+                <span class="text-[16px] font-bold tracking-wide opacity-80">Adicionar assunto</span>
+            </button>
+
             @foreach ($assuntos as $assunto)
                 <div class="assunto-card-wrapper" data-nome="{{ strtolower($assunto->nome) }}"
                     data-nome-real="{{ $assunto->nome }}" data-materia-id="{{ $assunto->materia_id }}"
