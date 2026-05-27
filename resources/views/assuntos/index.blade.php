@@ -40,8 +40,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             @foreach ($assuntos as $assunto)
                 <div class="assunto-card-wrapper" data-nome="{{ strtolower($assunto->nome) }}"
-                    data-materia-id="{{ $assunto->materia_id }}" data-id="{{ $assunto->id }}">
-                    <x-assunto-card :nome="$assunto->nome" :id="$assunto->id" />
+                    data-materia-id="{{ $assunto->materia_id }}" data-id="{{ $assunto->id }}" data-tipo="{{ $assunto->tipo ?? '' }}">
+                    <x-assunto-card :nome="$assunto->nome" :id="$assunto->id" :tipo="$assunto->tipo" />
                 </div>
             @endforeach
         </div>
@@ -62,21 +62,43 @@
             const btnAdicionar = document.getElementById('btnOpenAddAssuntoModal');
             const btnCancelar = document.getElementById('btnCancelarAssunto');
             const modalTitle = modal.querySelector('h2');
+            const tipoHidden = document.getElementById('assuntoTipoHidden');
+            const tipoCheckboxes = Array.from(modal.querySelectorAll('[data-assunto-tipo]'));
 
             let currentAssuntoId = null;
 
-            const openModal = (id = null, nome = '', materiaId = null) => {
+            const setTipo = (value) => {
+                const tipo = value || '';
+                if (tipoHidden) tipoHidden.value = tipo;
+                tipoCheckboxes.forEach(cb => {
+                    cb.checked = (cb.value === tipo);
+                });
+            };
+
+            tipoCheckboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    if (cb.checked) {
+                        setTipo(cb.value);
+                    } else {
+                        setTipo('');
+                    }
+                });
+            });
+
+            const openModal = (id = null, nome = '', materiaId = null, tipo = null) => {
                 currentAssuntoId = id;
                 if (id) {
                     modalTitle.innerText = 'Editar Assunto';
                     form.elements['nome'].value = nome;
                     document.getElementById('hiddenMateriaId').value = materiaId;
+                    setTipo(tipo);
                 } else {
                     modalTitle.innerText = 'Adicionar Assunto';
                     form.elements['nome'].value = '';
                     if (materiaSelect) {
                         document.getElementById('hiddenMateriaId').value = materiaSelect.value;
                     }
+                    setTipo('');
                 }
                 modal.classList.remove('hidden');
             };
@@ -115,6 +137,9 @@
                     const isEditing = !!currentAssuntoId;
                     const url = isEditing ? `/api/assuntos/${currentAssuntoId}` : '/api/assuntos';
                     const method = isEditing ? 'PUT' : 'POST';
+                    const payload = Object.fromEntries(formData);
+
+                    if (payload.tipo === '') payload.tipo = null;
 
                     try {
                         const response = await fetch(url, {
@@ -125,7 +150,7 @@
                                 'X-CSRF-TOKEN': document.querySelector(
                                     'meta[name="csrf-token"]')?.getAttribute('content')
                             },
-                            body: JSON.stringify(Object.fromEntries(formData))
+                            body: JSON.stringify(payload)
                         });
                         if (response.ok) {
                             closeModal();
@@ -145,8 +170,9 @@
                     const wrapper = e.target.closest('.assunto-card-wrapper');
                     const id = wrapper.dataset.id;
                     const materiaId = wrapper.dataset.materiaId;
+                    const tipo = wrapper.dataset.tipo || null;
                     const currentName = wrapper.querySelector('h2').innerText;
-                    openModal(id, currentName, materiaId);
+                    openModal(id, currentName, materiaId, tipo);
                 });
             });
 

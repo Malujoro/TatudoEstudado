@@ -50,7 +50,7 @@ class CronogramaService
         $assuntos = Assunto::query()
             ->whereHas('materia', fn ($q) => $q->where('user_id', $user->id))
             ->with('metrica:id,assunto_id,acertos,erros')
-            ->get(['id', 'nome', 'materia_id', 'teoria_finalizada']);
+            ->get(['id', 'nome', 'materia_id', 'teoria_finalizada', 'tipo']);
 
         if ($assuntos->isEmpty()) {
             return [
@@ -286,6 +286,13 @@ class CronogramaService
      */
     private function escolherTipo(array $state, int $minutosRestantes, array $ultimosTipos): ?string
     {
+        $tipoForcado = $state['assunto']?->tipo;
+        if (! empty($tipoForcado)) {
+            return (self::SESSION_MINUTES[$tipoForcado] ?? PHP_INT_MAX) <= $minutosRestantes
+                ? $tipoForcado
+                : null;
+        }
+
         $permitidos = $state['teoria_finalizada']
             ? ['exercicio', 'revisao']
             : ['teoria', 'revisao'];

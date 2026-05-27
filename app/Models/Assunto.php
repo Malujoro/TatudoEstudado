@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $nome Topic name.
  * @property string $materia_id Parent subject ID.
  * @property bool $teoria_finalizada Indicates if the theory part was completed.
+ * @property string|null $tipo Indicates if the topic is only teoria/exercicio/revisao.
  */
 class Assunto extends Model
 {
@@ -31,6 +32,7 @@ class Assunto extends Model
         'nome',
         'materia_id',
         'teoria_finalizada',
+        'tipo',
     ];
 
     protected $casts = [

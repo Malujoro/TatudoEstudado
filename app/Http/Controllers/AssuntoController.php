@@ -24,7 +24,7 @@ class AssuntoController extends Controller
 
         $assuntos = Assunto::query()
             ->whereHas('materia', fn ($q) => $q->where('user_id', $request->user()->id))
-            ->select(['id', 'nome', 'teoria_finalizada', 'materia_id', 'created_at', 'updated_at'])
+            ->select(['id', 'nome', 'teoria_finalizada', 'tipo', 'materia_id', 'created_at', 'updated_at'])
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
@@ -39,7 +39,7 @@ class AssuntoController extends Controller
         $this->ensureOwnership($request, $assunto);
 
         return response()->json(
-            $assunto->only(['id', 'nome', 'teoria_finalizada', 'materia_id', 'created_at', 'updated_at'])
+            $assunto->only(['id', 'nome', 'teoria_finalizada', 'tipo', 'materia_id', 'created_at', 'updated_at'])
         );
     }
 
@@ -61,10 +61,11 @@ class AssuntoController extends Controller
             'nome' => $data['nome'],
             'materia_id' => $materia->id,
             'teoria_finalizada' => $data['teoria_finalizada'] ?? false,
+            'tipo' => $data['tipo'] ?? null,
         ]);
 
         return response()->json(
-            $assunto->only(['id', 'nome', 'teoria_finalizada', 'materia_id', 'created_at', 'updated_at']),
+            $assunto->only(['id', 'nome', 'teoria_finalizada', 'tipo', 'materia_id', 'created_at', 'updated_at']),
             201
         );
     }
@@ -80,7 +81,7 @@ class AssuntoController extends Controller
         $assunto->save();
 
         return response()->json(
-            $assunto->only(['id', 'nome', 'teoria_finalizada', 'materia_id', 'created_at', 'updated_at'])
+            $assunto->only(['id', 'nome', 'teoria_finalizada', 'tipo', 'materia_id', 'created_at', 'updated_at'])
         );
     }
 
