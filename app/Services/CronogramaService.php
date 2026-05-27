@@ -322,9 +322,9 @@ class CronogramaService
 
             if (in_array('teoria', $permitidos)) {
                 if ($state['teoria_finalizada']) {
-                    $permitidos = array_values(array_filter($permitidos, fn($t) => $t !== 'teoria'));
+                    $permitidos = array_values(array_filter($permitidos, fn ($t) => $t !== 'teoria'));
                 } else {
-                    $permitidos = array_values(array_filter($permitidos, fn($t) => $t !== 'exercicio'));
+                    $permitidos = array_values(array_filter($permitidos, fn ($t) => $t !== 'exercicio'));
                 }
             }
         } else {
