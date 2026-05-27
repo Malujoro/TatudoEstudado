@@ -1,6 +1,6 @@
-@props(['placeholder' => 'Pesquisar'])
+@props(['placeholder' => 'Pesquisar', 'containerClass' => 'w-full sm:w-100'])
 
-<div class="relative w-full sm:w-100">
+<div class="relative {{ $containerClass }}">
     <input type="text" placeholder="{{ $placeholder }}"
         {{ $attributes->merge(['class' => 'w-full bg-purple-light placeholder-main-dark/80 text-main-dark px-5 py-2.5 rounded-full outline-none focus:ring-2 focus:ring-purple font-medium text-[18px]']) }} />
     <div

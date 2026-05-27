@@ -50,12 +50,14 @@
         @else
             <div class="flex flex-col gap-6">
                 @foreach ($dias as $dia)
-                    <div class="rounded-[26px] border border-purple-dim/50 bg-main-dark/90 px-6 py-4">
-                        <div class="flex flex-col gap-4 md:flex-row md:items-center">
-                            <span
-                                class="inline-flex w-28 items-center justify-center rounded-2xl bg-purple-light px-4 py-2 font-rem text-sm font-bold text-purple-night">
-                                {{ $dia['label'] }}
-                            </span>
+                    <div class="rounded-[26px] border-2 border-purple bg-purple-lightest px-6 py-4 shadow-sm">
+                        <div class="flex flex-col gap-4">
+                            <div>
+                                <span
+                                    class="inline-flex items-center justify-center rounded-2xl bg-purple-light px-4 py-2 font-rem text-sm font-bold text-purple-night">
+                                    {{ $dia['label'] }}
+                                </span>
+                            </div>
 
                             <div class="flex flex-1 flex-wrap gap-4">
                                 @forelse ($dia['sessoes'] as $sessao)
@@ -85,9 +87,6 @@
                                             <span
                                                 class="rounded-full bg-white/70 px-3 py-1 text-[11px] font-semibold text-purple-night">
                                                 {{ $duracao }}
-                                            </span>
-                                            <span class="text-[11px] font-semibold uppercase tracking-wide">
-                                                {{ $tipo }}
                                             </span>
                                             @if ($sessao->finalizado)
                                                 <span

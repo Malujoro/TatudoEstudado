@@ -4,22 +4,25 @@
     <div class="flex flex-col h-full w-full">
 
         <!-- Header: Botão Adicionar e Barra de Pesquisa -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5 mb-8">
-
-            <!-- Botão: Adicionar Matéria -->
-            <x-button id="btnOpenAddModal">
-                Adicionar Matéria
-                <div class="bg-purple-lightest rounded-full p-1 flex items-center justify-center">
-                    <x-icons.plus class="text-purple-light" />
-                </div>
-            </x-button>
-
-            <!-- Input de Pesquisa -->
-            <x-search-input class="py-3" />
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+            <div class="md:col-start-2 xl:col-start-3">
+                <!-- Input de Pesquisa -->
+                <x-search-input class="py-3" container-class="w-full" />
+            </div>
         </div>
 
         <!-- Grid de Cards das Matérias -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+            <!-- Card: Adicionar Matéria -->
+            <button id="btnOpenAddModal"
+                class="bg-purple rounded-[20px] p-6 flex flex-col items-center justify-center min-h-42.5 text-main-dark hover:bg-purple/90 transition-colors shadow-sm border-2 border-dashed border-main-dark/10">
+                <div class="bg-purple-lightest rounded-full p-3 mb-3 flex items-center justify-center">
+                    <x-icons.plus class="w-10 h-10 text-purple-light" />
+                </div>
+                <span class="text-[16px] font-bold tracking-wide opacity-80">Adicionar matéria</span>
+            </button>
+
             @foreach ($materias as $materia)
                 <div class="materia-card-wrapper" data-nome="{{ strtolower($materia->nome) }}" data-id="{{ $materia->id }}">
                     <x-materia-card :nome="$materia->nome" :id="$materia->id" :quantidade="$materia->assuntos_count" />
