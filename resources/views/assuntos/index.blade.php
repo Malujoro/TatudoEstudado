@@ -40,7 +40,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             @foreach ($assuntos as $assunto)
                 <div class="assunto-card-wrapper" data-nome="{{ strtolower($assunto->nome) }}"
-                    data-materia-id="{{ $assunto->materia_id }}" data-id="{{ $assunto->id }}" data-tipo='@json($assunto->tipo)'>
+                    data-materia-id="{{ $assunto->materia_id }}" data-id="{{ $assunto->id }}"
+                    data-tipo='@json($assunto->tipo)'>
                     <x-assunto-card :nome="$assunto->nome" :id="$assunto->id" :tipo="$assunto->tipo" />
                 </div>
             @endforeach
@@ -63,6 +64,7 @@
             const btnCancelar = document.getElementById('btnCancelarAssunto');
             const modalTitle = modal.querySelector('h2');
             const tipoCheckboxes = Array.from(modal.querySelectorAll('[data-assunto-tipo]'));
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
             let currentAssuntoId = null;
 
@@ -105,6 +107,70 @@
                 if (e.target === modal) closeModal();
             });
 
+            // --- Funções Auxiliares de API e UI ---
+            function atualizarTela() {
+                typeof Turbo !== 'undefined' ? Turbo.visit(window.location.href, {
+                    action: "replace"
+                }) : window.location.reload();
+            }
+
+            async function checarEGerarCronograma(mensagem) {
+                if (!confirm(mensagem)) return;
+                try {
+                    await fetch('/api/cronograma/gerar', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json'
+                        }
+                    });
+                } catch (error) {
+                    console.error("Erro ao gerar cronograma:", error);
+                }
+            }
+
+            async function salvarAssunto(url, method, payload) {
+                try {
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) {
+                        closeModal();
+                        await checarEGerarCronograma(
+                            "Assunto salvo com sucesso! Deseja gerar um novo cronograma para aplicar as mudanças?"
+                        );
+                        atualizarTela();
+                    }
+                } catch (error) {
+                    console.error("Erro ao salvar:", error);
+                }
+            }
+
+            async function excluirAssunto(id) {
+                try {
+                    const response = await fetch(`/api/assuntos/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    if (response.ok) {
+                        await checarEGerarCronograma(
+                            "Assunto excluído! Deseja gerar um novo cronograma para aplicar as mudanças?");
+                        atualizarTela();
+                    }
+                } catch (error) {
+                    console.error("Erro ao excluir:", error);
+                }
+            }
+
             // 1. Filtro Local Integrado (Pesquisa + Dropdown de Matéria)
             function filterAssuntos() {
                 const term = searchInput ? searchInput.value.toLowerCase() : '';
@@ -142,35 +208,7 @@
                         tipo: tipos,
                     };
 
-                    try {
-                        const response = await fetch(url, {
-                            method: method,
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector(
-                                    'meta[name="csrf-token"]')?.getAttribute('content')
-                            },
-                            body: JSON.stringify(payload)
-                        });
-                        if (response.ok) {
-                            closeModal();
-                            if (confirm("Assunto salvo com sucesso! Deseja gerar um novo cronograma para aplicar as mudanças?")) {
-                                await fetch('/api/cronograma/gerar', {
-                                    method: 'POST',
-                                    headers: {
-                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
-                                        'Accept': 'application/json'
-                                    }
-                                });
-                            }
-                            typeof Turbo !== 'undefined' ? Turbo.visit(window.location.href, {
-                                action: "replace"
-                            }) : window.location.reload();
-                        }
-                    } catch (error) {
-                        console.error("Erro ao salvar:", error);
-                    }
+                    await salvarAssunto(url, method, payload);
                 });
             }
 
@@ -197,32 +235,7 @@
                 btn.addEventListener('click', async (e) => {
                     if (!confirm("Tem certeza que deseja excluir este assunto?")) return;
                     const id = e.target.closest('.assunto-card-wrapper').dataset.id;
-                    try {
-                        const response = await fetch(`/api/assuntos/${id}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector(
-                                    'meta[name="csrf-token"]')?.getAttribute(
-                                    'content')
-                            }
-                        });
-                        if (response.ok) {
-                            if (confirm("Assunto excluído! Deseja gerar um novo cronograma para aplicar as mudanças?")) {
-                                await fetch('/api/cronograma/gerar', {
-                                    method: 'POST',
-                                    headers: {
-                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
-                                        'Accept': 'application/json'
-                                    }
-                                });
-                            }
-                            typeof Turbo !== 'undefined' ? Turbo.visit(window.location.href, {
-                                action: "replace"
-                            }) : window.location.reload();
-                        }
-                    } catch (error) {
-                        console.error("Erro ao excluir:", error);
-                    }
+                    await excluirAssunto(id);
                 });
             });
         })();
