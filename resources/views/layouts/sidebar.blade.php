@@ -55,6 +55,20 @@
                     </span>
                     Metas diárias
                 </a>
+                <a href="{{ route('ranking') }}"
+                    class="flex items-center gap-3 font-rem text-[20px] font-medium leading-none text-main-dark">
+                    <span class="inline-flex h-5 w-5 items-center justify-center">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                            <path d="M4 22h16" />
+                            <path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34" />
+                            <path d="M12 2a5 5 0 0 0-5 5v5a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z" />
+                        </svg>
+                    </span>
+                    Ranking
+                </a>
                 <a href="{{ route('materias.index') }}"
                     class="flex items-center gap-3 font-rem text-[20px] font-medium leading-none text-main-dark">
                     <span class="inline-flex h-5 w-5 items-center justify-center">
