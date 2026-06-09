@@ -3,7 +3,31 @@
 @section('content')
     <div class="flex flex-col gap-8">
         <div class="flex flex-wrap items-center justify-between gap-4">
-            <h2 class="font-rem text-[22px] font-bold text-main-dark">Metas diárias</h2>
+            <div class="flex items-center gap-4">
+                <h2 class="font-rem text-[22px] font-bold text-main-dark">Metas diárias</h2>
+                
+                @php
+                    $sequencia = auth()->user()->sequencia_estudo;
+                @endphp
+                
+                @if($sequencia > 0)
+                    <!-- Active Streak Badge -->
+                    <div class="flex items-center gap-2 rounded-2xl bg-amber-50 border border-amber-200/60 px-3.5 py-1.5 text-amber-800 shadow-sm transition-all hover:scale-105 duration-300 group" title="Sua sequência de estudos está ativa!">
+                        <x-icons.fire class="w-5 h-5 text-orange-500 fill-orange-500 transition-transform duration-300 group-hover:scale-110" />
+                        <span class="font-rem text-sm font-bold tracking-tight">
+                            {{ $sequencia }} {{ $sequencia == 1 ? 'dia seguido' : 'dias seguidos' }}!
+                        </span>
+                    </div>
+                @else
+                    <!-- Inactive Streak Badge (Grayed out to stimulate user) -->
+                    <div class="flex items-center gap-2 rounded-2xl bg-gray-50 border border-gray-200/50 px-3.5 py-1.5 text-gray-400 shadow-sm transition-all hover:scale-105 duration-300 group" title="Complete uma meta hoje para começar sua sequência!">
+                        <x-icons.fire class="w-5 h-5 text-gray-300 fill-gray-300 opacity-60 transition-transform duration-300 group-hover:scale-110" />
+                        <span class="font-rem text-sm font-semibold tracking-tight">
+                            Comece sua sequência!
+                        </span>
+                    </div>
+                @endif
+            </div>
             <div class="flex items-center gap-3">
                 <x-tag tipo="teoria" />
                 <x-tag tipo="exercicio" />
@@ -284,16 +308,7 @@
                 });
 
                 if (response.ok) {
-                    const card = document.querySelector(`[data-session-card][data-session-id="${sessaoId}"]`);
-                    const title = card?.querySelector('[data-session-title]');
-                    const actions = card?.querySelector('[data-session-actions]');
-
-                    card?.classList.add('opacity-60');
-                    title?.classList.add('line-through');
-                    actions?.querySelectorAll('button').forEach((btn) => btn.setAttribute('disabled', 'disabled'));
-
-                    modalExercicio?.classList.add('hidden');
-                    modalExercicio?.classList.remove('flex');
+                    window.location.reload();
                 }
             }
         })();
