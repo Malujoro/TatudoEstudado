@@ -30,93 +30,88 @@
             </div>
         @endif
 
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <div class="flex flex-col gap-3">
-                <p class="font-rem text-xs font-bold uppercase tracking-[0.18em] text-purple-muted">
-                    Tempo de estudo por dia
-                </p>
+        <div class="flex flex-col gap-3 w-fit">
+    <p class="font-rem text-xs font-bold uppercase tracking-[0.18em] text-purple-muted">
+        Defina seu tempo disponível por dia
+    </p>
 
-                <form action="{{ route('profile.update') }}" method="POST" class="rounded-3xl bg-purple-light px-6 py-6">
-                    @csrf
+                    <form action="{{ route('profile.update') }}" method="POST" class="rounded-3xl bg-purple-light px-5 py-5">
+    @csrf
 
-                    <div class="flex flex-col gap-4" data-study-hours>
-                        <p class="font-rem text-sm font-medium text-purple-night">
-                            Defina seu tempo disponível por dia
-                        </p>
+    <div class="flex flex-col gap-2" data-study-hours>
 
-                        @php
-                            $horario = $user->horario_semanal ?? [
-                                'domingo' => 0,
-                                'segunda' => 0,
-                                'terca' => 0,
-                                'quarta' => 0,
-                                'quinta' => 0,
-                                'sexta' => 0,
-                                'sabado' => 0,
-                            ];
-                            $dias = [
-                                'domingo' => 'Domingo',
-                                'segunda' => 'Segunda',
-                                'terca' => 'Terça',
-                                'quarta' => 'Quarta',
-                                'quinta' => 'Quinta',
-                                'sexta' => 'Sexta',
-                                'sabado' => 'Sábado',
-                            ];
-                        @endphp
+        @php
+            $horario = $user->horario_semanal ?? [
+                'domingo' => 0,
+                'segunda' => 0,
+                'terca' => 0,
+                'quarta' => 0,
+                'quinta' => 0,
+                'sexta' => 0,
+                'sabado' => 0,
+            ];
+            $dias = [
+                'domingo' => 'Dom',
+                'segunda' => 'Seg',
+                'terca' => 'Ter',
+                'quarta' => 'Qua',
+                'quinta' => 'Qui',
+                'sexta' => 'Sex',
+                'sabado' => 'Sáb',
+            ];
+        @endphp
 
-                        <div class="grid grid-cols-1 gap-3">
-                            @foreach ($dias as $key => $label)
-                                @php
-                                    $valorDecimal = old('horario_semanal.' . $key, $horario[$key] ?? 0);
-                                    $minutosTotais = (int) round($valorDecimal * 60);
-                                    $horas = intdiv($minutosTotais, 60);
-                                    $minutos = $minutosTotais % 60;
-                                @endphp
-                                <div class="grid grid-cols-[100px_1fr_1fr] items-center gap-2" data-day-row>
-                                    <span class="font-rem text-sm font-medium text-purple-night">{{ $label }}</span>
-                                    <div class="flex items-center gap-1.5">
-                                        <x-input type="number" min="0" max="24" inputmode="numeric"
-                                            placeholder="0" value="{{ $horas }}" data-hours-input />
-                                        <span class="text-sm font-medium text-purple-night">h</span>
-                                    </div>
-                                    <div class="flex items-center gap-1.5">
-                                        <select data-minutes-input
-                                            class="rounded-xl border border-purple-dim/50 bg-white px-3 py-2 text-sm text-purple-night outline-none focus:border-purple focus:ring-1 focus:ring-purple">
-                                            <option value="0" @selected($minutos == 0)>00</option>
-                                            <option value="15" @selected($minutos == 15)>15</option>
-                                            <option value="30" @selected($minutos == 30)>30</option>
-                                            <option value="45" @selected($minutos == 45)>45</option>
-                                        </select>
-                                        <span class="text-sm font-medium text-purple-night">m</span>
-                                    </div>
-                                    <input type="hidden" name="horario_semanal[{{ $key }}]"
-                                        value="{{ $valorDecimal }}" data-hidden-input />
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <div class="rounded-2xl bg-white/50 px-4 py-3">
-                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                                <p class="text-xs text-purple-night/70">
-                                    Total na semana: <span class="font-semibold text-purple-night" data-week-total>0h</span>
-                                </p>
-                                <p class="text-xs text-purple-night/70">
-                                    Média/dia:
-                                    <span class="font-semibold text-purple-night" data-day-avg>0h</span>
-                                </p>
-                            </div>
-                        </div>
+        <div class="flex flex-col gap-1.5">
+            @foreach ($dias as $key => $label)
+                @php
+                    $valorDecimal = old('horario_semanal.' . $key, $horario[$key] ?? 0);
+                    $minutosTotais = (int) round($valorDecimal * 60);
+                    $horas = intdiv($minutosTotais, 60);
+                    $minutos = $minutosTotais % 60;
+                @endphp
+                <div class="inline-flex items-center gap-2 rounded-2xl bg-white/40 px-4 py-2.5" data-day-row>
+                    
+                    <span class="w-8 font-rem text-xs font-bold uppercase tracking-wide text-purple-night">{{ $label }}</span>
+                    <div class="flex items-center gap-1">
+                        <input type="number" min="0" max="24" inputmode="numeric"
+                            placeholder="0" value="{{ $horas }}" data-hours-input
+                            style="width: 3rem;"
+                            class="rounded-xl border border-purple-dim/30 bg-white px-2 py-2 text-center text-sm text-purple-night outline-none focus:border-purple focus:ring-1 focus:ring-purple" />
+                        <span class="text-xs font-semibold text-purple-night/70">h</span>
                     </div>
-
-                    <div class="mt-5">
-                        <x-button type="submit">
-                            Salvar
-                        </x-button>
+                    <div class="flex items-center gap-1">
+                        <select data-minutes-input
+                            class="w-16 rounded-xl border border-purple-dim/30 bg-white px-2 py-2 text-sm text-purple-night outline-none focus:border-purple focus:ring-1 focus:ring-purple">
+                            <option value="0" @selected($minutos == 0)>00</option>
+                            <option value="15" @selected($minutos == 15)>15</option>
+                            <option value="30" @selected($minutos == 30)>30</option>
+                            <option value="45" @selected($minutos == 45)>45</option>
+                        </select>
+                        <span class="text-xs font-semibold text-purple-night/70">m</span>
                     </div>
-                </form>
-            </div>
+                    <input type="hidden" name="horario_semanal[{{ $key }}]"
+                        value="{{ $valorDecimal }}" data-hidden-input />
+                </div>
+            @endforeach
+        </div>
 
+        <div class="flex items-center justify-between rounded-2xl bg-white/40 px-4 py-2.5">
+            <p class="text-xs text-purple-night/70">
+                Total: <span class="font-bold text-purple-night" data-week-total>0h</span>
+            </p>
+            <p class="text-xs text-purple-night/70">
+                Média/dia: <span class="font-bold text-purple-night" data-day-avg>0h</span>
+            </p>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit"
+            class="w-full rounded-full bg-purple px-6 py-2.5 text-sm font-bold text-white hover:opacity-90 transition">
+            Salvar horários
+        </button>
+    </div>
+</form>
             <div class="flex flex-col gap-3">
                 <p class="font-rem text-xs font-bold uppercase tracking-[0.18em] text-purple-muted">
                     Matérias

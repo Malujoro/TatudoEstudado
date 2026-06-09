@@ -30,8 +30,8 @@
 
     /* Cores Secondary */
     --color-secondary-green: #9FA089;
-    --color-secondary-blue: #6BC5D2;
-    --color-secondary-red: #D77979;
+    --color-secondary-blue: #3D7489;
+    --color-secondary-red: #B15758;
 
     /* Cores Pop-ups (SweetAlert) */
     --color-swal-confirm: var(--color-purple);
