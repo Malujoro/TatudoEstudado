@@ -130,7 +130,7 @@
                     <div class="flex flex-col gap-3">
                         @foreach ($outros as $index => $item)
                             @php
-                                $posicao = $index + 4;
+                                $posicao = $index + 1;
                                 $isCurrentUser = $item['id'] === auth()->id();
                             @endphp
 
