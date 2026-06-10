@@ -178,4 +178,6 @@ class MetricaControllerTest extends TestCase
         $response->assertNotFound();
         $this->assertDatabaseHas('metricas', ['id' => $metrica->id]);
     }
+
+    
 }
