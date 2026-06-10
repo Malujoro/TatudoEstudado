@@ -13,9 +13,9 @@ class SessaoEstudoFactory extends Factory
     public function definition(): array
     {
         return [
-            'data'       => $this->faker->dateTimeBetween('-30 days', '+30 days')->format('Y-m-d'),
-            'tipo'       => $this->faker->randomElement(['teoria', 'exercicio', 'revisao']),
-            'horas'      => $this->faker->randomFloat(1, 0.5, 4.0),
+            'data' => $this->faker->dateTimeBetween('-30 days', '+30 days')->format('Y-m-d'),
+            'tipo' => $this->faker->randomElement(['teoria', 'exercicio', 'revisao']),
+            'horas' => $this->faker->randomFloat(1, 0.5, 4.0),
             'finalizado' => false,
             'assunto_id' => Assunto::factory(),
         ];

@@ -13,10 +13,10 @@ class AssuntoFactory extends Factory
     public function definition(): array
     {
         return [
-            'nome'              => $this->faker->words(2, true),
-            'materia_id'        => Materia::factory(),
+            'nome' => $this->faker->words(2, true),
+            'materia_id' => Materia::factory(),
             'teoria_finalizada' => false,
-            'tipo'              => ['teoria', 'exercicio'],
+            'tipo' => ['teoria', 'exercicio'],
         ];
     }
 }

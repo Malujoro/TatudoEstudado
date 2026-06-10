@@ -13,7 +13,7 @@ class MateriaFactory extends Factory
     public function definition(): array
     {
         return [
-            'nome'    => $this->faker->words(3, true),
+            'nome' => $this->faker->words(3, true),
             'user_id' => User::factory(),
         ];
     }

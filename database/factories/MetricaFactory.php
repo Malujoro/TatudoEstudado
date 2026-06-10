@@ -13,8 +13,8 @@ class MetricaFactory extends Factory
     public function definition(): array
     {
         return [
-            'acertos'    => $this->faker->numberBetween(0, 50),
-            'erros'      => $this->faker->numberBetween(0, 20),
+            'acertos' => $this->faker->numberBetween(0, 50),
+            'erros' => $this->faker->numberBetween(0, 20),
             'assunto_id' => Assunto::factory(),
         ];
     }

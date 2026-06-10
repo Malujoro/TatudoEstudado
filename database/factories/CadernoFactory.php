@@ -13,7 +13,7 @@ class CadernoFactory extends Factory
     public function definition(): array
     {
         return [
-            'conteudo'   => $this->faker->paragraph(),
+            'conteudo' => $this->faker->paragraph(),
             'assunto_id' => Assunto::factory(),
         ];
     }
