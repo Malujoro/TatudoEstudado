@@ -6,10 +6,15 @@
         {{-- Cabeçalho do usuário --}}
         <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div class="flex items-center gap-4">
-                <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-purple-light text-purple-deep">
-                    <span class="font-rem text-[28px] font-bold leading-none">
-                        {{ str($user->name)->trim()->upper()->substr(0, 1) }}
-                    </span>
+                <div class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-purple-light text-purple-deep">
+                    @if ($user->photo_url)
+                        <img src="{{ $user->photo_url }}" alt="Foto de perfil de {{ $user->name }}"
+                            class="h-full w-full object-cover" data-profile-avatar />
+                    @else
+                        <span class="font-rem text-[28px] font-bold leading-none" data-profile-initial>
+                            {{ str($user->name)->trim()->upper()->substr(0, 1) }}
+                        </span>
+                    @endif
                 </div>
                 <div class="flex flex-col gap-2">
                     <div class="w-full max-w-md">
@@ -19,6 +24,14 @@
                         <x-input type="email" value="{{ $user->email }}" readonly />
                     </div>
                 </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button type="button"
+                    class="rounded-full bg-purple px-5 py-2.5 text-sm font-bold text-white hover:opacity-90 transition"
+                    data-open-profile-modal>
+                    Editar perfil
+                </button>
             </div>
         </div>
 
@@ -225,6 +238,87 @@
         </div>
     </div>
 
+    <div class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4" data-profile-modal>
+        <div class="flex w-full max-w-2xl flex-col rounded-3xl bg-white p-6 shadow-2xl">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <h3 class="font-rem text-xl font-bold text-purple-night">Editar perfil</h3>
+                    <p class="text-sm text-purple-night/70">Atualize nome e foto de perfil.</p>
+                </div>
+                <button type="button" class="text-purple-night" data-close-profile-modal>✕</button>
+            </div>
+
+            <form action="{{ route('profile.details.update') }}" method="POST" enctype="multipart/form-data"
+                class="mt-6 flex flex-col gap-5">
+                @csrf
+
+                <div class="flex flex-col items-center gap-3">
+                    <div class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-purple-light text-purple-deep shadow-sm ring-4 ring-purple-light/30">
+                        @if ($user->photo_url)
+                            <img src="{{ $user->photo_url }}" alt="Foto de perfil de {{ $user->name }}"
+                                class="h-full w-full object-cover" />
+                        @else
+                            <span class="font-rem text-[34px] font-bold leading-none">
+                                {{ str($user->name)->trim()->upper()->substr(0, 1) }}
+                            </span>
+                        @endif
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button"
+                            class="rounded-full border border-purple-dim px-4 py-2 text-xs font-semibold text-purple-dim hover:bg-purple-dim hover:text-white transition"
+                            data-modal-remove-photo-button>
+                            Remover foto
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <label class="flex flex-col gap-2 text-sm font-semibold text-purple-night">
+                        Nome
+                        <input type="text" name="name" value="{{ old('name', $user->name) }}"
+                            class="rounded-2xl border border-purple-dim/30 bg-white px-4 py-3 text-sm text-purple-night outline-none focus:border-purple focus:ring-1 focus:ring-purple" />
+                    </label>
+                    <label class="flex flex-col gap-2 text-sm font-semibold text-purple-night">
+                        Email
+                        <input type="email" name="email" value="{{ old('email', $user->email) }}" readonly
+                            class="cursor-not-allowed rounded-2xl border border-purple-dim/30 bg-white/80 px-4 py-3 text-sm text-purple-night outline-none" />
+                    </label>
+                </div>
+
+                    <div class="flex flex-col gap-3">
+                    <label class="block text-xs font-bold uppercase tracking-[0.18em] text-purple-muted">
+                        Foto de perfil
+                    </label>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                        <input type="file" name="imagem" accept="image/*"
+                            class="w-full rounded-2xl border border-purple-dim/30 bg-white px-4 py-3 text-sm text-purple-night file:mr-4 file:rounded-full file:border-0 file:bg-purple-light file:px-4 file:py-2 file:text-sm file:font-semibold file:text-purple-night"
+                            data-modal-photo-input />
+                    </div>
+                    <input type="hidden" name="remove_photo" value="0" data-modal-remove-photo-input />
+
+                    <div class="hidden rounded-2xl border border-dashed border-purple-dim/40 bg-white/60 p-3"
+                        data-modal-photo-preview-wrap>
+                        <p class="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-purple-muted">Prévia</p>
+                        <img src="{{ $user->photo_url }}" alt="Prévia da foto de perfil"
+                            class="h-56 w-full rounded-3xl object-cover sm:h-72" data-modal-photo-preview />
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3">
+                    <button type="button"
+                        class="rounded-full border border-purple-dim px-5 py-2.5 text-sm font-semibold text-purple-dim hover:bg-purple-dim hover:text-white transition"
+                        data-close-profile-modal>
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="rounded-full bg-purple px-5 py-2.5 text-sm font-bold text-white hover:opacity-90 transition">
+                        Salvar dados
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Horário semanal
         (function() {
@@ -313,5 +407,54 @@
         document.getElementById('popup-tipos').addEventListener('click', function(e) {
             if (e.target === this) fecharTipos();
         });
+        (function() {
+            const modal = document.querySelector('[data-profile-modal]');
+            const openButton = document.querySelector('[data-open-profile-modal]');
+            const closeButtons = document.querySelectorAll('[data-close-profile-modal]');
+            const modalFileInput = document.querySelector('[data-modal-photo-input]');
+            const modalPreviewWrap = document.querySelector('[data-modal-photo-preview-wrap]');
+            const modalPreviewImg = document.querySelector('[data-modal-photo-preview]');
+            const modalRemoveButton = document.querySelector('[data-modal-remove-photo-button]');
+            const modalRemoveInput = document.querySelector('[data-modal-remove-photo-input]');
+
+            const openModal = () => {
+                modal?.classList.remove('hidden');
+                modal?.classList.add('flex');
+            };
+
+            const closeModal = () => {
+                modal?.classList.add('hidden');
+                modal?.classList.remove('flex');
+            };
+
+            openButton?.addEventListener('click', openModal);
+            closeButtons.forEach((button) => button.addEventListener('click', closeModal));
+
+            modalFileInput?.addEventListener('change', () => {
+                const file = modalFileInput.files?.[0];
+                if (!file || !modalPreviewWrap || !modalPreviewImg || !modalRemoveInput) return;
+
+                modalRemoveInput.value = '0';
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const result = event.target?.result;
+                    if (typeof result === 'string') {
+                        modalPreviewImg.src = result;
+                        modalPreviewWrap.classList.remove('hidden');
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+
+            modalRemoveButton?.addEventListener('click', () => {
+                if (modalFileInput) modalFileInput.value = '';
+                if (modalRemoveInput) modalRemoveInput.value = '1';
+                if (modalPreviewWrap && modalPreviewImg) {
+                    modalPreviewImg.src = '';
+                    modalPreviewWrap.classList.remove('hidden');
+                }
+            });
+        })();
     </script>
 @endsection

@@ -11,11 +11,14 @@ use App\Http\Controllers\UserController;
 use App\Models\Assunto;
 use App\Models\Materia;
 use App\Models\SessaoEstudo;
+use App\Models\User;
 use App\Services\CronogramaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
@@ -298,6 +301,67 @@ Route::middleware('auth')->group(function () {
 
         return back()->with('status', 'Disponibilidade atualizada!')->with('prompt_cronograma', true);
     })->name('profile.update');
+
+    Route::post('/perfil/dados', function (Request $request) {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($request->user()->id),
+            ],
+            'imagem' => ['sometimes', 'image', 'max:4096'],
+            'remove_photo' => ['sometimes', 'boolean'],
+        ]);
+
+        if ($request->boolean('remove_photo')) {
+            $data['photo_url'] = null;
+        }
+
+        if ($request->hasFile('imagem')) {
+            $file = $request->file('imagem');
+            $imageData = base64_encode(file_get_contents($file->getRealPath()));
+
+            $response = Http::asForm()->post('https://api.imgbb.com/1/upload', [
+                'key' => env('IMGBB_KEY'),
+                'image' => $imageData,
+            ]);
+
+            if ($response->successful()) {
+                $data['photo_url'] = $response->json('data.url');
+            } else {
+                return back()->withErrors(['imagem' => 'Falha ao enviar imagem para o ImgBB.']);
+            }
+        }
+
+        $request->user()->update($data);
+
+        return back()->with('status', 'Dados do perfil atualizados!');
+    })->name('profile.details.update');
+
+    /**
+     * User Leaderboard / Ranking.
+     *
+     * Lists users ranked by study streak.
+     *
+     * @return View
+     */
+    Route::get('/ranking', function (Request $request) {
+        $ranking = User::all()
+            ->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'sequencia' => $user->sequencia_estudo,
+                ];
+            })
+            ->sortByDesc('sequencia')
+            ->values();
+
+        return view('ranking', compact('ranking'));
+    })->name('ranking');
+
 });
 
 /**

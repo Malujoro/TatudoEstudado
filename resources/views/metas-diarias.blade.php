@@ -3,7 +3,31 @@
 @section('content')
     <div class="flex flex-col gap-8">
         <div class="flex flex-wrap items-center justify-between gap-4">
-            <h2 class="font-rem text-[22px] font-bold text-main-dark">Metas diárias</h2>
+            <div class="flex items-center gap-4">
+                <h2 class="font-rem text-[22px] font-bold text-main-dark">Metas diárias</h2>
+                
+                @php
+                    $sequencia = auth()->user()->sequencia_estudo;
+                @endphp
+                
+                @if($sequencia > 0)
+                    <!-- Active Streak Badge -->
+                    <div class="flex items-center gap-2 rounded-2xl bg-amber-50 border border-amber-200/60 px-3.5 py-1.5 text-amber-800 shadow-sm transition-all hover:scale-105 duration-300 group" title="Sua sequência de estudos está ativa!">
+                        <x-icons.fire class="w-5 h-5 text-orange-500 fill-orange-500 transition-transform duration-300 group-hover:scale-110" />
+                        <span class="font-rem text-sm font-bold tracking-tight">
+                            {{ $sequencia }} {{ $sequencia == 1 ? 'dia seguido' : 'dias seguidos' }}!
+                        </span>
+                    </div>
+                @else
+                    <!-- Inactive Streak Badge (Grayed out to stimulate user) -->
+                    <div class="flex items-center gap-2 rounded-2xl bg-gray-50 border border-gray-200/50 px-3.5 py-1.5 text-gray-400 shadow-sm transition-all hover:scale-105 duration-300 group" title="Complete uma meta hoje para começar sua sequência!">
+                        <x-icons.fire class="w-5 h-5 text-gray-300 fill-gray-300 opacity-60 transition-transform duration-300 group-hover:scale-110" />
+                        <span class="font-rem text-sm font-semibold tracking-tight">
+                            Comece sua sequência!
+                        </span>
+                    </div>
+                @endif
+            </div>
             <div class="flex items-center gap-3">
                 <x-tag tipo="teoria" />
                 <x-tag tipo="exercicio" />
@@ -151,6 +175,24 @@
         </div>
     </div>
 
+    <div class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50" data-modal-teoria>
+        <div class="w-full max-w-md rounded-3xl bg-white p-6">
+            <div class="flex items-center justify-between">
+                <h3 class="font-rem text-lg font-semibold text-purple-night">Finalizar teoria</h3>
+                <button type="button" class="text-purple-night" data-close-modal-teoria>✕</button>
+            </div>
+            <p class="mt-4 text-sm text-purple-night">Você já finalizou este conteúdo?</p>
+            <div class="mt-4 flex justify-end gap-2">
+                <button type="button"
+                    class="rounded-full border border-purple-dim px-4 py-2 text-xs font-semibold text-purple-dim hover:bg-purple-dim hover:text-white transition"
+                    data-teoria-option="no">Não, ainda preciso de mais teoria</button>
+                <button type="button"
+                    class="rounded-full bg-purple-light px-4 py-2 text-xs font-semibold text-purple-night hover:opacity-80 transition"
+                    data-teoria-option="yes">Sim, não preciso mais de teoria</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         (function() {
             const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -230,6 +272,10 @@
             const closeExercicio = document.querySelectorAll('[data-close-modal-exercicio]');
             let sessaoAtual = null;
 
+            const modalTeoria = document.querySelector('[data-modal-teoria]');
+            const closeTeoria = document.querySelectorAll('[data-close-modal-teoria]');
+            let teoriaSessaoAtual = null;
+
             document.querySelectorAll('[data-finalizar]').forEach((button) => {
                 button.addEventListener('click', async () => {
                     const tipo = button.getAttribute('data-tipo');
@@ -245,7 +291,49 @@
                         return;
                     }
 
+                    if (tipo === 'teoria') {
+                        teoriaSessaoAtual = sessaoId;
+                        modalTeoria?.classList.remove('hidden');
+                        modalTeoria?.classList.add('flex');
+                        return;
+                    }
+
                     await finalizarSessao(sessaoId, {});
+                });
+            });
+
+            closeTeoria.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    modalTeoria?.classList.add('hidden');
+                    modalTeoria?.classList.remove('flex');
+                    teoriaSessaoAtual = null;
+                });
+            });
+
+            // Handle teoria option buttons
+            document.querySelectorAll('[data-teoria-option]').forEach((btn) => {
+                btn.addEventListener('click', async (ev) => {
+                    const choice = ev.currentTarget.getAttribute('data-teoria-option');
+                    if (!teoriaSessaoAtual) return;
+
+                    modalTeoria?.classList.add('hidden');
+                    modalTeoria?.classList.remove('flex');
+
+                    if (choice === 'yes') {
+                        // User does not need more teoria: finalize sessao and mark assunto to skip teoria
+                        await finalizarSessao(teoriaSessaoAtual, { excluir_teoria: true });
+
+                        // Ask whether to regenerate cronograma using shared modal
+                        const regenerated = await window.promptGerarCronograma('Deseja gerar um novo cronograma agora?');
+                        if (regenerated) {
+                            window.location.reload();
+                        }
+                    } else {
+                        // User still needs theory: just finalize the session normally
+                        await finalizarSessao(teoriaSessaoAtual, {});
+                    }
+
+                    teoriaSessaoAtual = null;
                 });
             });
 
@@ -284,16 +372,7 @@
                 });
 
                 if (response.ok) {
-                    const card = document.querySelector(`[data-session-card][data-session-id="${sessaoId}"]`);
-                    const title = card?.querySelector('[data-session-title]');
-                    const actions = card?.querySelector('[data-session-actions]');
-
-                    card?.classList.add('opacity-60');
-                    title?.classList.add('line-through');
-                    actions?.querySelectorAll('button').forEach((btn) => btn.setAttribute('disabled', 'disabled'));
-
-                    modalExercicio?.classList.add('hidden');
-                    modalExercicio?.classList.remove('flex');
+                    window.location.reload();
                 }
             }
         })();
