@@ -71,3 +71,6 @@ lint:
 # Abre o terminal dentro do container
 shell:
 	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) bash
+
+test:
+	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) php artisan test
