@@ -74,3 +74,6 @@ shell:
 
 test:
 	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) php artisan test
+
+test_coverage:
+	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) php -d pcov.enabled=1 artisan test --coverage
