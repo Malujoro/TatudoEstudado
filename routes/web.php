@@ -299,6 +299,13 @@ Route::middleware('auth')->group(function () {
 
         $request->user()->update($data);
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Disponibilidade atualizada!'
+            ]);
+        }
+
         return back()->with('status', 'Disponibilidade atualizada!')->with('prompt_cronograma', true);
     })->name('profile.update');
 
