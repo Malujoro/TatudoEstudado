@@ -48,11 +48,11 @@ class CronogramaServiceTest extends TestCase
         $defaultHorario = [
             'domingo' => 0,
             'segunda' => 2,
-            'terca'   => 2,
-            'quarta'  => 2,
-            'quinta'  => 2,
-            'sexta'   => 2,
-            'sabado'  => 0,
+            'terca' => 2,
+            'quarta' => 2,
+            'quinta' => 2,
+            'sexta' => 2,
+            'sabado' => 0,
         ];
 
         return User::factory()->create([
@@ -65,9 +65,9 @@ class CronogramaServiceTest extends TestCase
         $materia = Materia::factory()->create(['user_id' => $user->id]);
 
         return Assunto::factory()->create(array_merge([
-            'materia_id'        => $materia->id,
+            'materia_id' => $materia->id,
             'teoria_finalizada' => false,
-            'tipo'              => ['teoria', 'exercicio', 'revisao'],
+            'tipo' => ['teoria', 'exercicio', 'revisao'],
         ], $attrs));
     }
 
@@ -77,7 +77,7 @@ class CronogramaServiceTest extends TestCase
 
     public function test_retorna_vazio_quando_usuario_nao_tem_assuntos(): void
     {
-        $user   = $this->makeUser();
+        $user = $this->makeUser();
         $inicio = Carbon::parse('2025-01-06'); // segunda
 
         $result = $this->service->gerar($user, $inicio, 5);
@@ -94,7 +94,7 @@ class CronogramaServiceTest extends TestCase
 
     public function test_intervalo_de_datas_correto_no_retorno(): void
     {
-        $user   = $this->makeUser();
+        $user = $this->makeUser();
         $inicio = Carbon::parse('2025-03-03');
 
         $result = $this->service->gerar($user, $inicio, 7);
@@ -105,7 +105,7 @@ class CronogramaServiceTest extends TestCase
 
     public function test_dias_invalido_usa_fallback_de_15(): void
     {
-        $user   = $this->makeUser();
+        $user = $this->makeUser();
         $inicio = Carbon::parse('2025-01-06');
 
         $result = $this->service->gerar($user, $inicio, 0);
@@ -123,10 +123,10 @@ class CronogramaServiceTest extends TestCase
         // Apenas segunda tem horas disponíveis
         $user = $this->makeUser([
             'segunda' => 1,
-            'terca'   => 0,
-            'quarta'  => 0,
-            'quinta'  => 0,
-            'sexta'   => 0,
+            'terca' => 0,
+            'quarta' => 0,
+            'quinta' => 0,
+            'sexta' => 0,
         ]);
         $this->makeAssunto($user);
 
@@ -166,16 +166,16 @@ class CronogramaServiceTest extends TestCase
 
     public function test_limpar_true_remove_sessoes_nao_finalizadas(): void
     {
-        $user    = $this->makeUser();
+        $user = $this->makeUser();
         $assunto = $this->makeAssunto($user);
-        $inicio  = Carbon::parse('2025-01-06');
+        $inicio = Carbon::parse('2025-01-06');
 
         $sessaoAntiga = SessaoEstudo::factory()->create([
             'assunto_id' => $assunto->id,
-            'data'       => '2025-01-06',
+            'data' => '2025-01-06',
             'finalizado' => false,
-            'tipo'       => 'teoria',
-            'horas'      => 0.5,
+            'tipo' => 'teoria',
+            'horas' => 0.5,
         ]);
 
         $this->service->gerar($user, $inicio, 5, limpar: true);
@@ -187,48 +187,48 @@ class CronogramaServiceTest extends TestCase
 
     public function test_limpar_true_preserva_sessoes_finalizadas(): void
     {
-        $user    = $this->makeUser();
+        $user = $this->makeUser();
         $assunto = $this->makeAssunto($user);
-        $inicio  = Carbon::parse('2025-01-06');
+        $inicio = Carbon::parse('2025-01-06');
 
         SessaoEstudo::factory()->create([
             'assunto_id' => $assunto->id,
-            'data'       => '2025-01-06',
+            'data' => '2025-01-06',
             'finalizado' => true,
-            'tipo'       => 'teoria',
-            'horas'      => 0.5,
+            'tipo' => 'teoria',
+            'horas' => 0.5,
         ]);
 
         $this->service->gerar($user, $inicio, 5, limpar: true);
 
         $this->assertDatabaseHas('sessoes_estudo', [
             'assunto_id' => $assunto->id,
-            'data'       => '2025-01-06',
+            'data' => '2025-01-06',
             'finalizado' => true,
         ]);
     }
 
     public function test_limpar_false_preserva_sessoes_nao_finalizadas(): void
     {
-        $user    = $this->makeUser();
+        $user = $this->makeUser();
         $assunto = $this->makeAssunto($user);
-        $inicio  = Carbon::parse('2025-01-06');
+        $inicio = Carbon::parse('2025-01-06');
 
         SessaoEstudo::factory()->create([
             'assunto_id' => $assunto->id,
-            'data'       => '2025-01-06',
+            'data' => '2025-01-06',
             'finalizado' => false,
-            'tipo'       => 'teoria',
-            'horas'      => 0.5,
+            'tipo' => 'teoria',
+            'horas' => 0.5,
         ]);
 
         $this->service->gerar($user, $inicio, 5, limpar: false);
 
         $this->assertDatabaseHas('sessoes_estudo', [
             'assunto_id' => $assunto->id,
-            'data'       => '2025-01-06',
+            'data' => '2025-01-06',
             'finalizado' => false,
-            'horas'      => 0.5,
+            'horas' => 0.5,
         ]);
     }
 
@@ -238,10 +238,10 @@ class CronogramaServiceTest extends TestCase
 
     public function test_gera_teoria_quando_teoria_nao_finalizada(): void
     {
-        $user    = $this->makeUser();
+        $user = $this->makeUser();
         $assunto = $this->makeAssunto($user, [
             'teoria_finalizada' => false,
-            'tipo'              => ['teoria'],
+            'tipo' => ['teoria'],
         ]);
 
         $inicio = Carbon::parse('2025-01-06'); // segunda
@@ -254,10 +254,10 @@ class CronogramaServiceTest extends TestCase
 
     public function test_nao_gera_teoria_quando_teoria_ja_finalizada(): void
     {
-        $user    = $this->makeUser();
+        $user = $this->makeUser();
         $assunto = $this->makeAssunto($user, [
             'teoria_finalizada' => true,
-            'tipo'              => ['teoria', 'exercicio', 'revisao'],
+            'tipo' => ['teoria', 'exercicio', 'revisao'],
         ]);
 
         $inicio = Carbon::parse('2025-01-06');
@@ -269,10 +269,10 @@ class CronogramaServiceTest extends TestCase
 
     public function test_respeita_tipo_restrito_do_assunto(): void
     {
-        $user    = $this->makeUser(['segunda' => 4]);
+        $user = $this->makeUser(['segunda' => 4]);
         $assunto = $this->makeAssunto($user, [
             'teoria_finalizada' => true,
-            'tipo'              => ['revisao'], // só revisão permitida
+            'tipo' => ['revisao'], // só revisão permitida
         ]);
 
         $inicio = Carbon::parse('2025-01-06');
@@ -296,25 +296,25 @@ class CronogramaServiceTest extends TestCase
         $materia = Materia::factory()->create(['user_id' => $user->id]);
 
         $assuntoBom = Assunto::factory()->create([
-            'materia_id'        => $materia->id,
+            'materia_id' => $materia->id,
             'teoria_finalizada' => true,
-            'tipo'              => ['exercicio'],
+            'tipo' => ['exercicio'],
         ]);
         Metrica::factory()->create([
             'assunto_id' => $assuntoBom->id,
-            'acertos'    => 9,
-            'erros'      => 1, // 10% de erro
+            'acertos' => 9,
+            'erros' => 1, // 10% de erro
         ]);
 
         $assuntoRuim = Assunto::factory()->create([
-            'materia_id'        => $materia->id,
+            'materia_id' => $materia->id,
             'teoria_finalizada' => true,
-            'tipo'              => ['exercicio'],
+            'tipo' => ['exercicio'],
         ]);
         Metrica::factory()->create([
             'assunto_id' => $assuntoRuim->id,
-            'acertos'    => 1,
-            'erros'      => 9, // 90% de erro
+            'acertos' => 1,
+            'erros' => 9, // 90% de erro
         ]);
 
         $inicio = Carbon::parse('2025-01-06');
@@ -373,7 +373,7 @@ class CronogramaServiceTest extends TestCase
 
     public function test_inicio_nulo_usa_data_de_hoje(): void
     {
-        $user   = $this->makeUser();
+        $user = $this->makeUser();
         $result = $this->service->gerar($user, null, 7);
 
         $this->assertSame(Carbon::today()->toDateString(), $result['inicio']);

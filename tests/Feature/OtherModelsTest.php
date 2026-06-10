@@ -8,22 +8,20 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-
 /**
-* Testes para Materia
-*
-* Cenários cobertos:
-* - criação de matéria com dados válidos
-* - geração automática de UUID como chave primária
-* - utilização de chave primária do tipo string
-* - relacionamento user(): pertence ao usuário correto
-* - relacionamento assuntos(): retorna apenas assuntos vinculados à matéria
-* - relacionamento assuntos(): suporta múltiplos assuntos
-* - persistência correta dos campos nome e user_id
-* - configuração correta dos atributos fillable
-* - modelo não utiliza chave primária auto incremental
-*/
-
+ * Testes para Materia
+ *
+ * Cenários cobertos:
+ * - criação de matéria com dados válidos
+ * - geração automática de UUID como chave primária
+ * - utilização de chave primária do tipo string
+ * - relacionamento user(): pertence ao usuário correto
+ * - relacionamento assuntos(): retorna apenas assuntos vinculados à matéria
+ * - relacionamento assuntos(): suporta múltiplos assuntos
+ * - persistência correta dos campos nome e user_id
+ * - configuração correta dos atributos fillable
+ * - modelo não utiliza chave primária auto incremental
+ */
 class OtherModelsTest extends TestCase
 {
     use RefreshDatabase;
@@ -37,7 +35,7 @@ class OtherModelsTest extends TestCase
         $user = User::factory()->create();
 
         $materia = Materia::create([
-            'nome'    => 'Matemática',
+            'nome' => 'Matemática',
             'user_id' => $user->id,
         ]);
 
@@ -45,8 +43,8 @@ class OtherModelsTest extends TestCase
         $this->assertSame('Matemática', $materia->nome);
 
         $this->assertDatabaseHas('materias', [
-            'id'      => $materia->id,
-            'nome'    => 'Matemática',
+            'id' => $materia->id,
+            'nome' => 'Matemática',
             'user_id' => $user->id,
         ]);
     }
@@ -117,7 +115,7 @@ class OtherModelsTest extends TestCase
 
     public function test_fillable_esta_configurado_corretamente(): void
     {
-        $materia = new Materia();
+        $materia = new Materia;
 
         $this->assertEquals(
             ['nome', 'user_id'],
