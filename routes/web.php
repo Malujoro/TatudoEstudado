@@ -302,7 +302,7 @@ Route::middleware('auth')->group(function () {
         if ($request->expectsJson()) {
             return response()->json([
                 'status' => 'success',
-                'message' => 'Disponibilidade atualizada!'
+                'message' => 'Disponibilidade atualizada!',
             ]);
         }
 
