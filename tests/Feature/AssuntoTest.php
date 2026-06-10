@@ -40,7 +40,7 @@ class AssuntoTest extends TestCase
 
     public function test_fillable_esta_configurado_corretamente(): void
     {
-        $assunto = new Assunto();
+        $assunto = new Assunto;
 
         $this->assertEquals([
             'nome',
@@ -133,4 +133,3 @@ class AssuntoTest extends TestCase
         );
     }
 }
-

@@ -123,5 +123,3 @@ class OtherModelsTest extends TestCase
         );
     }
 }
-
-
