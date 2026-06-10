@@ -222,7 +222,24 @@
                 });
             }
             if (searchInput) searchInput.addEventListener('input', filterAssuntos);
-            if (materiaSelect) materiaSelect.addEventListener('change', filterAssuntos);
+            
+            if (materiaSelect) {
+                materiaSelect.addEventListener('change', () => {
+                    filterAssuntos();
+                    
+                    try {
+                        const url = new URL(window.location.href);
+                        if (materiaSelect.value) {
+                            url.searchParams.set('materia_id', materiaSelect.value);
+                        } else {
+                            url.searchParams.delete('materia_id');
+                        }
+                        window.history.replaceState({}, '', url.toString());
+                    } catch (error) {
+                        console.error('Erro ao atualizar URL:', error);
+                    }
+                });
+            }
 
             filterAssuntos(); // Oculta itens de outras matérias que não sejam a padrão na hora que carrega a tela
 

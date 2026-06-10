@@ -325,6 +325,7 @@
             const root = document.querySelector('[data-study-hours]');
             if (!root) return;
 
+            const form = root.closest('form');
             const dayRows = Array.from(root.querySelectorAll('[data-day-row]'));
             const totalEl = root.querySelector('[data-week-total]');
             const avgEl   = root.querySelector('[data-day-avg]');
@@ -358,6 +359,55 @@
                 row.querySelector('[data-hours-input]')?.addEventListener('input', updateSummary);
                 row.querySelector('[data-minutes-input]')?.addEventListener('input', updateSummary);
             });
+
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(form);
+                    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': token
+                            },
+                            body: formData
+                        });
+                        
+                        if (response.ok) {
+                            if (typeof window.promptGerarCronograma === 'function') {
+                                await window.promptGerarCronograma('Horários salvos com sucesso!');
+                            } else {
+                                await Swal.fire({
+                                    title: 'Sucesso!',
+                                    text: 'Horários salvos com sucesso.',
+                                    icon: 'success',
+                                    confirmButtonColor: 'var(--color-swal-confirm)'
+                                });
+                            }
+                            window.location.reload();
+                        } else {
+                            Swal.fire({
+                                title: 'Erro!',
+                                text: 'Erro ao salvar os horários. Verifique se os valores estão corretos.',
+                                icon: 'error',
+                                confirmButtonColor: 'var(--color-swal-confirm)'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Erro ao salvar horários:', error);
+                        Swal.fire({
+                            title: 'Erro!',
+                            text: 'Erro de conexão ao tentar salvar os horários.',
+                            icon: 'error',
+                            confirmButtonColor: 'var(--color-swal-confirm)'
+                        });
+                    }
+                });
+            }
         })();
 
         // Popup de tipos

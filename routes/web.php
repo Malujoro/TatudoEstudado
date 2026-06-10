@@ -299,6 +299,13 @@ Route::middleware('auth')->group(function () {
 
         $request->user()->update($data);
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Disponibilidade atualizada!',
+            ]);
+        }
+
         return back()->with('status', 'Disponibilidade atualizada!')->with('prompt_cronograma', true);
     })->name('profile.update');
 
@@ -354,6 +361,7 @@ Route::middleware('auth')->group(function () {
                     'id' => $user->id,
                     'name' => $user->name,
                     'sequencia' => $user->sequencia_estudo,
+                    'photo_url' => $user->photo_url,
                 ];
             })
             ->sortByDesc('sequencia')
