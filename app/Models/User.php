@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
  * @property string $email
  * @property string $password
  * @property string $role
+ * @property string|null $photo_url
  * @property array|null $horario_semanal
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -46,6 +47,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'photo_url',
         'horario_semanal',
     ];
 

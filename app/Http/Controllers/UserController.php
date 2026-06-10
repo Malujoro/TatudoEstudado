@@ -22,7 +22,7 @@ class UserController extends Controller
         $perPage = $perPage > 0 ? $perPage : 15;
 
         $users = User::query()
-            ->select(['id', 'name', 'email', 'role', 'horario_semanal', 'created_at', 'updated_at'])
+            ->select(['id', 'name', 'email', 'role', 'photo_url', 'horario_semanal', 'created_at', 'updated_at'])
             ->orderBy('id')
             ->paginate($perPage);
 
@@ -35,7 +35,7 @@ class UserController extends Controller
     public function show(User $user): JsonResponse
     {
         return response()->json(
-            $user->only(['id', 'name', 'email', 'role', 'horario_semanal', 'created_at', 'updated_at'])
+            $user->only(['id', 'name', 'email', 'role', 'photo_url', 'horario_semanal', 'created_at', 'updated_at'])
         );
     }
 
@@ -59,7 +59,7 @@ class UserController extends Controller
         $user = User::create($data);
 
         return response()->json(
-            $user->only(['id', 'name', 'email', 'role', 'horario_semanal', 'created_at', 'updated_at']),
+            $user->only(['id', 'name', 'email', 'role', 'photo_url', 'horario_semanal', 'created_at', 'updated_at']),
             201
         );
     }
@@ -79,7 +79,7 @@ class UserController extends Controller
         $user->save();
 
         return response()->json(
-            $user->only(['id', 'name', 'email', 'role', 'horario_semanal', 'created_at', 'updated_at'])
+            $user->only(['id', 'name', 'email', 'role', 'photo_url', 'horario_semanal', 'created_at', 'updated_at'])
         );
     }
 
