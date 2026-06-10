@@ -101,33 +101,46 @@
         </main>
     </div>
 
-    @if (session('prompt_cronograma'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                Swal.fire({
-                    title: 'Disponibilidade alterada!',
-                    text: 'Deseja gerar um novo cronograma para aplicar as mudanças?',
-                    icon: 'info',
-                    showCancelButton: true,
-                    confirmButtonColor: 'var(--color-swal-confirm)',
-                    cancelButtonColor: 'var(--color-swal-cancel)',
-                    confirmButtonText: 'Sim, gerar novo',
-                    cancelButtonText: 'Não, manter atual'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch('/api/cronograma/gerar', {
+            <script>
+                // Global helper to prompt the user to generate a new cronograma using SweetAlert2
+                window.promptGerarCronograma = async function(title = 'Disponibilidade alterada!') {
+                    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                    const result = await Swal.fire({
+                        title: title,
+                        text: 'Deseja gerar um novo cronograma para aplicar as mudanças?',
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonColor: 'var(--color-swal-confirm)',
+                        cancelButtonColor: 'var(--color-swal-cancel)',
+                        confirmButtonText: 'Sim, gerar novo',
+                        cancelButtonText: 'Não, manter atual'
+                    });
+
+                    if (!result.isConfirmed) return false;
+
+                    try {
+                        await fetch('/api/cronograma/gerar', {
                             method: 'POST',
                             headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .getAttribute('content'),
+                                'X-CSRF-TOKEN': token,
                                 'Accept': 'application/json'
                             }
-                        }).then(() => window.location.reload());
+                        });
+                        return true;
+                    } catch (e) {
+                        console.error('Erro ao gerar cronograma:', e);
+                        return false;
                     }
-                });
-            });
-        </script>
-    @endif
+                };
+
+                // Legacy: if server flashed prompt_cronograma, trigger the prompt on load
+                @if (session('prompt_cronograma'))
+                    document.addEventListener('DOMContentLoaded', () => {
+                        window.promptGerarCronograma();
+                    });
+                @endif
+            </script>
 </body>
 
 </html>

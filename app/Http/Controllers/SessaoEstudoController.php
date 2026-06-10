@@ -166,8 +166,12 @@ class SessaoEstudoController extends Controller
         }
 
         if ($sessaoEstudo->tipo === 'teoria') {
-            $sessaoEstudo->assunto->teoria_finalizada = true;
-            $sessaoEstudo->assunto->save();
+            // Only mark the assunto as "teoria_finalizada" when the client
+            // explicitly requests it (payload boolean `excluir_teoria`).
+            if ($request->boolean('excluir_teoria', false)) {
+                $sessaoEstudo->assunto->teoria_finalizada = true;
+                $sessaoEstudo->assunto->save();
+            }
         }
 
         $sessaoEstudo->finalizado = true;
