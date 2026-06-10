@@ -22,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property array|null $horario_semanal
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @property-read int $sequencia_estudo Current consecutive study days streak.
  */
 class User extends Authenticatable
 {
@@ -81,5 +82,59 @@ class User extends Authenticatable
     public function materias(): HasMany
     {
         return $this->hasMany(Materia::class);
+    }
+
+    /**
+     * Calculate the current streak of consecutive study days.
+     * A day is counted if there is at least one completed study session.
+     */
+    public function obterSequenciaEstudo(): int
+    {
+        // Fetch all unique dates of completed study sessions for this user
+        $datasEstudadas = SessaoEstudo::query()
+            ->whereHas('assunto.materia', fn ($q) => $q->where('user_id', $this->id))
+            ->where('finalizado', true)
+            ->select('data')
+            ->distinct()
+            ->orderBy('data', 'desc')
+            ->pluck('data')
+            ->map(fn ($d) => $d instanceof Carbon ? $d->toDateString() : Carbon::parse($d)->toDateString())
+            ->toArray();
+
+        if (empty($datasEstudadas)) {
+            return 0;
+        }
+
+        $hoje = Carbon::today();
+        $hojeStr = $hoje->toDateString();
+        $ontemStr = $hoje->copy()->subDay()->toDateString();
+
+        $temHoje = in_array($hojeStr, $datasEstudadas);
+        $temOntem = in_array($ontemStr, $datasEstudadas);
+
+        // If the user did not study today nor yesterday, the streak is broken
+        if (! $temHoje && ! $temOntem) {
+            return 0;
+        }
+
+        // Start counting from today (if studied today) or yesterday
+        $dataCorrente = $temHoje ? $hoje : $hoje->copy()->subDay();
+        $sequencia = 0;
+
+        // Decrement day by day as long as the date exists in the study records
+        while (in_array($dataCorrente->toDateString(), $datasEstudadas)) {
+            $sequencia++;
+            $dataCorrente->subDay();
+        }
+
+        return $sequencia;
+    }
+
+    /**
+     * Accessor to retrieve the user's current study streak.
+     */
+    public function getSequenciaEstudoAttribute(): int
+    {
+        return $this->obterSequenciaEstudo();
     }
 }

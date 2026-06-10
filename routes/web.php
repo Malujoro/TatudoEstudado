@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Models\Assunto;
 use App\Models\Materia;
 use App\Models\SessaoEstudo;
+use App\Models\User;
 use App\Services\CronogramaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -295,6 +296,29 @@ Route::middleware('auth')->group(function () {
 
         return back()->with('status', 'Dados do perfil atualizados!');
     })->name('profile.details.update');
+
+    /**
+     * User Leaderboard / Ranking.
+     *
+     * Lists users ranked by study streak.
+     *
+     * @return View
+     */
+    Route::get('/ranking', function (Request $request) {
+        $ranking = User::all()
+            ->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'sequencia' => $user->sequencia_estudo,
+                ];
+            })
+            ->sortByDesc('sequencia')
+            ->values();
+
+        return view('ranking', compact('ranking'));
+    })->name('ranking');
+
 });
 
 /**
