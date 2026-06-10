@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\TipoSessao;
 use App\Http\Controllers\AssuntoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CadernoController;
@@ -231,7 +232,49 @@ Route::middleware('auth')->group(function () {
      */
     Route::get('/perfil', function (Request $request) {
         $user = $request->user();
-        $materias = Materia::where('user_id', $user->id)->withCount('assuntos')->orderBy('nome')->get();
+
+        $materias = Materia::where('user_id', $user->id)
+            ->withCount('assuntos')
+            ->with([
+                'assuntos.sessoesEstudo',
+                'assuntos.metrica',
+            ])
+            ->orderBy('nome')
+            ->get()
+            ->map(function ($materia) {
+                $assuntos = $materia->assuntos;
+
+                $horasTotal = $assuntos
+                    ->flatMap(fn ($a) => $a->sessoesEstudo)
+                    ->where('finalizado', true)
+                    ->sum('horas');
+
+                $acertos = $assuntos->sum(fn ($a) => $a->metrica?->acertos ?? 0);
+                $erros = $assuntos->sum(fn ($a) => $a->metrica?->erros ?? 0);
+                $total = $acertos + $erros;
+                $taxaAcerto = $total > 0 ? round(($acertos / $total) * 100) : null;
+
+                $sessoesFin = $assuntos
+                    ->flatMap(fn ($a) => $a->sessoesEstudo)
+                    ->where('finalizado', true);
+
+                // Conta por quantidade usando os valores do Enum
+                $tipos = collect(TipoSessao::cases())
+                    ->mapWithKeys(fn ($tipo) => [
+                        $tipo->value => $sessoesFin->filter(fn ($s) => $s->tipo === $tipo)->count(),
+                    ])
+                    ->filter(fn ($qtd) => $qtd > 0);
+
+                // Tipo mais estudado
+                $tipoMais = $tipos->sortDesc()->keys()->first();
+
+                $materia->horas_total = round($horasTotal, 1);
+                $materia->taxa_acerto = $taxaAcerto;
+                $materia->tipos = $tipos;
+                $materia->tipo_mais = $tipoMais ? TipoSessao::from($tipoMais) : null;
+
+                return $materia;
+            });
 
         return view('profile', compact('user', 'materias'));
     })->name('profile');
