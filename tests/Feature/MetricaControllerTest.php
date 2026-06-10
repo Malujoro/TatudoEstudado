@@ -20,14 +20,14 @@ class MetricaControllerTest extends TestCase
 
         return Metrica::factory()->create(array_merge([
             'assunto_id' => $assunto->id,
-            'acertos'    => 0,
-            'erros'      => 0,
+            'acertos' => 0,
+            'erros' => 0,
         ], $attrs));
     }
 
     public function test_index_returns_only_users_metricas(): void
     {
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
         $other = User::factory()->create();
 
         $this->createMetrica($user);
@@ -55,7 +55,7 @@ class MetricaControllerTest extends TestCase
 
     public function test_show_returns_own_metrica(): void
     {
-        $user    = User::factory()->create();
+        $user = User::factory()->create();
         $metrica = $this->createMetrica($user, ['acertos' => 10, 'erros' => 3]);
 
         $response = $this->actingAs($user)->getJson(route('api.metricas.show', $metrica));
@@ -66,8 +66,8 @@ class MetricaControllerTest extends TestCase
 
     public function test_show_returns_404_for_other_users_metrica(): void
     {
-        $user    = User::factory()->create();
-        $other   = User::factory()->create();
+        $user = User::factory()->create();
+        $other = User::factory()->create();
         $metrica = $this->createMetrica($other);
 
         $response = $this->actingAs($user)->getJson(route('api.metricas.show', $metrica));
@@ -77,7 +77,7 @@ class MetricaControllerTest extends TestCase
 
     public function test_store_creates_metrica_with_default_zeros(): void
     {
-        $user    = User::factory()->create();
+        $user = User::factory()->create();
         $materia = Materia::factory()->create(['user_id' => $user->id]);
         $assunto = Assunto::factory()->create(['materia_id' => $materia->id]);
 
@@ -91,14 +91,14 @@ class MetricaControllerTest extends TestCase
 
     public function test_store_creates_metrica_with_explicit_values(): void
     {
-        $user    = User::factory()->create();
+        $user = User::factory()->create();
         $materia = Materia::factory()->create(['user_id' => $user->id]);
         $assunto = Assunto::factory()->create(['materia_id' => $materia->id]);
 
         $response = $this->actingAs($user)->postJson(route('api.metricas.store'), [
             'assunto_id' => $assunto->id,
-            'acertos'    => 8,
-            'erros'      => 2,
+            'acertos' => 8,
+            'erros' => 2,
         ]);
 
         $response->assertCreated();
@@ -107,8 +107,8 @@ class MetricaControllerTest extends TestCase
 
     public function test_store_returns_404_when_assunto_belongs_to_other_user(): void
     {
-        $user    = User::factory()->create();
-        $other   = User::factory()->create();
+        $user = User::factory()->create();
+        $other = User::factory()->create();
         $materia = Materia::factory()->create(['user_id' => $other->id]);
         $assunto = Assunto::factory()->create(['materia_id' => $materia->id]);
 
@@ -131,12 +131,12 @@ class MetricaControllerTest extends TestCase
 
     public function test_update_modifies_metrica(): void
     {
-        $user    = User::factory()->create();
+        $user = User::factory()->create();
         $metrica = $this->createMetrica($user, ['acertos' => 2, 'erros' => 1]);
 
         $response = $this->actingAs($user)->putJson(route('api.metricas.update', $metrica), [
             'acertos' => 15,
-            'erros'   => 5,
+            'erros' => 5,
         ]);
 
         $response->assertOk();
@@ -145,8 +145,8 @@ class MetricaControllerTest extends TestCase
 
     public function test_update_returns_404_for_other_users_metrica(): void
     {
-        $user    = User::factory()->create();
-        $other   = User::factory()->create();
+        $user = User::factory()->create();
+        $other = User::factory()->create();
         $metrica = $this->createMetrica($other);
 
         $response = $this->actingAs($user)->putJson(route('api.metricas.update', $metrica), [
@@ -158,7 +158,7 @@ class MetricaControllerTest extends TestCase
 
     public function test_destroy_deletes_metrica_and_returns_204(): void
     {
-        $user    = User::factory()->create();
+        $user = User::factory()->create();
         $metrica = $this->createMetrica($user);
 
         $response = $this->actingAs($user)->deleteJson(route('api.metricas.destroy', $metrica));
@@ -169,8 +169,8 @@ class MetricaControllerTest extends TestCase
 
     public function test_destroy_returns_404_for_other_users_metrica(): void
     {
-        $user    = User::factory()->create();
-        $other   = User::factory()->create();
+        $user = User::factory()->create();
+        $other = User::factory()->create();
         $metrica = $this->createMetrica($other);
 
         $response = $this->actingAs($user)->deleteJson(route('api.metricas.destroy', $metrica));
