@@ -354,6 +354,7 @@ Route::middleware('auth')->group(function () {
                     'id' => $user->id,
                     'name' => $user->name,
                     'sequencia' => $user->sequencia_estudo,
+                    'photo_url' => $user->photo_url,
                 ];
             })
             ->sortByDesc('sequencia')

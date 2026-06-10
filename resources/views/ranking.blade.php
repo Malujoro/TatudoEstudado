@@ -46,10 +46,20 @@
                 <!-- 2º Lugar -->
                 @if (isset($posicoesPodio[1]))
                     <div class="flex flex-col items-center flex-1 group">
-                        <div class="mb-2 text-center w-full">
+                        <div class="mb-2 flex flex-col items-center justify-center text-center w-full gap-1">
                             <span class="text-2xl">🥈</span>
+                            <div class="flex h-12 w-12 md:h-14 md:w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white border-2 border-slate-300 shadow-md text-slate-500 my-0.5">
+                                @if ($posicoesPodio[1]['photo_url'])
+                                    <img src="{{ $posicoesPodio[1]['photo_url'] }}" alt="Foto de {{ $posicoesPodio[1]['name'] }}"
+                                        class="h-full w-full object-cover" />
+                                @else
+                                    <span class="font-rem text-base font-bold leading-none">
+                                        {{ str($posicoesPodio[1]['name'] ?? 'U')->trim()->upper()->substr(0, 1) }}
+                                    </span>
+                                @endif
+                            </div>
                             <p
-                                class="font-poppins text-xs md:text-sm font-semibold text-purple-night truncate group-hover:text-purple-dark transition-colors">
+                                class="font-poppins text-xs md:text-sm font-semibold text-purple-night truncate max-w-full group-hover:text-purple-dark transition-colors">
                                 {{ $posicoesPodio[1]['name'] }}
                             </p>
                             @if ($isUser2)
@@ -71,10 +81,20 @@
                 <!-- 1º Lugar -->
                 @if (isset($posicoesPodio[0]))
                     <div class="flex flex-col items-center flex-1 group">
-                        <div class="mb-2 text-center w-full">
+                        <div class="mb-2 flex flex-col items-center justify-center text-center w-full gap-1">
                             <span class="text-3xl animate-bounce inline-block">👑</span>
+                            <div class="flex h-14 w-14 md:h-16 md:w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white border-2 border-amber-400 shadow-md text-amber-500 my-0.5">
+                                @if ($posicoesPodio[0]['photo_url'])
+                                    <img src="{{ $posicoesPodio[0]['photo_url'] }}" alt="Foto de {{ $posicoesPodio[0]['name'] }}"
+                                        class="h-full w-full object-cover" />
+                                @else
+                                    <span class="font-rem text-lg font-bold leading-none">
+                                        {{ str($posicoesPodio[0]['name'] ?? 'U')->trim()->upper()->substr(0, 1) }}
+                                    </span>
+                                @endif
+                            </div>
                             <p
-                                class="font-poppins text-sm md:text-base font-bold text-purple-night truncate group-hover:text-purple-deep transition-colors">
+                                class="font-poppins text-sm md:text-base font-bold text-purple-night truncate max-w-full group-hover:text-purple-deep transition-colors">
                                 {{ $posicoesPodio[0]['name'] }}
                             </p>
                             @if ($isUser1)
@@ -99,10 +119,20 @@
                 <!-- 3º Lugar -->
                 @if (isset($posicoesPodio[2]))
                     <div class="flex flex-col items-center flex-1 group">
-                        <div class="mb-2 text-center w-full">
+                        <div class="mb-2 flex flex-col items-center justify-center text-center w-full gap-1">
                             <span class="text-2xl">🥉</span>
+                            <div class="flex h-12 w-12 md:h-14 md:w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white border-2 border-amber-700/30 shadow-md text-amber-700/60 my-0.5">
+                                @if ($posicoesPodio[2]['photo_url'])
+                                    <img src="{{ $posicoesPodio[2]['photo_url'] }}" alt="Foto de {{ $posicoesPodio[2]['name'] }}"
+                                        class="h-full w-full object-cover" />
+                                @else
+                                    <span class="font-rem text-base font-bold leading-none">
+                                        {{ str($posicoesPodio[2]['name'] ?? 'U')->trim()->upper()->substr(0, 1) }}
+                                    </span>
+                                @endif
+                            </div>
                             <p
-                                class="font-poppins text-xs md:text-sm font-semibold text-purple-night truncate group-hover:text-purple-dark transition-colors">
+                                class="font-poppins text-xs md:text-sm font-semibold text-purple-night truncate max-w-full group-hover:text-purple-dark transition-colors">
                                 {{ $posicoesPodio[2]['name'] }}
                             </p>
                             @if ($isUser3)
