@@ -175,6 +175,24 @@
         </div>
     </div>
 
+    <div class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50" data-modal-teoria>
+        <div class="w-full max-w-md rounded-3xl bg-white p-6">
+            <div class="flex items-center justify-between">
+                <h3 class="font-rem text-lg font-semibold text-purple-night">Finalizar teoria</h3>
+                <button type="button" class="text-purple-night" data-close-modal-teoria>✕</button>
+            </div>
+            <p class="mt-4 text-sm text-purple-night">Você já finalizou este conteúdo?</p>
+            <div class="mt-4 flex justify-end gap-2">
+                <button type="button"
+                    class="rounded-full border border-purple-dim px-4 py-2 text-xs font-semibold text-purple-dim hover:bg-purple-dim hover:text-white transition"
+                    data-teoria-option="no">Não, ainda preciso de mais teoria</button>
+                <button type="button"
+                    class="rounded-full bg-purple-light px-4 py-2 text-xs font-semibold text-purple-night hover:opacity-80 transition"
+                    data-teoria-option="yes">Sim, não preciso mais de teoria</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         (function() {
             const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -254,6 +272,10 @@
             const closeExercicio = document.querySelectorAll('[data-close-modal-exercicio]');
             let sessaoAtual = null;
 
+            const modalTeoria = document.querySelector('[data-modal-teoria]');
+            const closeTeoria = document.querySelectorAll('[data-close-modal-teoria]');
+            let teoriaSessaoAtual = null;
+
             document.querySelectorAll('[data-finalizar]').forEach((button) => {
                 button.addEventListener('click', async () => {
                     const tipo = button.getAttribute('data-tipo');
@@ -269,7 +291,49 @@
                         return;
                     }
 
+                    if (tipo === 'teoria') {
+                        teoriaSessaoAtual = sessaoId;
+                        modalTeoria?.classList.remove('hidden');
+                        modalTeoria?.classList.add('flex');
+                        return;
+                    }
+
                     await finalizarSessao(sessaoId, {});
+                });
+            });
+
+            closeTeoria.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    modalTeoria?.classList.add('hidden');
+                    modalTeoria?.classList.remove('flex');
+                    teoriaSessaoAtual = null;
+                });
+            });
+
+            // Handle teoria option buttons
+            document.querySelectorAll('[data-teoria-option]').forEach((btn) => {
+                btn.addEventListener('click', async (ev) => {
+                    const choice = ev.currentTarget.getAttribute('data-teoria-option');
+                    if (!teoriaSessaoAtual) return;
+
+                    modalTeoria?.classList.add('hidden');
+                    modalTeoria?.classList.remove('flex');
+
+                    if (choice === 'yes') {
+                        // User does not need more teoria: finalize sessao and mark assunto to skip teoria
+                        await finalizarSessao(teoriaSessaoAtual, { excluir_teoria: true });
+
+                        // Ask whether to regenerate cronograma using shared modal
+                        const regenerated = await window.promptGerarCronograma('Deseja gerar um novo cronograma agora?');
+                        if (regenerated) {
+                            window.location.reload();
+                        }
+                    } else {
+                        // User still needs theory: just finalize the session normally
+                        await finalizarSessao(teoriaSessaoAtual, {});
+                    }
+
+                    teoriaSessaoAtual = null;
                 });
             });
 

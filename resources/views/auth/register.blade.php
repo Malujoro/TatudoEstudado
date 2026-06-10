@@ -53,7 +53,7 @@
 
                         <div>
                             <label for="password" class="sr-only">Senha</label>
-                            <x-input id="password" name="password" type="password" placeholder="Senha">
+                            <x-input id="password" name="password" type="password" placeholder="Senha" :isPassword="true">
                                 <x-slot name="icon">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
@@ -70,7 +70,7 @@
                         <div>
                             <label for="password_confirmation" class="sr-only">Confirmar a senha</label>
                             <x-input id="password_confirmation" name="password_confirmation" type="password"
-                                placeholder="Confirmar a senha">
+                                placeholder="Confirmar a senha" :isPassword="true">
                                 <x-slot name="icon">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
