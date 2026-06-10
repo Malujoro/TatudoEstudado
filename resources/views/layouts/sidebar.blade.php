@@ -68,13 +68,23 @@
             </nav>
 
             <div class="px-6 py-5 border-t border-secondary-green">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <a href="{{ route('profile') }}"
-                            class="font-poppins text-[20px] font-medium leading-none text-main-dark hover:underline">
+                <div class="flex items-center justify-between gap-3">
+                    <a href="{{ route('profile') }}" class="flex items-center gap-3 group">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/60 text-purple-deep">
+                            @if (auth()->user()?->photo_url)
+                                <img src="{{ auth()->user()->photo_url }}" alt="Foto de perfil"
+                                    class="h-full w-full object-cover" />
+                            @else
+                                <span class="font-rem text-base font-bold leading-none">
+                                    {{ str(auth()->user()->name ?? 'U')->trim()->upper()->substr(0, 1) }}
+                                </span>
+                            @endif
+                        </div>
+                        <span
+                            class="font-poppins text-[20px] font-medium leading-none text-main-dark group-hover:underline">
                             {{ auth()->user()->name ?? 'Usuário' }}
-                        </a>
-                    </div>
+                        </span>
+                    </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
