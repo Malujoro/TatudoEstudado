@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
@@ -58,12 +59,12 @@ class AuthControllerTest extends TestCase
     public function test_login_with_valid_credentials_redirects(): void
     {
         $user = User::factory()->create([
-            'email' => 'user@example.com',
+            'email'    => 'user@example.com',
             'password' => Hash::make('secret123'),
         ]);
 
         $response = $this->post(route('login'), [
-            'email' => 'user@example.com',
+            'email'    => 'user@example.com',
             'password' => 'secret123',
         ]);
 
@@ -74,12 +75,12 @@ class AuthControllerTest extends TestCase
     public function test_login_with_wrong_password_returns_error(): void
     {
         User::factory()->create([
-            'email' => 'user@example.com',
+            'email'    => 'user@example.com',
             'password' => Hash::make('correct'),
         ]);
 
         $response = $this->post(route('login'), [
-            'email' => 'user@example.com',
+            'email'    => 'user@example.com',
             'password' => 'wrong',
         ]);
 
@@ -91,7 +92,7 @@ class AuthControllerTest extends TestCase
     public function test_login_with_nonexistent_email_returns_error(): void
     {
         $response = $this->post(route('login'), [
-            'email' => 'nobody@example.com',
+            'email'    => 'nobody@example.com',
             'password' => 'any',
         ]);
 
@@ -109,7 +110,7 @@ class AuthControllerTest extends TestCase
     public function test_login_requires_valid_email_format(): void
     {
         $response = $this->post(route('login'), [
-            'email' => 'not-an-email',
+            'email'    => 'not-an-email',
             'password' => 'secret123',
         ]);
 
@@ -130,9 +131,9 @@ class AuthControllerTest extends TestCase
     public function test_register_creates_user_and_redirects(): void
     {
         $response = $this->post(route('register'), [
-            'name' => 'João Silva',
-            'email' => 'joao@example.com',
-            'password' => 'senha123',
+            'name'                  => 'João Silva',
+            'email'                 => 'joao@example.com',
+            'password'              => 'senha123',
             'password_confirmation' => 'senha123',
         ]);
 
@@ -140,17 +141,17 @@ class AuthControllerTest extends TestCase
         $this->assertAuthenticated();
         $this->assertDatabaseHas('users', [
             'email' => 'joao@example.com',
-            'name' => 'João Silva',
-            'role' => 'user',
+            'name'  => 'João Silva',
+            'role'  => 'user',
         ]);
     }
 
     public function test_register_stores_default_horario_semanal(): void
     {
         $this->post(route('register'), [
-            'name' => 'Ana',
-            'email' => 'ana@example.com',
-            'password' => 'senha123',
+            'name'                  => 'Ana',
+            'email'                 => 'ana@example.com',
+            'password'              => 'senha123',
             'password_confirmation' => 'senha123',
         ]);
 
@@ -167,9 +168,9 @@ class AuthControllerTest extends TestCase
         User::factory()->create(['email' => 'dup@example.com']);
 
         $response = $this->post(route('register'), [
-            'name' => 'Outro',
-            'email' => 'dup@example.com',
-            'password' => 'senha123',
+            'name'                  => 'Outro',
+            'email'                 => 'dup@example.com',
+            'password'              => 'senha123',
             'password_confirmation' => 'senha123',
         ]);
 
@@ -180,9 +181,9 @@ class AuthControllerTest extends TestCase
     public function test_register_requires_password_confirmation(): void
     {
         $response = $this->post(route('register'), [
-            'name' => 'Teste',
-            'email' => 'teste@example.com',
-            'password' => 'senha123',
+            'name'                  => 'Teste',
+            'email'                 => 'teste@example.com',
+            'password'              => 'senha123',
             'password_confirmation' => 'different',
         ]);
 
@@ -193,9 +194,9 @@ class AuthControllerTest extends TestCase
     public function test_register_requires_password_min_6_chars(): void
     {
         $response = $this->post(route('register'), [
-            'name' => 'Teste',
-            'email' => 'teste@example.com',
-            'password' => '123',
+            'name'                  => 'Teste',
+            'email'                 => 'teste@example.com',
+            'password'              => '123',
             'password_confirmation' => '123',
         ]);
 
@@ -205,8 +206,8 @@ class AuthControllerTest extends TestCase
     public function test_register_requires_name(): void
     {
         $response = $this->post(route('register'), [
-            'email' => 'teste@example.com',
-            'password' => 'senha123',
+            'email'                 => 'teste@example.com',
+            'password'              => 'senha123',
             'password_confirmation' => 'senha123',
         ]);
 
@@ -216,9 +217,9 @@ class AuthControllerTest extends TestCase
     public function test_register_requires_valid_email(): void
     {
         $response = $this->post(route('register'), [
-            'name' => 'Teste',
-            'email' => 'invalido',
-            'password' => 'senha123',
+            'name'                  => 'Teste',
+            'email'                 => 'invalido',
+            'password'              => 'senha123',
             'password_confirmation' => 'senha123',
         ]);
 
@@ -290,16 +291,16 @@ class AuthControllerTest extends TestCase
         Password::shouldReceive('reset')
             ->once()
             ->andReturnUsing(function ($creds, $callback) {
-                $user = new User(['password' => 'old']);
+                $user = User::factory()->make(); // instância sem persistir
                 $callback($user, 'newpassword');
 
-                return Password::PASSWORD_RESET;
+                return 'passwords.reset';
             });
 
         $response = $this->post('/reset-password', [
-            'token' => 'valid-token',
-            'email' => 'user@example.com',
-            'password' => 'newpassword',
+            'token'                 => 'valid-token',
+            'email'                 => 'user@example.com',
+            'password'              => 'newpassword',
             'password_confirmation' => 'newpassword',
         ]);
 
@@ -314,9 +315,9 @@ class AuthControllerTest extends TestCase
             ->andReturn(Password::INVALID_TOKEN);
 
         $response = $this->post('/reset-password', [
-            'token' => 'bad-token',
-            'email' => 'user@example.com',
-            'password' => 'newpassword12',
+            'token'                 => 'bad-token',
+            'email'                 => 'user@example.com',
+            'password'              => 'newpassword12',
             'password_confirmation' => 'newpassword12',
         ]);
 
@@ -326,9 +327,9 @@ class AuthControllerTest extends TestCase
     public function test_reset_password_requires_min_8_chars(): void
     {
         $response = $this->post('/reset-password', [
-            'token' => 'tok',
-            'email' => 'user@example.com',
-            'password' => 'short',
+            'token'                 => 'tok',
+            'email'                 => 'user@example.com',
+            'password'              => 'short',
             'password_confirmation' => 'short',
         ]);
 
@@ -338,8 +339,8 @@ class AuthControllerTest extends TestCase
     public function test_reset_password_requires_token(): void
     {
         $response = $this->post('/reset-password', [
-            'email' => 'user@example.com',
-            'password' => 'newpassword',
+            'email'                 => 'user@example.com',
+            'password'              => 'newpassword',
             'password_confirmation' => 'newpassword',
         ]);
 
