@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
 
 # Instalar extensões PHP
 RUN docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd
+RUN pecl install pcov && echo "extension=pcov.so" > /usr/local/etc/php/php.ini
 
 # Resolve o erro: fatal: detected dubious ownership in repository at '/var/www'
 RUN git config --global --add safe.directory /var/www
