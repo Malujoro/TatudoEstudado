@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\TipoSessao;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
-use App\Enums\TipoSessao;
 
 /**
  * Model representing an individual study session.
@@ -38,10 +38,10 @@ class SessaoEstudo extends Model
     ];
 
     protected $casts = [
-        'data'       => 'date',
+        'data' => 'date',
         'finalizado' => 'boolean',
-        'horas'      => 'float',
-        'tipo'       => TipoSessao::class,
+        'horas' => 'float',
+        'tipo' => TipoSessao::class,
     ];
 
     /**
