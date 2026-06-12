@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use App\Enums\TipoSessao;
 
 /**
  * Model representing an individual study session.
@@ -37,9 +38,10 @@ class SessaoEstudo extends Model
     ];
 
     protected $casts = [
-        'data' => 'date',
+        'data'       => 'date',
         'finalizado' => 'boolean',
-        'horas' => 'float',
+        'horas'      => 'float',
+        'tipo'       => TipoSessao::class,
     ];
 
     /**
