@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\TipoSessao;
 use App\Models\Assunto;
 use App\Models\SessaoEstudo;
 use App\Models\User;
@@ -113,7 +114,7 @@ class CronogramaService
             $minutosExistentesPorDia[$dataStr] = ($minutosExistentesPorDia[$dataStr] ?? 0) + $minutos;
 
             if (isset($states[$sessao->assunto_id])) {
-                $tipoStr = $sessao->tipo instanceof \App\Enums\TipoSessao
+                $tipoStr = $sessao->tipo instanceof TipoSessao
                     ? $sessao->tipo->value
                     : (string) $sessao->tipo;
 
@@ -219,14 +220,14 @@ class CronogramaService
             'total' => count($criadas),
             'sessoes' => collect($criadas)
                 ->map(fn (SessaoEstudo $sessao) => [
-                    'id'         => $sessao->id,
-                    'data'       => $sessao->data instanceof \Illuminate\Support\Carbon
+                    'id' => $sessao->id,
+                    'data' => $sessao->data instanceof Carbon
                                         ? $sessao->data->toDateString()
                                         : (string) $sessao->data,
-                    'tipo'       => $sessao->tipo instanceof \App\Enums\TipoSessao
+                    'tipo' => $sessao->tipo instanceof TipoSessao
                                         ? $sessao->tipo->value
                                         : (string) $sessao->tipo,
-                    'horas'      => $sessao->horas,
+                    'horas' => $sessao->horas,
                     'finalizado' => $sessao->finalizado,
                     'assunto_id' => $sessao->assunto_id,
                     'created_at' => $sessao->created_at,

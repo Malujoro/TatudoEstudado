@@ -5,10 +5,8 @@ namespace Tests\Unit;
 use App\Enums\TipoSessao;
 use PHPUnit\Framework\TestCase;
 
-
 class TipoSessaoTest extends TestCase
 {
-
     // Backing values
     public function test_teoria_tem_value_correto(): void
     {
@@ -24,7 +22,6 @@ class TipoSessaoTest extends TestCase
     {
         $this->assertSame('revisao', TipoSessao::Revisao->value);
     }
-
 
     // label()
     public function test_label_teoria(): void
@@ -42,7 +39,6 @@ class TipoSessaoTest extends TestCase
         $this->assertSame('Revisão', TipoSessao::Revisao->label());
     }
 
-
     // cor()
     public function test_cor_teoria(): void
     {
@@ -59,7 +55,6 @@ class TipoSessaoTest extends TestCase
         $this->assertSame('bg-teal-100 text-teal-700', TipoSessao::Revisao->cor());
     }
 
-
     // letra()
     public function test_letra_teoria(): void
     {
@@ -75,7 +70,6 @@ class TipoSessaoTest extends TestCase
     {
         $this->assertSame('R', TipoSessao::Revisao->letra());
     }
-
 
     // from()
     public function test_from_instancia_teoria(): void

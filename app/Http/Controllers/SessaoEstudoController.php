@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TipoSessao;
 use App\Http\Requests\StoreSessaoEstudoRequest;
 use App\Http\Requests\UpdateSessaoEstudoRequest;
 use App\Models\Assunto;
@@ -137,7 +138,7 @@ class SessaoEstudoController extends Controller
             );
         }
 
-        if ($sessaoEstudo->tipo === \App\Enums\TipoSessao::Exercicios) {
+        if ($sessaoEstudo->tipo === TipoSessao::Exercicios) {
             $questoes = $data['questoes'] ?? null;
             $acertos = $data['acertos'] ?? null;
 
@@ -165,7 +166,7 @@ class SessaoEstudoController extends Controller
             $metrica->save();
         }
 
-        if ($sessaoEstudo->tipo === \App\Enums\TipoSessao::Teoria) {
+        if ($sessaoEstudo->tipo === TipoSessao::Teoria) {
             $sessaoEstudo->assunto->teoria_finalizada = true;
             $sessaoEstudo->assunto->save();
         }
