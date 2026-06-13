@@ -113,11 +113,15 @@ class CronogramaService
             $minutosExistentesPorDia[$dataStr] = ($minutosExistentesPorDia[$dataStr] ?? 0) + $minutos;
 
             if (isset($states[$sessao->assunto_id])) {
-                $states[$sessao->assunto_id]['scheduled_count']++;
-                $states[$sessao->assunto_id]['type_counts'][$sessao->tipo] =
-                    ($states[$sessao->assunto_id]['type_counts'][$sessao->tipo] ?? 0) + 1;
+                $tipoStr = $sessao->tipo instanceof \App\Enums\TipoSessao
+                    ? $sessao->tipo->value
+                    : (string) $sessao->tipo;
 
-                $ultimosTiposPorDia[$dataStr][] = $sessao->tipo;
+                $states[$sessao->assunto_id]['scheduled_count']++;
+                $states[$sessao->assunto_id]['type_counts'][$tipoStr] =
+                    ($states[$sessao->assunto_id]['type_counts'][$tipoStr] ?? 0) + 1;
+
+                $ultimosTiposPorDia[$dataStr][] = $tipoStr;
                 $ultimasMateriasPorDia[$dataStr][] = $states[$sessao->assunto_id]['materia_id'];
             }
         }
@@ -214,16 +218,20 @@ class CronogramaService
             'fim' => $fim->toDateString(),
             'total' => count($criadas),
             'sessoes' => collect($criadas)
-                ->map(fn (SessaoEstudo $sessao) => $sessao->only([
-                    'id',
-                    'data',
-                    'tipo',
-                    'horas',
-                    'finalizado',
-                    'assunto_id',
-                    'created_at',
-                    'updated_at',
-                ]))
+                ->map(fn (SessaoEstudo $sessao) => [
+                    'id'         => $sessao->id,
+                    'data'       => $sessao->data instanceof \Illuminate\Support\Carbon
+                                        ? $sessao->data->toDateString()
+                                        : (string) $sessao->data,
+                    'tipo'       => $sessao->tipo instanceof \App\Enums\TipoSessao
+                                        ? $sessao->tipo->value
+                                        : (string) $sessao->tipo,
+                    'horas'      => $sessao->horas,
+                    'finalizado' => $sessao->finalizado,
+                    'assunto_id' => $sessao->assunto_id,
+                    'created_at' => $sessao->created_at,
+                    'updated_at' => $sessao->updated_at,
+                ])
                 ->values(),
         ];
     }

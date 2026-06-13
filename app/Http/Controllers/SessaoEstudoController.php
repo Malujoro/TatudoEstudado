@@ -137,7 +137,7 @@ class SessaoEstudoController extends Controller
             );
         }
 
-        if ($sessaoEstudo->tipo === 'exercicio') {
+        if ($sessaoEstudo->tipo === \App\Enums\TipoSessao::Exercicios) {
             $questoes = $data['questoes'] ?? null;
             $acertos = $data['acertos'] ?? null;
 
@@ -165,13 +165,9 @@ class SessaoEstudoController extends Controller
             $metrica->save();
         }
 
-        if ($sessaoEstudo->tipo === 'teoria') {
-            // Only mark the assunto as "teoria_finalizada" when the client
-            // explicitly requests it (payload boolean `excluir_teoria`).
-            if ($request->boolean('excluir_teoria', false)) {
-                $sessaoEstudo->assunto->teoria_finalizada = true;
-                $sessaoEstudo->assunto->save();
-            }
+        if ($sessaoEstudo->tipo === \App\Enums\TipoSessao::Teoria) {
+            $sessaoEstudo->assunto->teoria_finalizada = true;
+            $sessaoEstudo->assunto->save();
         }
 
         $sessaoEstudo->finalizado = true;
