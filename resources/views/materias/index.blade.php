@@ -154,10 +154,27 @@
             // Abrir edição
             document.querySelectorAll('.btn-edit-materia').forEach(btn => {
                 btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+
                     const wrapper = e.target.closest('.materia-card-wrapper');
                     const id = wrapper.dataset.id;
                     const currentName = wrapper.querySelector('h2').innerText;
+
                     openModal(id, currentName);
+                });
+            });
+
+            // Clicar no card abre os assuntos da matéria (exceto nos botões)
+            document.querySelectorAll('.materia-card-wrapper').forEach(wrapper => {
+                wrapper.style.cursor = 'pointer';
+
+                wrapper.addEventListener('click', (e) => {
+                    if (e.target.closest('.btn-edit-materia')) return;
+                    if (e.target.closest('.btn-delete-materia')) return;
+
+                    const materiaId = wrapper.dataset.id;
+
+                    window.location.href = `/assuntos?materia_id=${materiaId}`;
                 });
             });
 
