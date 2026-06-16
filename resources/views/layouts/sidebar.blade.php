@@ -21,9 +21,9 @@
     </style>
 </head>
 
-<body class="min-h-screen bg-main-light text-main-dark">
-    <div class="min-h-screen flex">
-        <aside class="w-64 bg-secondary-green text-main-dark flex flex-col border-r border-secondary-green">
+<body class="h-screen bg-main-light text-main-dark">
+    <div class="h-screen flex">
+        <aside class="w-64 bg-secondary-green text-main-dark flex flex-col border-r border-secondary-green h-screen overflow-y-auto">
             <div class="px-6 pt-6">
                 <div class="mx-auto w-40">
                     <img src="{{ Vite::asset('resources/assets/logo.png') }}" alt="Logo Tatu do Estudado"
@@ -110,7 +110,7 @@
             </div>
         </aside>
 
-        <main class="flex-1 p-8">
+        <main class="flex-1 p-8 h-screen overflow-y-auto">
             @yield('content')
         </main>
     </div>
