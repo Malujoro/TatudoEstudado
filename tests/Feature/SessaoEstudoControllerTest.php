@@ -379,9 +379,9 @@ class SessaoEstudoControllerTest extends TestCase
     {
         $user = User::factory()->create([
             'horario_semanal' => [
-                'domingo' => 0, 'segunda' => 0, 'terca'  => 0,
-                'quarta'  => 0, 'quinta'  => 0, 'sexta'  => 0, 'sabado' => 0,
-            ]
+                'domingo' => 0, 'segunda' => 0, 'terca' => 0,
+                'quarta' => 0, 'quinta' => 0, 'sexta' => 0, 'sabado' => 0,
+            ],
         ]);
 
         $response = $this->actingAs($user)->postJson(route('api.cronograma.gerar'));
@@ -389,7 +389,7 @@ class SessaoEstudoControllerTest extends TestCase
         $response->assertStatus(422);
         $response->assertJson([
             'error' => 'sem_horas',
-            'message' => 'Não é possível gerar cronograma. Você não definiu suas horas disponíveis.'
+            'message' => 'Não é possível gerar cronograma. Você não definiu suas horas disponíveis.',
         ]);
     }
 
@@ -397,9 +397,9 @@ class SessaoEstudoControllerTest extends TestCase
     {
         $user = User::factory()->create([
             'horario_semanal' => [
-                'domingo' => 0, 'segunda' => 2, 'terca'  => 2,
-                'quarta'  => 2, 'quinta'  => 2, 'sexta'  => 2, 'sabado' => 2,
-            ]
+                'domingo' => 0, 'segunda' => 2, 'terca' => 2,
+                'quarta' => 2, 'quinta' => 2, 'sexta' => 2, 'sabado' => 2,
+            ],
         ]);
 
         $response = $this->actingAs($user)->postJson(route('api.cronograma.gerar'));
@@ -407,7 +407,7 @@ class SessaoEstudoControllerTest extends TestCase
         $response->assertStatus(422);
         $response->assertJson([
             'error' => 'dia_zerado',
-            'message' => 'Você tem ao menos um dia com tempo zerado. Deseja gerar o cronograma mesmo assim?'
+            'message' => 'Você tem ao menos um dia com tempo zerado. Deseja gerar o cronograma mesmo assim?',
         ]);
     }
 
@@ -415,9 +415,9 @@ class SessaoEstudoControllerTest extends TestCase
     {
         $user = User::factory()->create([
             'horario_semanal' => [
-                'domingo' => 0, 'segunda' => 2, 'terca'  => 2,
-                'quarta'  => 2, 'quinta'  => 2, 'sexta'  => 2, 'sabado' => 2,
-            ]
+                'domingo' => 0, 'segunda' => 2, 'terca' => 2,
+                'quarta' => 2, 'quinta' => 2, 'sexta' => 2, 'sabado' => 2,
+            ],
         ]);
 
         // Create a subject and materia so CronogramaService has subjects to generate for
@@ -425,7 +425,7 @@ class SessaoEstudoControllerTest extends TestCase
         Assunto::factory()->create(['materia_id' => $materia->id]);
 
         $response = $this->actingAs($user)->postJson(route('api.cronograma.gerar'), [
-            'ignorar_zerado' => true
+            'ignorar_zerado' => true,
         ]);
 
         $response->assertStatus(201);
