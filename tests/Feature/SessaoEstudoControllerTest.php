@@ -370,4 +370,64 @@ class SessaoEstudoControllerTest extends TestCase
             'erros' => 5,
         ]);
     }
+
+    // -----------------------------------------------------------------------
+    // gerarCronograma
+    // -----------------------------------------------------------------------
+
+    public function test_gerar_cronograma_fails_if_all_hours_are_zero(): void
+    {
+        $user = User::factory()->create([
+            'horario_semanal' => [
+                'domingo' => 0, 'segunda' => 0, 'terca'  => 0,
+                'quarta'  => 0, 'quinta'  => 0, 'sexta'  => 0, 'sabado' => 0,
+            ]
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('api.cronograma.gerar'));
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'error' => 'sem_horas',
+            'message' => 'Não é possível gerar cronograma. Você não definiu suas horas disponíveis.'
+        ]);
+    }
+
+    public function test_gerar_cronograma_warns_if_at_least_one_day_is_zero(): void
+    {
+        $user = User::factory()->create([
+            'horario_semanal' => [
+                'domingo' => 0, 'segunda' => 2, 'terca'  => 2,
+                'quarta'  => 2, 'quinta'  => 2, 'sexta'  => 2, 'sabado' => 2,
+            ]
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('api.cronograma.gerar'));
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'error' => 'dia_zerado',
+            'message' => 'Você tem ao menos um dia com tempo zerado. Deseja gerar o cronograma mesmo assim?'
+        ]);
+    }
+
+    public function test_gerar_cronograma_succeeds_with_zero_day_when_ignorar_zerado_is_provided(): void
+    {
+        $user = User::factory()->create([
+            'horario_semanal' => [
+                'domingo' => 0, 'segunda' => 2, 'terca'  => 2,
+                'quarta'  => 2, 'quinta'  => 2, 'sexta'  => 2, 'sabado' => 2,
+            ]
+        ]);
+
+        // Create a subject and materia so CronogramaService has subjects to generate for
+        $materia = Materia::factory()->create(['user_id' => $user->id]);
+        Assunto::factory()->create(['materia_id' => $materia->id]);
+
+        $response = $this->actingAs($user)->postJson(route('api.cronograma.gerar'), [
+            'ignorar_zerado' => true
+        ]);
+
+        $response->assertStatus(201);
+    }
 }
