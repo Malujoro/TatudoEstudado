@@ -116,10 +116,87 @@
     </div>
 
             <script>
-                // Global helper to prompt the user to generate a new cronograma using SweetAlert2
-                window.promptGerarCronograma = async function(title = 'Disponibilidade alterada!') {
+                // Global helper to perform the schedule generation API call with checks and notifications
+                window.executarGeracaoCronograma = async function() {
                     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
+                    const callApi = async (ignorar) => {
+                        const response = await fetch('/api/cronograma/gerar', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': token || '',
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({ ignorar_zerado: ignorar })
+                        });
+                        if (response.ok) {
+                            return { success: true };
+                        }
+                        if (response.status === 422) {
+                            const data = await response.json();
+                            return { success: false, error: data.error, message: data.message };
+                        }
+                        return { success: false, error: 'generic', message: 'Erro ao gerar o cronograma.' };
+                    };
+
+                    let result = await callApi(false);
+
+                    if (result.success) {
+                        return true;
+                    }
+
+                    if (result.error === 'sem_horas') {
+                        await Swal.fire({
+                            title: 'Aviso',
+                            text: result.message || 'Não é possível gerar cronograma. Você não definiu suas horas disponíveis.',
+                            icon: 'warning',
+                            confirmButtonColor: 'var(--color-swal-confirm)',
+                            confirmButtonText: 'Ok'
+                        });
+                        return false;
+                    }
+
+                    if (result.error === 'dia_zerado') {
+                        const confirmResult = await Swal.fire({
+                            title: 'Atenção',
+                            text: result.message || 'Você tem ao menos um dia com tempo zerado. Deseja gerar o cronograma mesmo assim?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: 'var(--color-swal-confirm)',
+                            cancelButtonColor: 'var(--color-swal-cancel)',
+                            confirmButtonText: 'Sim, gerar',
+                            cancelButtonText: 'Não, cancelar'
+                        });
+
+                        if (confirmResult.isConfirmed) {
+                            let secondResult = await callApi(true);
+                            if (secondResult.success) {
+                                return true;
+                            } else {
+                                await Swal.fire({
+                                    title: 'Erro',
+                                    text: secondResult.message || 'Falha ao gerar cronograma.',
+                                    icon: 'error',
+                                    confirmButtonColor: 'var(--color-swal-confirm)',
+                                });
+                            }
+                        }
+                        return false;
+                    }
+
+                    // Default generic error
+                    await Swal.fire({
+                        title: 'Erro',
+                        text: result.message || 'Falha ao gerar cronograma.',
+                        icon: 'error',
+                        confirmButtonColor: 'var(--color-swal-confirm)',
+                    });
+                    return false;
+                };
+
+                // Global helper to prompt the user to generate a new cronograma using SweetAlert2
+                window.promptGerarCronograma = async function(title = 'Disponibilidade alterada!') {
                     const result = await Swal.fire({
                         title: title,
                         text: 'Deseja gerar um novo cronograma para aplicar as mudanças?',
@@ -133,19 +210,7 @@
 
                     if (!result.isConfirmed) return false;
 
-                    try {
-                        await fetch('/api/cronograma/gerar', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': token,
-                                'Accept': 'application/json'
-                            }
-                        });
-                        return true;
-                    } catch (e) {
-                        console.error('Erro ao gerar cronograma:', e);
-                        return false;
-                    }
+                    return await window.executarGeracaoCronograma();
                 };
 
                 // Legacy: if server flashed prompt_cronograma, trigger the prompt on load

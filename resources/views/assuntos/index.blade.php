@@ -141,29 +141,33 @@
             }
 
             async function checarEGerarCronograma(titulo) {
-                const result = await Swal.fire({
-                    title: titulo,
-                    text: 'Deseja gerar um novo cronograma para aplicar as mudanças?',
-                    icon: 'success',
-                    showCancelButton: true,
-                    confirmButtonColor: 'var(--color-swal-confirm)',
-                    cancelButtonColor: 'var(--color-swal-cancel)',
-                    confirmButtonText: 'Gerar cronograma',
-                    cancelButtonText: 'Manter atual'
-                });
-
-                if (!result.isConfirmed) return;
-
-                try {
-                    await fetch('/api/cronograma/gerar', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': token,
-                            'Accept': 'application/json'
-                        }
+                if (typeof window.promptGerarCronograma === 'function') {
+                    await window.promptGerarCronograma(titulo);
+                } else {
+                    const result = await Swal.fire({
+                        title: titulo,
+                        text: 'Deseja gerar um novo cronograma para aplicar as mudanças?',
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonColor: 'var(--color-swal-confirm)',
+                        cancelButtonColor: 'var(--color-swal-cancel)',
+                        confirmButtonText: 'Gerar cronograma',
+                        cancelButtonText: 'Manter atual'
                     });
-                } catch (error) {
-                    console.error("Erro ao gerar cronograma:", error);
+
+                    if (!result.isConfirmed) return;
+
+                    try {
+                        await fetch('/api/cronograma/gerar', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': token,
+                                'Accept': 'application/json'
+                            }
+                        });
+                    } catch (error) {
+                        console.error("Erro ao gerar cronograma:", error);
+                    }
                 }
             }
 
