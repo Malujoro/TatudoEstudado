@@ -83,12 +83,7 @@
                         }
                     });
                     if (response.ok) {
-                        await Swal.fire({
-                            title: 'Sucesso!',
-                            text: 'Matéria excluída com sucesso.',
-                            icon: 'success',
-                            confirmButtonColor: 'var(--color-swal-confirm)'
-                        });
+                        await window.promptGerarCronograma('Matéria excluída com sucesso!');
                         atualizarTela();
                     }
                 } catch (error) {
