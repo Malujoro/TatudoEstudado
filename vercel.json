@@ -1,11 +1,12 @@
 {
     "version": 2,
+    "framework": null,
     "buildCommand": "npm run build",
     "outputDirectory": "public",
     "builds": [
         {
             "src": "public/index.php",
-            "use": "vercel-php@0.7.3"
+            "use": "vercel-php@0.8.0"
         }
     ],
     "routes": [
