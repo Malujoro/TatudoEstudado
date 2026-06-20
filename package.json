@@ -5,6 +5,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
+    "vercel-build": "npm run build",
     "prepare": "husky"
   },
   "devDependencies": {
