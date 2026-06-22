@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Força todas as URLs geradas (Vite, assets, links de formulário) a usarem HTTPS em produção
-        if (config('app.env') === 'production') {
+        if (config('app.env') === 'production' || isset($_SERVER['HTTP_X_VERCEL_DEPLOYMENT_URL'])) {
             URL::forceScheme('https');
         }
     }
