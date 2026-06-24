@@ -18,23 +18,106 @@
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
         }
+
+        /* Sidebar Transition and Custom Utility Classes */
+        #sidebar {
+            transition: transform 0.3s ease-in-out, margin-left 0.3s ease-in-out;
+        }
+
+        @media (max-width: 767px) {
+            #sidebar {
+                position: fixed !important;
+            }
+            .sidebar-mobile-hidden {
+                transform: translateX(-100%) !important;
+            }
+        }
+
+        @media (min-width: 768px) {
+            #sidebar {
+                position: sticky !important;
+                transform: translateX(0) !important;
+            }
+            .sidebar-mobile-hidden {
+                transform: translateX(0) !important;
+            }
+            .md\:-ml-64 {
+                margin-left: -16rem !important; /* -256px */
+            }
+            #desktop-sidebar-trigger.translate-x-0 {
+                transform: translateX(0) !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+            }
+        }
+
+        /* Fallbacks for transition utilities in case they aren't compiled in the static CSS bundle */
+        .-translate-x-12 {
+            transform: translateX(-3rem) !important;
+        }
+        .translate-x-0 {
+            transform: translateX(0) !important;
+        }
+        .opacity-0 {
+            opacity: 0 !important;
+        }
+        .opacity-100 {
+            opacity: 1 !important;
+        }
+        .pointer-events-none {
+            pointer-events: none !important;
+        }
+        .pointer-events-auto {
+            pointer-events: auto !important;
+        }
     </style>
 </head>
 
 <body class="h-screen bg-main-light text-main-dark">
-    <div class="h-screen flex">
-        <aside class="w-64 bg-secondary-green text-main-dark flex flex-col border-r border-secondary-green h-screen overflow-y-auto">
-            <div class="px-6 pt-6">
-                <div class="mx-auto w-40">
-                    <img src="{{ Vite::asset('resources/assets/logo.png') }}" alt="Logo Tatu do Estudado"
-                        class="w-full" />
+    <div class="h-screen flex flex-col md:flex-row overflow-hidden">
+        <!-- Backdrop for mobile drawer -->
+        <div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-40 hidden opacity-0 transition-opacity duration-300 md:hidden"></div>
+
+        <!-- Mobile Top Header Bar -->
+        <header class="flex items-center justify-between px-6 py-4 bg-secondary-green md:hidden border-b border-purple-dim/15 shrink-0">
+            <button id="mobile-sidebar-toggle" class="p-2 rounded-xl bg-white/20 hover:bg-white/35 text-main-dark transition-all duration-200" aria-label="Abrir menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="h-5 w-5">
+                    <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" />
+                </svg>
+            </button>
+            <div class="flex items-center gap-2">
+                <img src="{{ Vite::asset('resources/assets/logo.png') }}" alt="Logo Tatu do Estudado" class="h-8 w-auto" />
+                <span class="font-rem text-lg font-bold text-main-dark">TATU<span class="text-purple-dim">DO</span>ESTUDADO</span>
+            </div>
+            <div class="w-9"></div>
+        </header>
+
+
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar-mobile-hidden fixed md:sticky top-0 bottom-0 left-0 z-50 w-64 bg-secondary-green text-main-dark flex flex-col border-r border-secondary-green h-screen overflow-y-auto md:translate-x-0 transition-all duration-300 ease-in-out shrink-0">
+            <!-- Sidebar Header inside drawer (Mobile and Desktop) -->
+            <div class="px-6 pt-6 relative flex items-center justify-between md:block">
+                <!-- Desktop View Logo -->
+                <div class="hidden md:block mx-auto w-40">
+                    <img src="{{ Vite::asset('resources/assets/logo.png') }}" alt="Logo Tatu do Estudado" class="w-full" />
+                    <p class="mt-2 text-center font-rem text-[20px] font-bold leading-none text-main-dark">
+                        TATU<span class="text-purple-dim">DO</span>ESTUDADO
+                    </p>
                 </div>
-                <p class="mt-2 text-center font-rem text-[20px] font-bold leading-none text-main-dark">
-                    TATU<span class="text-purple-dim">DO</span>ESTUDADO
-                </p>
+
+                <!-- Mobile View Logo -->
+                <div class="flex items-center gap-2 md:hidden">
+                    <img src="{{ Vite::asset('resources/assets/logo.png') }}" alt="Logo Tatu do Estudado" class="h-8 w-auto" />
+                    <span class="font-rem text-lg font-bold text-main-dark">TATU<span class="text-purple-dim">DO</span>ESTUDADO</span>
+                </div>
+
+
+
+
             </div>
 
-            <div class="my-4 h-px w-full bg-purple-dim"></div>
+            <div class="my-4 h-px w-full bg-purple-dim shrink-0"></div>
 
             <nav class="mt-8 flex-1 px-6 space-y-5">
                 <a href="{{ route('home') }}"
@@ -110,116 +193,165 @@
             </div>
         </aside>
 
-        <main class="flex-1 px-8 pb-8 pt-0 h-screen overflow-y-auto">
+        <!-- Main Content -->
+        <main class="flex-1 px-8 pb-8 pt-0 h-full overflow-y-auto">
             @yield('content')
         </main>
     </div>
 
-            <script>
-                // Global helper to perform the schedule generation API call with checks and notifications
-                window.executarGeracaoCronograma = async function() {
-                    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    <script>
+        // Global helper to perform the schedule generation API call with checks and notifications
+        window.executarGeracaoCronograma = async function() {
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-                    const callApi = async (ignorar) => {
-                        const response = await fetch('/api/cronograma/gerar', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': token || '',
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json'
-                            },
-                            body: JSON.stringify({ ignorar_zerado: ignorar })
-                        });
-                        if (response.ok) {
-                            return { success: true };
-                        }
-                        if (response.status === 422) {
-                            const data = await response.json();
-                            return { success: false, error: data.error, message: data.message };
-                        }
-                        return { success: false, error: 'generic', message: 'Erro ao gerar o cronograma.' };
-                    };
+            const callApi = async (ignorar) => {
+                const response = await fetch('/api/cronograma/gerar', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token || '',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ ignorar_zerado: ignorar })
+                });
+                if (response.ok) {
+                    return { success: true };
+                }
+                if (response.status === 422) {
+                    const data = await response.json();
+                    return { success: false, error: data.error, message: data.message };
+                }
+                return { success: false, error: 'generic', message: 'Erro ao gerar o cronograma.' };
+            };
 
-                    let result = await callApi(false);
+            let result = await callApi(false);
 
-                    if (result.success) {
+            if (result.success) {
+                return true;
+            }
+
+            if (result.error === 'sem_horas') {
+                await Swal.fire({
+                    title: 'Aviso',
+                    text: result.message || 'Não é possível gerar cronograma. Você não definiu suas horas disponíveis.',
+                    icon: 'warning',
+                    confirmButtonColor: 'var(--color-swal-confirm)',
+                    confirmButtonText: 'Ok'
+                });
+                return false;
+            }
+
+            if (result.error === 'dia_zerado') {
+                const confirmResult = await Swal.fire({
+                    title: 'Atenção',
+                    text: result.message || 'Você tem ao menos um dia com tempo zerado. Deseja gerar o cronograma mesmo assim?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: 'var(--color-swal-confirm)',
+                    cancelButtonColor: 'var(--color-swal-cancel)',
+                    confirmButtonText: 'Sim, gerar',
+                    cancelButtonText: 'Não, cancelar'
+                });
+
+                if (confirmResult.isConfirmed) {
+                    let secondResult = await callApi(true);
+                    if (secondResult.success) {
                         return true;
-                    }
-
-                    if (result.error === 'sem_horas') {
+                    } else {
                         await Swal.fire({
-                            title: 'Aviso',
-                            text: result.message || 'Não é possível gerar cronograma. Você não definiu suas horas disponíveis.',
-                            icon: 'warning',
+                            title: 'Erro',
+                            text: secondResult.message || 'Falha ao gerar cronograma.',
+                            icon: 'error',
                             confirmButtonColor: 'var(--color-swal-confirm)',
-                            confirmButtonText: 'Ok'
                         });
-                        return false;
                     }
+                }
+                return false;
+            }
 
-                    if (result.error === 'dia_zerado') {
-                        const confirmResult = await Swal.fire({
-                            title: 'Atenção',
-                            text: result.message || 'Você tem ao menos um dia com tempo zerado. Deseja gerar o cronograma mesmo assim?',
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: 'var(--color-swal-confirm)',
-                            cancelButtonColor: 'var(--color-swal-cancel)',
-                            confirmButtonText: 'Sim, gerar',
-                            cancelButtonText: 'Não, cancelar'
-                        });
+            // Default generic error
+            await Swal.fire({
+                title: 'Erro',
+                text: result.message || 'Falha ao gerar cronograma.',
+                icon: 'error',
+                confirmButtonColor: 'var(--color-swal-confirm)',
+            });
+            return false;
+        };
 
-                        if (confirmResult.isConfirmed) {
-                            let secondResult = await callApi(true);
-                            if (secondResult.success) {
-                                return true;
-                            } else {
-                                await Swal.fire({
-                                    title: 'Erro',
-                                    text: secondResult.message || 'Falha ao gerar cronograma.',
-                                    icon: 'error',
-                                    confirmButtonColor: 'var(--color-swal-confirm)',
-                                });
-                            }
+        // Global helper to prompt the user to generate a new cronograma using SweetAlert2
+        window.promptGerarCronograma = async function(title = 'Disponibilidade alterada!') {
+            const result = await Swal.fire({
+                title: title,
+                text: 'Deseja gerar um novo cronograma para aplicar as mudanças?',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--color-swal-confirm)',
+                cancelButtonColor: 'var(--color-swal-cancel)',
+                confirmButtonText: 'Sim, gerar novo',
+                cancelButtonText: 'Não, manter atual'
+            });
+
+            if (!result.isConfirmed) return false;
+
+            return await window.executarGeracaoCronograma();
+        };
+
+        // Legacy: if server flashed prompt_cronograma, trigger the prompt on load
+        @if (session('prompt_cronograma'))
+            document.addEventListener('DOMContentLoaded', () => {
+                window.promptGerarCronograma();
+            });
+        @endif
+
+        // Toggle sidebar responsiveness and collapsible behavior
+        function initSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar || sidebar.dataset.initialized === 'true') return;
+            sidebar.dataset.initialized = 'true';
+
+            const backdrop = document.getElementById('sidebar-backdrop');
+            const mobileToggle = document.getElementById('mobile-sidebar-toggle');
+
+            // Toggle mobile sidebar
+            function toggleMobile(open) {
+                if (open) {
+                    sidebar.classList.remove('sidebar-mobile-hidden');
+                    backdrop.classList.remove('hidden');
+                    // Force reflow for transitions
+                    backdrop.offsetHeight;
+                    backdrop.classList.remove('opacity-0');
+                    backdrop.classList.add('opacity-100');
+                    document.body.classList.add('overflow-hidden');
+                } else {
+                    sidebar.classList.add('sidebar-mobile-hidden');
+                    backdrop.classList.remove('opacity-100');
+                    backdrop.classList.add('opacity-0');
+                    document.body.classList.remove('overflow-hidden');
+                    setTimeout(() => {
+                        if (sidebar.classList.contains('sidebar-mobile-hidden')) {
+                            backdrop.classList.add('hidden');
                         }
-                        return false;
-                    }
+                    }, 300);
+                }
+            }
 
-                    // Default generic error
-                    await Swal.fire({
-                        title: 'Erro',
-                        text: result.message || 'Falha ao gerar cronograma.',
-                        icon: 'error',
-                        confirmButtonColor: 'var(--color-swal-confirm)',
-                    });
-                    return false;
-                };
+            // Event listeners
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', () => toggleMobile(true));
+            }
+            if (backdrop) {
+                backdrop.addEventListener('click', () => toggleMobile(false));
+            }
+        }
 
-                // Global helper to prompt the user to generate a new cronograma using SweetAlert2
-                window.promptGerarCronograma = async function(title = 'Disponibilidade alterada!') {
-                    const result = await Swal.fire({
-                        title: title,
-                        text: 'Deseja gerar um novo cronograma para aplicar as mudanças?',
-                        icon: 'info',
-                        showCancelButton: true,
-                        confirmButtonColor: 'var(--color-swal-confirm)',
-                        cancelButtonColor: 'var(--color-swal-cancel)',
-                        confirmButtonText: 'Sim, gerar novo',
-                        cancelButtonText: 'Não, manter atual'
-                    });
-
-                    if (!result.isConfirmed) return false;
-
-                    return await window.executarGeracaoCronograma();
-                };
-
-                // Legacy: if server flashed prompt_cronograma, trigger the prompt on load
-                @if (session('prompt_cronograma'))
-                    document.addEventListener('DOMContentLoaded', () => {
-                        window.promptGerarCronograma();
-                    });
-                @endif
-            </script>
+        // Initialize on load and on turbo visits
+        initSidebar();
+        if (!window.sidebarInitialized) {
+            window.sidebarInitialized = true;
+            document.addEventListener('turbo:load', initSidebar);
+        }
+    </script>
 </body>
 
 </html>
