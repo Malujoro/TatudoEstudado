@@ -164,7 +164,7 @@
                 </a>
             </nav>
 
-            <div class="px-6 py-5 border-t border-secondary-green">
+            <div class="px-6 pt-5 pb-16 md:pb-5 border-t border-secondary-green">
                 <div class="flex items-center justify-between gap-3">
                     <a href="{{ route('profile') }}" class="flex items-center gap-3 group">
                         <div class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/60 text-purple-deep">
