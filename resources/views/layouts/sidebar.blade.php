@@ -110,7 +110,7 @@
             </div>
         </aside>
 
-        <main class="flex-1 p-8 h-screen overflow-y-auto">
+        <main class="flex-1 px-8 pb-8 pt-0 h-screen overflow-y-auto">
             @yield('content')
         </main>
     </div>

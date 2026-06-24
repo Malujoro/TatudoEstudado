@@ -1,7 +1,7 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <div class="flex flex-col h-full">
+    <div class="flex flex-col h-full pt-8">
 
         {{-- Cabeçalho do usuário --}}
         <div class="shrink-0 pb-6 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">

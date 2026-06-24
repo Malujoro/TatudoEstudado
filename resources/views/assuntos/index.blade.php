@@ -1,7 +1,7 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <div class="flex flex-col h-full w-full">
+    <div class="flex flex-col h-full w-full pt-8">
 
         <!-- Header: Select Matéria e Barra de Pesquisa -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">

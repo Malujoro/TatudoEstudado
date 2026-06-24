@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="flex flex-col gap-8">
-        <div class="flex flex-col gap-4">
+        <div class="sticky top-0 z-20 -mx-8 px-8 pt-8 pb-4 bg-main-light border-b border-purple-dim/10 flex flex-col gap-4">
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
                     <h2 class="font-rem text-[22px] font-bold text-main-dark">Metas da semana</h2>
