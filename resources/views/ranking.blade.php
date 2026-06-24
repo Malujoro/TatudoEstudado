@@ -1,7 +1,7 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <div class="flex flex-col gap-8">
+    <div class="flex flex-col gap-8 pt-8">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div>
                 <h2 class="font-rem text-[22px] font-bold text-main-dark">Ranking de Sequências</h2>
