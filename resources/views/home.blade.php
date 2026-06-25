@@ -253,12 +253,30 @@
                 container.style.top = `${top}px`;
                 container.style.left = `${left}px`;
                 container.style.bottom = 'auto';
+
+                // Ocultar suavemente o tatu se o card entrar atrás do cabeçalho fixo (quando mais da metade do card sumir)
+                const header = document.querySelector('.sticky.top-0');
+                if (header) {
+                    const rectHeader = header.getBoundingClientRect();
+                    const cardCenter = rectCard.top + (rectCard.height / 2);
+                    if (cardCenter < rectHeader.bottom) {
+                        container.style.opacity = '0';
+                        container.style.pointerEvents = 'none';
+                    } else {
+                        container.style.opacity = '1';
+                    }
+                }
             }
             
             // Usa DOMContentLoaded para garantir que o HTML foi carregado antes de executar
             document.addEventListener('DOMContentLoaded', posicionarTatu);
+            document.addEventListener('turbo:load', posicionarTatu);
             window.addEventListener('resize', posicionarTatu);
-            window.addEventListener('scroll', posicionarTatu);
+            window.addEventListener('scroll', posicionarTatu, true);
+
+            // Garantir posicionamento após carregamento do vídeo
+            vid.addEventListener('loadedmetadata', posicionarTatu);
+            vid.addEventListener('canplay', posicionarTatu);
         })();
     </script>
     
