@@ -50,7 +50,14 @@
         @else
             <div class="flex flex-col gap-6">
                 @foreach ($dias as $dia)
-                    <div class="rounded-[26px] border-2 border-purple bg-purple-lightest px-6 py-4 shadow-sm">
+                    @php
+                        $ehHoje = \Carbon\Carbon::parse($dia['data'])->isToday();
+                    @endphp
+
+                    <div
+                        class="rounded-[26px] border-2 border-purple bg-purple-lightest px-6 py-4 shadow-sm"
+                        @if($ehHoje) data-dia-atual @endif
+                    >
                         <div class="flex flex-col gap-4">
                             <div>
                                 <span
@@ -200,4 +207,77 @@
             });
         })();
     </script>
+
+<div id="home-container-tatu" class="fixed z-50 pointer-events-none transition-all duration-700" style="bottom: 0; left: 0;">
+        <video
+            id="home-vid-animacao"
+            autoplay
+            muted
+            playsinline
+            class="w-32 md:w-80 mix-blend-multiply">
+            <source src="{{ asset('videos/tatu_aponta.webm') }}" type="video/webm">
+        </video>
+    </div>
+
+    <script>
+        (function () {
+            const vid = document.getElementById('home-vid-animacao');
+            const container = document.getElementById('home-container-tatu');
+            const delayMs = 3000; // delay em ms entre repetições
+
+            vid.addEventListener('ended', () => {
+                setTimeout(() => {
+                    vid.currentTime = 0;
+                    vid.play();
+                }, delayMs);
+            });
+
+            function posicionarTatu() {
+                const cardHoje = document.querySelector('[data-dia-atual]');
+                if (!cardHoje) {
+                    container.style.display = 'none'; // Esconde se não achar o card
+                    return;
+                }
+
+                container.style.display = 'block'; // Garante que está visível
+
+                const rectCard = cardHoje.getBoundingClientRect();
+                const rectTatu = container.getBoundingClientRect();
+
+                // Alinha verticalmente ao centro do card
+                const top = (rectCard.top + (rectCard.height / 2) - (rectTatu.height / 2)) - 63;
+
+                // Posiciona o tatu à esquerda do card (fora dele)
+                const left = Math.max(8, rectCard.left - rectTatu.width) + 157;
+
+                container.style.top = `${top}px`;
+                container.style.left = `${left}px`;
+                container.style.bottom = 'auto';
+
+                // Ocultar suavemente o tatu se o card entrar atrás do cabeçalho fixo (quando mais da metade do card sumir)
+                const header = document.querySelector('.sticky.top-0');
+                if (header) {
+                    const rectHeader = header.getBoundingClientRect();
+                    const cardCenter = rectCard.top + (rectCard.height / 2);
+                    if (cardCenter < rectHeader.bottom) {
+                        container.style.opacity = '0';
+                        container.style.pointerEvents = 'none';
+                    } else {
+                        container.style.opacity = '1';
+                    }
+                }
+            }
+            
+            // Usa DOMContentLoaded para garantir que o HTML foi carregado antes de executar
+            document.addEventListener('DOMContentLoaded', posicionarTatu);
+            document.addEventListener('turbo:load', posicionarTatu);
+            window.addEventListener('resize', posicionarTatu);
+            window.addEventListener('scroll', posicionarTatu, true);
+
+            // Garantir posicionamento após carregamento do vídeo
+            vid.addEventListener('loadedmetadata', posicionarTatu);
+            vid.addEventListener('canplay', posicionarTatu);
+        })();
+    </script>
+    
 @endsection
