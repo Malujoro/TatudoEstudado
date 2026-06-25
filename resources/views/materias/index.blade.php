@@ -1,7 +1,7 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <div class="flex flex-col h-full w-full">
+    <div class="flex flex-col h-full w-full pt-8">
 
         <!-- Header: Botão Adicionar e Barra de Pesquisa -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
@@ -83,12 +83,7 @@
                         }
                     });
                     if (response.ok) {
-                        await Swal.fire({
-                            title: 'Sucesso!',
-                            text: 'Matéria excluída com sucesso.',
-                            icon: 'success',
-                            confirmButtonColor: 'var(--color-swal-confirm)'
-                        });
+                        await window.promptGerarCronograma('Matéria excluída com sucesso!');
                         atualizarTela();
                     }
                 } catch (error) {
@@ -154,10 +149,27 @@
             // Abrir edição
             document.querySelectorAll('.btn-edit-materia').forEach(btn => {
                 btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+
                     const wrapper = e.target.closest('.materia-card-wrapper');
                     const id = wrapper.dataset.id;
                     const currentName = wrapper.querySelector('h2').innerText;
+
                     openModal(id, currentName);
+                });
+            });
+
+            // Clicar no card abre os assuntos da matéria (exceto nos botões)
+            document.querySelectorAll('.materia-card-wrapper').forEach(wrapper => {
+                wrapper.style.cursor = 'pointer';
+
+                wrapper.addEventListener('click', (e) => {
+                    if (e.target.closest('.btn-edit-materia')) return;
+                    if (e.target.closest('.btn-delete-materia')) return;
+
+                    const materiaId = wrapper.dataset.id;
+
+                    window.location.href = `/assuntos?materia_id=${materiaId}`;
                 });
             });
 

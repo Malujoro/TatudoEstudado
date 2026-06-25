@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TipoSessao;
 use App\Http\Requests\StoreSessaoEstudoRequest;
 use App\Http\Requests\UpdateSessaoEstudoRequest;
 use App\Models\Assunto;
@@ -106,11 +107,40 @@ class SessaoEstudoController extends Controller
      */
     public function gerarCronograma(Request $request, CronogramaService $cronogramaService): JsonResponse
     {
+        $user = $request->user();
+        $horario = $user->horario_semanal ?? [];
+
+        $diasSemanais = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+        $somaHoras = 0;
+        $temDiaZerado = false;
+
+        foreach ($diasSemanais as $dia) {
+            $horasDia = floatval($horario[$dia] ?? 0);
+            $somaHoras += $horasDia;
+            if ($horasDia <= 0) {
+                $temDiaZerado = true;
+            }
+        }
+
+        if ($somaHoras <= 0) {
+            return response()->json([
+                'error' => 'sem_horas',
+                'message' => 'Não é possível gerar cronograma. Você não definiu suas horas disponíveis.',
+            ], 422);
+        }
+
+        if ($temDiaZerado && ! $request->boolean('ignorar_zerado', false) && ! $request->input('ignorar_zerado')) {
+            return response()->json([
+                'error' => 'dia_zerado',
+                'message' => 'Você tem ao menos um dia com tempo zerado. Deseja gerar o cronograma mesmo assim?',
+            ], 422);
+        }
+
         $inicio = $request->query('inicio');
         $limpar = $request->boolean('limpar', true);
 
         $resultado = $cronogramaService->gerar(
-            $request->user(),
+            $user,
             $inicio ? Carbon::parse($inicio) : null,
             15,
             $limpar
@@ -137,7 +167,7 @@ class SessaoEstudoController extends Controller
             );
         }
 
-        if ($sessaoEstudo->tipo === 'exercicio') {
+        if ($sessaoEstudo->tipo === TipoSessao::Exercicios) {
             $questoes = $data['questoes'] ?? null;
             $acertos = $data['acertos'] ?? null;
 
@@ -165,13 +195,9 @@ class SessaoEstudoController extends Controller
             $metrica->save();
         }
 
-        if ($sessaoEstudo->tipo === 'teoria') {
-            // Only mark the assunto as "teoria_finalizada" when the client
-            // explicitly requests it (payload boolean `excluir_teoria`).
-            if ($request->boolean('excluir_teoria', false)) {
-                $sessaoEstudo->assunto->teoria_finalizada = true;
-                $sessaoEstudo->assunto->save();
-            }
+        if ($sessaoEstudo->tipo === TipoSessao::Teoria) {
+            $sessaoEstudo->assunto->teoria_finalizada = true;
+            $sessaoEstudo->assunto->save();
         }
 
         $sessaoEstudo->finalizado = true;

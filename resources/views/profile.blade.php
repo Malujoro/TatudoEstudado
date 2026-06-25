@@ -1,10 +1,10 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <div class="flex flex-col gap-8">
+    <div class="flex flex-col h-full pt-8">
 
         {{-- Cabeçalho do usuário --}}
-        <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div class="shrink-0 pb-6 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div class="flex items-center gap-4">
                 <div class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-purple-light text-purple-deep">
                     @if ($user->photo_url)
@@ -35,190 +35,193 @@
             </div>
         </div>
 
+        <div class="flex-1 overflow-y-auto flex flex-col gap-8 pr-1">
+
         <x-validation-errors />
 
-        @if (session('status'))
-            <div class="rounded-2xl border border-purple-dim/30 bg-white/60 px-4 py-3 text-sm text-purple-night">
-                {{ session('status') }}
-            </div>
-        @endif
+            @if (session('status'))
+                <div class="rounded-2xl border border-purple-dim/30 bg-white/60 px-4 py-3 text-sm text-purple-night">
+                    {{ session('status') }}
+                </div>
+            @endif
 
-        {{-- Grid de dois containers --}}
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-15">
+            {{-- Grid de dois containers --}}
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-15">
 
-            {{-- Espaço em branco --}}
-            <div class="hidden lg:block"></div>
+                {{-- Espaço em branco --}}
+                <div class="hidden lg:block"></div>
 
-            {{-- Container: Tempo de estudo por dia --}}
-            <div class="flex flex-col gap-3 lg:col-span-5">
-                <p class="font-rem text-xs font-bold uppercase tracking-[0.18em] text-purple-muted">
-                    Tempo de estudo por dia
-                </p>
+                {{-- Container: Tempo de estudo por dia --}}
+                <div class="flex flex-col gap-3 lg:col-span-5">
+                    <p class="font-rem text-xs font-bold uppercase tracking-[0.18em] text-purple-muted">
+                        Tempo de estudo por dia
+                    </p>
 
-                <form action="{{ route('profile.update') }}" method="POST" class="rounded-3xl bg-purple-light px-5 py-5">
-                    @csrf
+                    <form action="{{ route('profile.update') }}" method="POST" class="rounded-3xl bg-purple-light px-5 py-5">
+                        @csrf
 
-                    <div class="flex flex-col gap-2" data-study-hours>
+                        <div class="flex flex-col gap-2" data-study-hours>
 
-                        @php
-                            $horario = $user->horario_semanal ?? [
-                                'domingo' => 0, 'segunda' => 0, 'terca'  => 0,
-                                'quarta'  => 0, 'quinta'  => 0, 'sexta'  => 0, 'sabado' => 0,
-                            ];
-                            $dias = [
-                                'domingo' => 'Dom', 'segunda' => 'Seg', 'terca' => 'Ter',
-                                'quarta'  => 'Qua', 'quinta'  => 'Qui', 'sexta' => 'Sex', 'sabado' => 'Sáb',
-                            ];
-                        @endphp
+                            @php
+                                $horario = $user->horario_semanal ?? [
+                                    'domingo' => 0, 'segunda' => 0, 'terca'  => 0,
+                                    'quarta'  => 0, 'quinta'  => 0, 'sexta'  => 0, 'sabado' => 0,
+                                ];
+                                $dias = [
+                                    'domingo' => 'Dom', 'segunda' => 'Seg', 'terca' => 'Ter',
+                                    'quarta'  => 'Qua', 'quinta'  => 'Qui', 'sexta' => 'Sex', 'sabado' => 'Sáb',
+                                ];
+                            @endphp
 
-                        <div class="flex flex-col gap-1.5">
-                            @foreach ($dias as $key => $label)
-                                @php
-                                    $valorDecimal  = old('horario_semanal.' . $key, $horario[$key] ?? 0);
-                                    $minutosTotais = (int) round($valorDecimal * 60);
-                                    $horas         = intdiv($minutosTotais, 60);
-                                    $minutos       = $minutosTotais % 60;
-                                @endphp
-                                <div class="inline-flex items-center gap-2 rounded-2xl bg-white/40 px-4 py-2.5" data-day-row>
-                                    <span class="w-8 font-rem text-xs font-bold uppercase tracking-wide text-purple-night">{{ $label }}</span>
-                                    <div class="flex items-center gap-1">
-                                        <input type="number" min="0" max="24" inputmode="numeric"
-                                            placeholder="0" value="{{ $horas }}" data-hours-input
-                                            style="width: 3rem;"
-                                            class="rounded-xl border border-purple-dim/30 bg-white px-2 py-2 text-center text-sm text-purple-night outline-none focus:border-purple focus:ring-1 focus:ring-purple" />
-                                        <span class="text-xs font-semibold text-purple-night/70">h</span>
+                            <div class="flex flex-col gap-1.5">
+                                @foreach ($dias as $key => $label)
+                                    @php
+                                        $valorDecimal  = old('horario_semanal.' . $key, $horario[$key] ?? 0);
+                                        $minutosTotais = (int) round($valorDecimal * 60);
+                                        $horas         = intdiv($minutosTotais, 60);
+                                        $minutos       = $minutosTotais % 60;
+                                    @endphp
+                                    <div class="inline-flex items-center gap-2 rounded-2xl bg-white/40 px-4 py-2.5" data-day-row>
+                                        <span class="w-8 font-rem text-xs font-bold uppercase tracking-wide text-purple-night">{{ $label }}</span>
+                                        <div class="flex items-center gap-1">
+                                            <input type="number" min="0" max="24" inputmode="numeric"
+                                                placeholder="0" value="{{ $horas }}" data-hours-input
+                                                style="width: 3rem;"
+                                                class="rounded-xl border border-purple-dim/30 bg-white px-2 py-2 text-center text-sm text-purple-night outline-none focus:border-purple focus:ring-1 focus:ring-purple" />
+                                            <span class="text-xs font-semibold text-purple-night/70">h</span>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <select data-minutes-input
+                                                class="w-16 rounded-xl border border-purple-dim/30 bg-white px-2 py-2 text-sm text-purple-night outline-none focus:border-purple focus:ring-1 focus:ring-purple">
+                                                <option value="0"  @selected($minutos == 0) >00</option>
+                                                <option value="15" @selected($minutos == 15)>15</option>
+                                                <option value="30" @selected($minutos == 30)>30</option>
+                                                <option value="45" @selected($minutos == 45)>45</option>
+                                            </select>
+                                            <span class="text-xs font-semibold text-purple-night/70">m</span>
+                                        </div>
+                                        <input type="hidden" name="horario_semanal[{{ $key }}]"
+                                            value="{{ $valorDecimal }}" data-hidden-input />
                                     </div>
-                                    <div class="flex items-center gap-1">
-                                        <select data-minutes-input
-                                            class="w-16 rounded-xl border border-purple-dim/30 bg-white px-2 py-2 text-sm text-purple-night outline-none focus:border-purple focus:ring-1 focus:ring-purple">
-                                            <option value="0"  @selected($minutos == 0) >00</option>
-                                            <option value="15" @selected($minutos == 15)>15</option>
-                                            <option value="30" @selected($minutos == 30)>30</option>
-                                            <option value="45" @selected($minutos == 45)>45</option>
-                                        </select>
-                                        <span class="text-xs font-semibold text-purple-night/70">m</span>
-                                    </div>
-                                    <input type="hidden" name="horario_semanal[{{ $key }}]"
-                                        value="{{ $valorDecimal }}" data-hidden-input />
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
+
+                            <div class="flex items-center justify-between rounded-2xl bg-white/40 px-4 py-2.5">
+                                <p class="text-xs text-purple-night/70">
+                                    Total: <span class="font-bold text-purple-night" data-week-total>0h</span>
+                                </p>
+                                <p class="text-xs text-purple-night/70">
+                                    Média/dia: <span class="font-bold text-purple-night" data-day-avg>0h</span>
+                                </p>
+                            </div>
                         </div>
 
-                        <div class="flex items-center justify-between rounded-2xl bg-white/40 px-4 py-2.5">
-                            <p class="text-xs text-purple-night/70">
-                                Total: <span class="font-bold text-purple-night" data-week-total>0h</span>
-                            </p>
-                            <p class="text-xs text-purple-night/70">
-                                Média/dia: <span class="font-bold text-purple-night" data-day-avg>0h</span>
-                            </p>
+                        <div class="mt-4">
+                            <button type="submit"
+                                class="w-full rounded-full bg-purple px-6 py-2.5 text-sm font-bold text-white transition hover:opacity-90">
+                                Salvar horários
+                            </button>
                         </div>
-                    </div>
+                    </form>
+                </div>
 
-                    <div class="mt-4">
-                        <button type="submit"
-                            class="w-full rounded-full bg-purple px-6 py-2.5 text-sm font-bold text-white transition hover:opacity-90">
-                            Salvar horários
-                        </button>
-                    </div>
-                </form>
-            </div>
+                {{-- Espaço em branco --}}
+                <div class="hidden lg:block"></div>
 
-            {{-- Espaço em branco --}}
-            <div class="hidden lg:block"></div>
+                {{-- Container: Matérias com métricas --}}
+                <div class="flex flex-col gap-3 lg:col-span-7">
+                    <p class="font-rem text-xs font-bold uppercase tracking-[0.18em] text-purple-muted">
+                        Matérias
+                    </p>
 
-            {{-- Container: Matérias com métricas --}}
-            <div class="flex flex-col gap-3 lg:col-span-7">
-                <p class="font-rem text-xs font-bold uppercase tracking-[0.18em] text-purple-muted">
-                    Matérias
-                </p>
+                    <div class="rounded-3xl bg-purple px-6 py-6">
+                        <div class="flex flex-col gap-3">
+                            @forelse($materias as $materia)
+                                <div class="flex flex-col gap-2 rounded-2xl bg-white/40 px-4 py-3"
+                                    data-materia-id="{{ $materia->id }}"
+                                    data-materia-tipos="{{ json_encode($materia->tipos) }}"
+                                    data-materia-nome="{{ $materia->nome }}">
 
-                <div class="rounded-3xl bg-purple px-6 py-6">
-                    <div class="flex flex-col gap-3">
-                        @forelse($materias as $materia)
-                            <div class="flex flex-col gap-2 rounded-2xl bg-white/40 px-4 py-3"
-                                 data-materia-id="{{ $materia->id }}"
-                                 data-materia-tipos="{{ json_encode($materia->tipos) }}"
-                                 data-materia-nome="{{ $materia->nome }}">
-
-                                {{-- Nome + contagem de assuntos --}}
-                                <div class="flex items-center justify-between">
-                                    <span class="font-rem text-sm font-bold uppercase tracking-wide text-purple-deep">
-                                        {{ $materia->nome }}
-                                    </span>
-                                    <span class="rounded-full bg-white/60 px-3 py-1 text-xs font-semibold text-purple-night">
-                                        {{ $materia->assuntos_count }} {{ str('assunto')->plural($materia->assuntos_count) }}
-                                    </span>
-                                </div>
-
-                                {{-- Métricas --}}
-                                <div class="grid grid-cols-3 gap-2">
-
-                                    {{-- Horas estudadas --}}
-                                    <div class="flex flex-col items-center rounded-xl bg-white/50 px-2 py-2 text-center">
-                                        <span class="text-lg font-bold leading-none text-purple-deep">
-                                            {{ $materia->horas_total > 0 ? $materia->horas_total . 'h' : '—' }}
+                                    {{-- Nome + contagem de assuntos --}}
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-rem text-sm font-bold uppercase tracking-wide text-purple-deep">
+                                            {{ $materia->nome }}
                                         </span>
-                                        <span class="mt-1 text-[10px] font-medium uppercase tracking-wide text-purple-night/60">
-                                            Horas
+                                        <span class="rounded-full bg-white/60 px-3 py-1 text-xs font-semibold text-purple-night">
+                                            {{ $materia->assuntos_count }} {{ str('assunto')->plural($materia->assuntos_count) }}
                                         </span>
                                     </div>
 
-                                    {{-- Taxa de acerto --}}
-                                    <div class="flex flex-col items-center rounded-xl bg-white/50 px-2 py-2 text-center">
-                                        @if ($materia->taxa_acerto !== null)
-                                            <span class="text-lg font-bold leading-none {{ $materia->taxa_acerto >= 70 ? 'text-green-600' : ($materia->taxa_acerto >= 50 ? 'text-yellow-600' : 'text-red-500') }}">
-                                                {{ $materia->taxa_acerto }}%
+                                    {{-- Métricas --}}
+                                    <div class="grid grid-cols-3 gap-2">
+
+                                        {{-- Horas estudadas --}}
+                                        <div class="flex flex-col items-center rounded-xl bg-white/50 px-2 py-2 text-center">
+                                            <span class="text-lg font-bold leading-none text-purple-deep">
+                                                {{ $materia->horas_total > 0 ? $materia->horas_total . 'h' : '—' }}
                                             </span>
-                                        @else
-                                            <span class="text-lg font-bold leading-none text-purple-night/30">—</span>
-                                        @endif
-                                        <span class="mt-1 text-[10px] font-medium uppercase tracking-wide text-purple-night/60">
-                                            Acertos
-                                        </span>
-                                    </div>
+                                            <span class="mt-1 text-[10px] font-medium uppercase tracking-wide text-purple-night/60">
+                                                Horas
+                                            </span>
+                                        </div>
 
-                                    {{-- Tipo mais estudado --}}
-                                    <div class="flex flex-col items-center rounded-xl bg-white/50 px-2 py-2 text-center">
-                                        @if ($materia->tipo_mais)
-                                            @php $tm = $materia->tipo_mais; @endphp
-                                            <div class="flex items-center gap-1">
-                                                <span class="rounded-full px-2 py-0.5 text-[11px] font-bold {{ $tm->cor() }}">
-                                                    {{ $tm->letra() }} {{ $materia->tipos[$tm->value] }}x
+                                        {{-- Taxa de acerto --}}
+                                        <div class="flex flex-col items-center rounded-xl bg-white/50 px-2 py-2 text-center">
+                                            @if ($materia->taxa_acerto !== null)
+                                                <span class="text-lg font-bold leading-none {{ $materia->taxa_acerto >= 70 ? 'text-green-600' : ($materia->taxa_acerto >= 50 ? 'text-yellow-600' : 'text-red-500') }}">
+                                                    {{ $materia->taxa_acerto }}%
                                                 </span>
-                                                <button type="button"
-                                                    class="text-purple-night/40 hover:text-purple-night transition"
-                                                    onclick="abrirTipos('{{ $materia->id }}')">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none"
-                                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        @else
-                                            <span class="text-lg font-bold leading-none text-purple-night/30">—</span>
-                                        @endif
-                                        <span class="mt-1 text-[10px] font-medium uppercase tracking-wide text-purple-night/60">
-                                            Tipo
-                                        </span>
-                                    </div>
+                                            @else
+                                                <span class="text-lg font-bold leading-none text-purple-night/30">—</span>
+                                            @endif
+                                            <span class="mt-1 text-[10px] font-medium uppercase tracking-wide text-purple-night/60">
+                                                Acertos
+                                            </span>
+                                        </div>
 
+                                        {{-- Tipo mais estudado --}}
+                                        <div class="flex flex-col items-center rounded-xl bg-white/50 px-2 py-2 text-center">
+                                            @if ($materia->tipo_mais)
+                                                @php $tm = $materia->tipo_mais; @endphp
+                                                <div class="flex items-center gap-1">
+                                                    <span class="rounded-full px-2 py-0.5 text-[11px] font-bold {{ $tm->cor() }}">
+                                                        {{ $tm->letra() }} {{ $materia->tipos[$tm->value] }}x
+                                                    </span>
+                                                    <button type="button"
+                                                        class="text-purple-night/40 hover:text-purple-night transition"
+                                                        onclick="abrirTipos('{{ $materia->id }}')">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none"
+                                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            @else
+                                                <span class="text-lg font-bold leading-none text-purple-night/30">—</span>
+                                            @endif
+                                            <span class="mt-1 text-[10px] font-medium uppercase tracking-wide text-purple-night/60">
+                                                Tipo
+                                            </span>
+                                        </div>
+
+                                    </div>
                                 </div>
-                            </div>
-                        @empty
-                            <div class="rounded-full bg-white/30 px-4 py-2 text-center">
-                                <span class="font-rem text-sm font-medium text-purple-night/70">
-                                    Nenhuma matéria cadastrada
-                                </span>
-                            </div>
-                        @endforelse
+                            @empty
+                                <div class="rounded-full bg-white/30 px-4 py-2 text-center">
+                                    <span class="font-rem text-sm font-medium text-purple-night/70">
+                                        Nenhuma matéria cadastrada
+                                    </span>
+                                </div>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
+
+                {{-- Espaço em branco --}}
+                <div class="hidden lg:block"></div>
+
             </div>
-
-            {{-- Espaço em branco --}}
-            <div class="hidden lg:block"></div>
-
         </div>
     </div>
 
