@@ -507,4 +507,30 @@
             });
         })();
     </script>
+
+  <div class="fixed bottom-170 left-250 z-50" id="profile-container-tatu">
+        <video
+            id="profile-vid-animacao"
+            autoplay
+            muted
+            playsinline
+            class="w-32 md:w-130 mix-blend-multiply">
+            <!-- <source src="{{ asset('videos/tatu_esquerda.mp4') }}" type="video/mp4"> -->
+            <source src="{{ asset('videos/tatu_rede.webm') }}" type="video/webm">
+        </video>
+    </div>
+
+    <script>
+        (function () {
+            const vid = document.getElementById('profile-vid-animacao');
+
+            vid.addEventListener('ended', () => {
+                setTimeout(() => {
+                    vid.currentTime = 0;
+                    vid.play();
+                });
+            });
+        })();
+    </script>
+
 @endsection
