@@ -6,7 +6,10 @@
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center gap-4">
                     <h2 class="font-rem text-[22px] font-bold text-main-dark">Metas da semana</h2>
-                    <x-button type="button" data-generate-cronograma>
+                    @php
+                        $hasHours = array_sum(auth()->user()->horario_semanal ?? []) > 0;
+                    @endphp
+                    <x-button type="button" data-generate-cronograma data-has-hours="{{ $hasHours ? 'true' : 'false' }}">
                         Gerar metas da semana
                         <span
                             class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/70 text-purple-dark">
