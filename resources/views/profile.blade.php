@@ -1,7 +1,7 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <div class="flex flex-col h-full pt-8">
+    <div class="flex flex-col h-full pt-8 relative">
 
         {{-- Cabeçalho do usuário --}}
         <div class="shrink-0 pb-6 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
@@ -214,6 +214,19 @@
                                     </span>
                                 </div>
                             @endforelse
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center w-full -mt-3 pointer-events-none" id="profile-container-tatu">
+                        <div class="w-3/4 min-w-[90px]">
+                            <video
+                                id="profile-vid-animacao"
+                                autoplay
+                                muted
+                                playsinline
+                                class="w-full h-auto mix-blend-multiply block">
+                                <source src="{{ asset('videos/tatu_rede.webm') }}" type="video/webm">
+                            </video>
                         </div>
                     </div>
                 </div>
@@ -511,17 +524,7 @@
         })();
     </script>
 
-  <div class="fixed bottom-170 left-250 z-50" id="profile-container-tatu">
-        <video
-            id="profile-vid-animacao"
-            autoplay
-            muted
-            playsinline
-            class="w-32 md:w-130 mix-blend-multiply">
-            <!-- <source src="{{ asset('videos/tatu_esquerda.mp4') }}" type="video/mp4"> -->
-            <source src="{{ asset('videos/tatu_rede.webm') }}" type="video/webm">
-        </video>
-    </div>
+
 
     <script>
         (function () {
